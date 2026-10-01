@@ -105,10 +105,37 @@ app.get('/', (req, res) => {
 });
 
 // -----------------------
-// 404 Handler
+// 404 Handler (Custom HTML 404 Page for WooRank + JSON for API)
 // -----------------------
 app.use((req, res) => {
-  res.status(404).json({ error: 'Route not found' });
+  if (req.accepts('html')) {
+    res.status(404).send(`
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>404 - Page Not Found | Fresh Hot Bread</title>
+        <style>
+          body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; padding: 60px 20px; background-color: #FFFEF9; color: #2C2C2C; }
+          h1 { font-size: 72px; color: #960909; margin: 0; }
+          h2 { font-size: 24px; margin-top: 10px; color: #2C2C2C; }
+          p { color: #666; font-size: 16px; margin-bottom: 30px; }
+          a { display: inline-block; background-color: #960909; color: #ffffff; padding: 12px 28px; text-decoration: none; border-radius: 8px; font-weight: bold; }
+          a:hover { background-color: #6B0707; }
+        </style>
+      </head>
+      <body>
+        <h1>404</h1>
+        <h2>Oops! Page Not Found</h2>
+        <p>The page you are looking for might have been removed or is temporarily unavailable.</p>
+        <a href="/">Back to Homepage</a>
+      </body>
+      </html>
+    `);
+  } else {
+    res.status(404).json({ error: 'Route not found' });
+  }
 });
 
 // -----------------------
