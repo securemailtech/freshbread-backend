@@ -1,8 +1,15 @@
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
+const fs = require('fs'); 
 const bcrypt = require('bcryptjs');
 
-const dbPath = path.join(__dirname, '../database/freshbread.db');
+
+const dbDir = path.join(__dirname, '../database');
+if (!fs.existsSync(dbDir)) {
+  fs.mkdirSync(dbDir, { recursive: true });
+}
+
+const dbPath = process.env.DB_PATH || path.join(dbDir, 'freshbread.db');
 
 let db;
 
