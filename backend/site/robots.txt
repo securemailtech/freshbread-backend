@@ -1,0 +1,89 @@
+# robots.txt
+
+User-agent: *
+Allow: /
+
+# OpenAI
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+# Anthropic
+User-agent: ClaudeBot
+Allow: /
+
+# Google AI
+User-agent: Google-Extended
+Allow: /
+
+# Microsoft Bing AI / Copilot
+User-agent: Bingbot
+Allow: /
+
+# Perplexity
+User-agent: PerplexityBot
+Allow: /
+
+# You.com
+User-agent: YouBot
+Allow: /
+
+# Amazon
+User-agent: Amazonbot
+Allow: /
+
+# Apple
+User-agent: Applebot
+Allow: /
+
+# Meta
+User-agent: Meta-ExternalAgent
+Allow: /
+
+User-agent: Meta-ExternalFetcher
+Allow: /
+
+# ByteDance
+User-agent: Bytespider
+Allow: /
+
+# CommonCrawl
+User-agent: CCBot
+Allow: /
+
+# DuckDuckGo
+User-agent: DuckDuckBot
+Allow: /
+
+# Ahrefs
+User-agent: AhrefsBot
+Allow: /
+# Semrush
+User-agent: SemrushBot
+Allow: /
+
+# Mojeek
+User-agent: MojeekBot
+Allow: /
+
+Disallow: *?lightbox=
+
+# Optimization for Google Ads Bot
+User-agent: AdsBot-Google-Mobile
+User-agent: AdsBot-Google
+Disallow: /_partials*
+Disallow: /pro-gallery-webapp/v1/galleries/*
+
+# Block PetalBot
+User-agent: PetalBot
+Disallow: /
+
+# Crawl delay for overly enthusiastic bots
+User-agent: dotbot
+Crawl-delay: 10
+User-agent: AhrefsBot
+Crawl-delay: 10
+
+Sitemap: 

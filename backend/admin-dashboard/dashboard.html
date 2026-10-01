@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard | Fresh Hot Bread</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="dashboard-page">
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+   <div class="sidebar-header">
+  <div class="sidebar-logo">
+    <img src="/images/logo.jpg" alt="Logo" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+  </div>
+  <div class="sidebar-brand">
+    <span>Fresh Hot</span>
+    <strong>Bread</strong>
+  </div>
+</div>
+    
+    <nav class="sidebar-nav">
+      <a href="#" class="nav-item active" data-section="overview">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+          <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+        </svg>
+        <span>Overview</span>
+      </a>
+      <a href="#" class="nav-item" data-section="orders">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+          <line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>
+        </svg>
+        <span>Orders</span>
+        <span class="nav-badge" id="pending-badge">0</span>
+      </a>
+      <a href="#" class="nav-item" data-section="revenue">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+        </svg>
+        <span>Revenue</span>
+      </a>
+      <a href="#" class="nav-item" data-section="images">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+          <circle cx="8.5" cy="8.5" r="1.5"/>
+          <polyline points="21 15 16 10 5 21"/>
+        </svg>
+        <span>Images</span>
+      </a>
+      <a href="#" class="nav-item" data-section="content">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+        </svg>
+        <span>Edit Content</span>
+      </a>
+      <a href="#" class="nav-item" data-section="special">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+        </svg>
+        <span>Special Offer</span>
+      </a>
+      <a href="#" class="nav-item" data-section="contact">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72"/>
+        </svg>
+        <span>Contact Info</span>
+      </a>
+    </nav>
+    
+    <div class="sidebar-footer">
+      <a href="https://freshhotbreadallday.onrender.com" class="view-site-btn" target="_blank">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+          <polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+        </svg>
+        View Website
+      </a>
+      <button class="logout-btn" id="logout-btn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+        Logout
+      </button>
+    </div>
+  </aside>
+  
+  <!-- Mobile Header -->
+  <header class="mobile-header">
+    <button class="menu-toggle" id="menu-toggle">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
+    <span class="mobile-title">Dashboard</span>
+    <button class="sound-toggle" id="sound-toggle" title="Toggle order notifications">
+      <svg class="sound-on" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+        <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>
+      </svg>
+      <svg class="sound-off" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;">
+        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+        <line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>
+      </svg>
+    </button>
+  </header>
+  
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Overview Section -->
+    <section class="content-section active" id="section-overview">
+      <div class="section-header">
+        <div class="section-header-top">
+          <div>
+            <h1>Dashboard Overview</h1>
+            <p>Welcome back! Here's what's happening today.</p>
+          </div>
+          <button class="sound-toggle-desktop" id="sound-toggle-desktop" title="Toggle order notifications">
+            <svg class="sound-on" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+              <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>
+            </svg>
+            <svg class="sound-off" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+              <line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>
+            </svg>
+            <span class="sound-label">Sound On</span>
+          </button>
+        </div>
+      </div>
+      
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon orders-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+            </svg>
+          </div>
+          <div class="stat-content">
+            <span class="stat-label">Today's Orders</span>
+            <span class="stat-value" id="stat-today-orders">0</span>
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-icon revenue-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+            </svg>
+          </div>
+          <div class="stat-content">
+            <span class="stat-label">Today's Revenue</span>
+            <span class="stat-value" id="stat-today-revenue">$0</span>
+          </div>
+        </div>
+        
+        <div class="stat-card highlight-card">
+          <div class="stat-icon pending-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+            </svg>
+          </div>
+          <div class="stat-content">
+            <span class="stat-label">Pending Orders</span>
+            <span class="stat-value" id="stat-pending">0</span>
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-icon total-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+            </svg>
+          </div>
+          <div class="stat-content">
+            <span class="stat-label">Total Revenue</span>
+            <span class="stat-value" id="stat-total-revenue">$0</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="recent-orders-card">
+        <div class="card-header">
+          <h2>Recent Orders</h2>
+          <button class="link-btn" data-goto="orders">View All →</button>
+        </div>
+        <div id="recent-orders-list" class="orders-list">
+          <p class="empty-state">Loading orders...</p>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Orders Section -->
+    <section class="content-section" id="section-orders">
+      <div class="section-header">
+        <h1>Order Management</h1>
+        <p>View and manage all customer orders</p>
+      </div>
+      
+      <div class="orders-toolbar">
+        <div class="orders-filters">
+          <button class="filter-btn active" data-filter="all">All</button>
+          <button class="filter-btn" data-filter="pending">
+            <span class="filter-dot pending"></span> Pending
+          </button>
+          <button class="filter-btn" data-filter="confirmed">
+            <span class="filter-dot confirmed"></span> Confirmed
+          </button>
+          <button class="filter-btn" data-filter="completed">
+            <span class="filter-dot completed"></span> Completed
+          </button>
+          <button class="filter-btn" data-filter="cancelled">
+            <span class="filter-dot cancelled"></span> Cancelled
+          </button>
+        </div>
+        <button class="refresh-btn" id="refresh-orders">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+          </svg>
+          Refresh
+        </button>
+      </div>
+      
+      <div id="all-orders-list" class="orders-list full-list">
+        <p class="empty-state">Loading orders...</p>
+      </div>
+    </section>
+    
+    <!-- Revenue Section -->
+    <section class="content-section" id="section-revenue">
+      <div class="section-header">
+        <h1>Revenue Management</h1>
+        <p>Track online orders and add walk-in sales</p>
+      </div>
+      
+      <div class="stats-grid" style="margin-bottom: 32px;">
+        <div class="stat-card">
+          <div class="stat-icon orders-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+            </svg>
+          </div>
+          <div class="stat-content">
+            <span class="stat-label">Online Orders</span>
+            <span class="stat-value" id="online-revenue">$0</span>
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-icon pending-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+          </div>
+          <div class="stat-content">
+            <span class="stat-label">Walk-in Sales</span>
+            <span class="stat-value" id="manual-revenue">$0</span>
+          </div>
+        </div>
+        
+        <div class="stat-card highlight-card">
+          <div class="stat-icon revenue-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+            </svg>
+          </div>
+          <div class="stat-content">
+            <span class="stat-label">Total Revenue</span>
+            <span class="stat-value" id="combined-revenue">$0</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="form-card">
+        <h3>Add Walk-in Sale</h3>
+        <p style="color: var(--gray-500); margin-bottom: 20px;">Record cash/card sales from in-person customers</p>
+        <div class="revenue-input-group">
+          <div class="form-group" style="flex: 1;">
+            <label for="add-revenue-amount">Amount ($)</label>
+            <input type="number" id="add-revenue-amount" min="0" step="0.01" placeholder="0.00">
+          </div>
+          <div class="form-group" style="flex: 1;">
+            <label>&nbsp;</label>
+            <button class="save-btn" id="add-revenue-btn" style="width: 100%;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+              Add Sale
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="form-card" style="margin-top: 24px;">
+        <h3>Set Total Walk-in Revenue</h3>
+        <p style="color: var(--gray-500); margin-bottom: 20px;">Override the walk-in revenue with a specific amount</p>
+        <div class="revenue-input-group">
+          <div class="form-group" style="flex: 1;">
+            <label for="set-revenue-amount">Total Amount ($)</label>
+            <input type="number" id="set-revenue-amount" min="0" step="0.01" placeholder="0.00">
+          </div>
+          <div class="form-group" style="flex: 1;">
+            <label>&nbsp;</label>
+            <button class="save-btn" id="set-revenue-btn" style="width: 100%; background: var(--blue);">
+              Set Amount
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="form-card" style="margin-top: 24px; border: 2px solid var(--red-light);">
+        <h3 style="color: var(--red);">Reset Revenue</h3>
+        <p style="color: var(--gray-500); margin-bottom: 20px;">Reset manual revenue to $0. This cannot be undone.</p>
+        <button class="save-btn" id="reset-revenue-btn" style="background: var(--red);">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+          </svg>
+          Reset Walk-in Revenue to $0
+        </button>
+      </div>
+    </section>
+    
+    <!-- Images Section -->
+    <section class="content-section" id="section-images">
+      <div class="section-header">
+        <h1>Image Manager</h1>
+        <p>Update images throughout your website</p>
+      </div>
+      
+      <div class="image-manager-grid">
+        <!-- Hero Image -->
+        <div class="image-card">
+          <div class="image-card-header">
+            <h3>Hero Image</h3>
+            <span class="image-location">Main banner image</span>
+          </div>
+          <div class="image-preview" id="preview-hero">
+            <img src="/images/gemeni 3.png" alt="Hero Image">
+            <div class="image-overlay">
+              <span>Click to change</span>
+            </div>
+          </div>
+          <input type="file" id="upload-hero" accept="image/*" data-image-key="hero" hidden>
+          <div class="image-card-actions">
+            <button class="upload-btn" onclick="document.getElementById('upload-hero').click()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
+              Upload New
+            </button>
+          </div>
+        </div>
+        
+        <!-- Logo -->
+        <div class="image-card">
+          <div class="image-card-header">
+            <h3>Logo</h3>
+            <span class="image-location">Navigation & Footer</span>
+          </div>
+          <div class="image-preview square" id="preview-logo">
+            <img src="/images/logo.jpg" alt="Logo">
+            <div class="image-overlay">
+              <span>Click to change</span>
+            </div>
+          </div>
+          <input type="file" id="upload-logo" accept="image/*" data-image-key="logo" hidden>
+          <div class="image-card-actions">
+            <button class="upload-btn" onclick="document.getElementById('upload-logo').click()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
+              Upload New
+            </button>
+          </div>
+        </div>
+        
+        <!-- Product Image -->
+        <div class="image-card">
+          <div class="image-card-header">
+            <h3>Product Image</h3>
+            <span class="image-location">Menu section</span>
+          </div>
+          <div class="image-preview" id="preview-product">
+            <img src="/images/download (1).jpg" alt="Product Image">
+            <div class="image-overlay">
+              <span>Click to change</span>
+            </div>
+          </div>
+          <input type="file" id="upload-product" accept="image/*" data-image-key="product" hidden>
+          <div class="image-card-actions">
+            <button class="upload-btn" onclick="document.getElementById('upload-product').click()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
+              Upload New
+            </button>
+          </div>
+        </div>
+        
+        <!-- Coffee Machine -->
+        <div class="image-card">
+          <div class="image-card-header">
+            <h3>Coffee Station</h3>
+            <span class="image-location">Coffee section</span>
+          </div>
+          <div class="image-preview" id="preview-coffee-machine">
+            <img src="/images/coffee-machine.webp" alt="Coffee Machine">
+            <div class="image-overlay">
+              <span>Click to change</span>
+            </div>
+          </div>
+          <input type="file" id="upload-coffee-machine" accept="image/*" data-image-key="coffee-machine" hidden>
+          <div class="image-card-actions">
+            <button class="upload-btn" onclick="document.getElementById('upload-coffee-machine').click()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
+              Upload New
+            </button>
+          </div>
+        </div>
+        
+        <!-- Coffee Menu -->
+        <div class="image-card">
+          <div class="image-card-header">
+            <h3>Coffee Menu</h3>
+            <span class="image-location">Coffee section badge</span>
+          </div>
+          <div class="image-preview" id="preview-coffee-menu">
+            <img src="/images/coffee-menu.webp" alt="Coffee Menu">
+            <div class="image-overlay">
+              <span>Click to change</span>
+            </div>
+          </div>
+          <input type="file" id="upload-coffee-menu" accept="image/*" data-image-key="coffee-menu" hidden>
+          <div class="image-card-actions">
+            <button class="upload-btn" onclick="document.getElementById('upload-coffee-menu').click()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
+              Upload New
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Feature Images -->
+      <div class="form-card" style="margin-top: 32px;">
+        <h3>Feature Section Images</h3>
+        <p style="color: var(--gray-500); margin-bottom: 20px;">The three images in the "About" section</p>
+        <div class="image-manager-grid small">
+          <div class="image-card mini">
+            <div class="image-preview square" id="preview-feature1">
+              <img src="/images/shop.webp" alt="Feature 1">
+              <div class="image-overlay"><span>Change</span></div>
+            </div>
+            <input type="file" id="upload-feature1" accept="image/*" data-image-key="feature1" hidden>
+            <button class="upload-btn small" onclick="document.getElementById('upload-feature1').click()">Baked Fresh Daily</button>
+          </div>
+          <div class="image-card mini">
+            <div class="image-preview square" id="preview-feature2">
+              <img src="/images/inside.webp" alt="Feature 2">
+              <div class="image-overlay"><span>Change</span></div>
+            </div>
+            <input type="file" id="upload-feature2" accept="image/*" data-image-key="feature2" hidden>
+            <button class="upload-btn small" onclick="document.getElementById('upload-feature2').click()">Quality Ingredients</button>
+          </div>
+          <div class="image-card mini">
+            <div class="image-preview square" id="preview-feature3">
+              <img src="/images/bread 4.jpg" alt="Feature 3">
+              <div class="image-overlay"><span>Change</span></div>
+            </div>
+            <input type="file" id="upload-feature3" accept="image/*" data-image-key="feature3" hidden>
+            <button class="upload-btn small" onclick="document.getElementById('upload-feature3').click()">Made with Love</button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Gallery Images -->
+      <div class="form-card" style="margin-top: 32px;">
+        <h3>Gallery Images</h3>
+        <p style="color: var(--gray-500); margin-bottom: 20px;">The four images in the Gallery section</p>
+        <div class="image-manager-grid small">
+          <div class="image-card mini">
+            <div class="image-preview square" id="preview-gallery1">
+              <img src="/images/hq720.jpg" alt="Gallery 1">
+              <div class="image-overlay"><span>Change</span></div>
+            </div>
+            <input type="file" id="upload-gallery1" accept="image/*" data-image-key="gallery1" hidden>
+            <button class="upload-btn small" onclick="document.getElementById('upload-gallery1').click()">Gallery 1</button>
+          </div>
+          <div class="image-card mini">
+            <div class="image-preview square" id="preview-gallery2">
+              <img src="/images/bread 2.jpg" alt="Gallery 2">
+              <div class="image-overlay"><span>Change</span></div>
+            </div>
+            <input type="file" id="upload-gallery2" accept="image/*" data-image-key="gallery2" hidden>
+            <button class="upload-btn small" onclick="document.getElementById('upload-gallery2').click()">Gallery 2</button>
+          </div>
+          <div class="image-card mini">
+            <div class="image-preview square" id="preview-gallery3">
+              <img src="/images/Screenshot 2025-12-04 123539.png" alt="Gallery 3">
+              <div class="image-overlay"><span>Change</span></div>
+            </div>
+            <input type="file" id="upload-gallery3" accept="image/*" data-image-key="gallery3" hidden>
+            <button class="upload-btn small" onclick="document.getElementById('upload-gallery3').click()">Gallery 3</button>
+          </div>
+          <div class="image-card mini">
+            <div class="image-preview square" id="preview-gallery4">
+              <img src="/images/frontview.webp" alt="Gallery 4">
+              <div class="image-overlay"><span>Change</span></div>
+            </div>
+            <input type="file" id="upload-gallery4" accept="image/*" data-image-key="gallery4" hidden>
+            <button class="upload-btn small" onclick="document.getElementById('upload-gallery4').click()">Gallery 4</button>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Content Section -->
+    <section class="content-section" id="section-content">
+      <div class="section-header">
+        <h1>Edit Website Content</h1>
+        <p>Update the text displayed on your website</p>
+      </div>
+      
+      <form id="content-form" class="edit-form">
+        <div class="form-card">
+          <h3>Hero Section</h3>
+          <div class="form-group">
+            <label for="hero_title">Main Title</label>
+            <input type="text" id="hero_title" name="hero_title" placeholder="e.g., Señorita">
+            <span class="form-hint">This appears as the big headline</span>
+          </div>
+          <div class="form-group">
+            <label for="hero_subtitle">Subtitle</label>
+            <input type="text" id="hero_subtitle" name="hero_subtitle" placeholder="e.g., Made Fresh Daily">
+          </div>
+          <div class="form-group">
+            <label for="hero_description">Description</label>
+            <textarea id="hero_description" name="hero_description" rows="3" placeholder="Main description text..."></textarea>
+          </div>
+        </div>
+        
+        <div class="form-card">
+          <h3>Product Information</h3>
+          <div class="form-group">
+            <label for="product_name">Product Name</label>
+            <input type="text" id="product_name" name="product_name" placeholder="e.g., Señorita Bread">
+          </div>
+          <div class="form-group">
+            <label for="product_description">Product Description</label>
+            <textarea id="product_description" name="product_description" rows="3" placeholder="Describe your product..."></textarea>
+          </div>
+        </div>
+        
+        <div class="form-actions">
+          <button type="submit" class="save-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+              <polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>
+            </svg>
+            Save Changes
+          </button>
+        </div>
+      </form>
+    </section>
+    
+    <!-- Special Offer Section -->
+    <section class="content-section" id="section-special">
+      <div class="section-header">
+        <h1>Special Offer</h1>
+        <p>Control the special offer badge on your website</p>
+      </div>
+      
+      <form id="special-form" class="edit-form">
+        <div class="form-card">
+          <h3>Show/Hide Special Offer</h3>
+          <div class="toggle-container">
+            <label class="toggle-label">
+              <input type="checkbox" id="special_enabled" name="special_enabled">
+              <span class="toggle-switch"></span>
+              <span class="toggle-text">Show Special Offer on Website</span>
+            </label>
+          </div>
+          <p class="form-hint" style="margin-top: 12px;">When disabled, the special offer badge will be hidden from your website.</p>
+        </div>
+        
+        <div class="form-card" id="special-settings">
+          <h3>Special of the Day Badge</h3>
+          <div class="special-preview">
+            <div class="preview-badge">
+              <span class="preview-label" id="preview-label">Special of the Day</span>
+              <span class="preview-discount" id="preview-discount">20% OFF</span>
+              <span class="preview-text" id="preview-text">TODAY</span>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="special_label">Top Label</label>
+              <input type="text" id="special_label" name="special_label" placeholder="e.g., Special of the Day">
+            </div>
+            <div class="form-group">
+              <label for="special_discount">Discount/Offer</label>
+              <input type="text" id="special_discount" name="special_discount" placeholder="e.g., 20% OFF">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="special_text">Bottom Text</label>
+            <input type="text" id="special_text" name="special_text" placeholder="e.g., TODAY">
+          </div>
+        </div>
+        
+        <div class="form-actions">
+          <button type="submit" class="save-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+            </svg>
+            Save Special Offer
+          </button>
+        </div>
+      </form>
+    </section>
+    
+    <!-- Contact Section -->
+    <section class="content-section" id="section-contact">
+      <div class="section-header">
+        <h1>Contact Information</h1>
+        <p>Update your business contact details</p>
+      </div>
+      
+      <form id="contact-form" class="edit-form">
+        <div class="form-card">
+          <h3>Business Details</h3>
+          <div class="form-group">
+            <label for="phone">Phone Number</label>
+            <input type="tel" id="phone" name="phone" placeholder="(209) 420-7925">
+          </div>
+          <div class="form-group">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" name="email" placeholder="freshhotbread@gmail.com">
+          </div>
+          <div class="form-group">
+            <label for="location">Address/Location</label>
+            <input type="text" id="location" name="location" placeholder="Full address...">
+          </div>
+          <div class="form-group">
+            <label for="business_hours">Business Hours</label>
+            <textarea id="business_hours" name="business_hours" rows="2" placeholder="e.g., Tues–Sun: 6AM–6PM"></textarea>
+            <span class="form-hint">Use &lt;br&gt; for line breaks</span>
+          </div>
+        </div>
+        
+        <div class="form-actions">
+          <button type="submit" class="save-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+            </svg>
+            Save Contact Info
+          </button>
+        </div>
+      </form>
+    </section>
+  </main>
+  
+  <!-- Order Detail Modal -->
+  <div class="modal-overlay" id="order-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Order Details</h2>
+        <button class="modal-close" id="modal-close">&times;</button>
+      </div>
+      <div class="modal-body" id="order-detail">
+        <!-- Filled by JS -->
+      </div>
+    </div>
+  </div>
+  
+  <!-- New Order Alert -->
+  <div class="new-order-alert" id="new-order-alert">
+    <div class="alert-content">
+      <div class="alert-icon">🛒</div>
+      <div class="alert-text">
+        <strong>New Order!</strong>
+        <span id="alert-order-info">Order #123 - $45.00</span>
+      </div>
+      <button class="alert-close" onclick="document.getElementById('new-order-alert').classList.remove('show')">&times;</button>
+    </div>
+  </div>
+  
+  <!-- Toast -->
+  <div class="toast" id="toast">
+    <span class="toast-icon">✓</span>
+    <span class="toast-message" id="toast-message">Saved successfully!</span>
+  </div>
+  
+  <script src="script.js"></script>
+</body>
+</html>

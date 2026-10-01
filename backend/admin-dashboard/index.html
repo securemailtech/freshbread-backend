@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login | Fresh Hot Bread </title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="login-page">
+  <div class="login-container">
+    <div class="login-card">
+      <div class="login-header">
+        <div class="login-logo">🍞</div>
+        <h1>Fresh Hot Bread</h1>
+        <p>Admin Dashboard</p>
+      </div>
+      
+      <form id="login-form" class="login-form">
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" name="username" required autocomplete="username" placeholder="admin">
+        </div>
+        
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" required autocomplete="current-password" placeholder="••••••••">
+        </div>
+        
+        <div id="login-error" class="error-message"></div>
+        
+        <button type="submit" class="login-btn">
+          <span>Sign In</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </button>
+      </form>
+      
+      <div class="login-footer">
+        <a href="/">← Back to Website</a>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    const API_URL = window.location.origin;
+    
+    // Check if already logged in
+    const token = localStorage.getItem('adminToken');
+    if (token) {
+      fetch(`${API_URL}/api/auth/verify`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.valid) window.location.href = 'dashboard.html';
+      })
+      .catch(() => {});
+    }
+    
+    // Handle login
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      const errorEl = document.getElementById('login-error');
+      const btn = e.target.querySelector('button');
+      
+      btn.disabled = true;
+      btn.innerHTML = '<span>Signing in...</span>';
+      errorEl.textContent = '';
+      
+      try {
+        const response = await fetch(`${API_URL}/api/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success || data.token) {
+          localStorage.setItem('adminToken', data.token);
+          window.location.href = 'dashboard.html';
+        } else {
+          errorEl.textContent = data.error || 'Invalid credentials';
+          resetButton();
+        }
+      } catch (error) {
+        errorEl.textContent = 'Connection error. Is the server running?';
+        resetButton();
+      }
+      
+      function resetButton() {
+        btn.disabled = false;
+        btn.innerHTML = '<span>Sign In</span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
+      }
+    });
+  </script>
+</body>
+</html>
