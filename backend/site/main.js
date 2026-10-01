@@ -452,12 +452,74 @@ document.addEventListener("DOMContentLoaded", function() {
           }
         }
       } catch (error) {
-        // Use default image if fetch fails - silently continue
+        // Use default image if fetch fails
       }
     }
   }
 
-  // Load dynamic images
+  // ========== LOAD DYNAMIC TEXT CONTENT FROM DATABASE ==========
+  async function loadDynamicContent() {
+    try {
+      const response = await fetch(API_URL + '/api/content');
+      if (!response.ok) return;
+      const data = await response.json();
+
+      const content = {};
+      if (Array.isArray(data)) {
+        data.forEach(function(item) { content[item.key] = item.value; });
+      } else if (data.content) {
+        Object.assign(content, data.content);
+      } else if (typeof data === 'object') {
+        Object.assign(content, data);
+      }
+
+      const textMap = {
+        'hero_title': ['.hero-title', '#hero-title', '.hero-content h1'],
+        'hero_subtitle': ['.hero-subtitle', '#hero-subtitle', '.hero-content .subtitle'],
+        'hero_description': ['.hero-description', '#hero-description', '.hero-content p'],
+        'special_label': ['.special-badge .label', '#special-label'],
+        'special_discount': ['.special-badge .discount', '#special-discount'],
+        'special_text': ['.special-text', '#special-text'],
+        'product_name': ['.product-title', '.product-name', '#product-name'],
+        'product_description': ['.product-description', '#product-description'],
+        'business_hours': ['.business-hours', '#business-hours', '.hours-text'],
+        'phone': ['.phone-number', '#phone', '.contact-phone'],
+        'email': ['.email-address', '#email', '.contact-email'],
+        'location': ['.location-text', '#location', '.contact-location']
+      };
+
+      for (const key in content) {
+        const val = content[key];
+        if (!val) continue;
+
+        // Try data-content attribute match
+        const dataElements = document.querySelectorAll('[data-content="' + key + '"]');
+        if (dataElements.length > 0) {
+          dataElements.forEach(function(el) { el.innerHTML = val; });
+          continue;
+        }
+
+        // Try selector mapping
+        if (textMap[key]) {
+          textMap[key].forEach(function(selector) {
+            const elements = document.querySelectorAll(selector);
+            elements.forEach(function(el) { el.innerHTML = val; });
+          });
+        }
+
+        // Try direct ID match
+        const idEl = document.getElementById(key) || document.getElementById(key.replace('_', '-'));
+        if (idEl) {
+          idEl.innerHTML = val;
+        }
+      }
+    } catch (error) {
+      console.log('Could not load dynamic text content:', error);
+    }
+  }
+
+  // Load dynamic content and images
   loadDynamicImages();
+  loadDynamicContent();
 
 });
