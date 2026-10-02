@@ -1,8 +1,18 @@
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 const fs = require('fs');
+const https = require('https');
 const bcrypt = require('bcryptjs');
+const cloudinary = require('cloudinary').v2;
 
+// Configure Cloudinary if keys exist
+if (process.env.CLOUDINARY_CLOUD_NAME) {
+  cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+  });
+}
 
 const dbDir = path.join(__dirname, '../database');
 if (!fs.existsSync(dbDir)) {
@@ -10,6 +20,54 @@ if (!fs.existsSync(dbDir)) {
 }
 
 const dbPath = process.env.DB_PATH || path.join(dbDir, 'freshbread.db');
+
+// ==========================================
+// AUTO-BACKUP DATABASE TO CLOUDINARY
+// ==========================================
+async function backupDatabaseToCloudinary() {
+  if (!process.env.CLOUDINARY_CLOUD_NAME || !fs.existsSync(dbPath)) return;
+  try {
+    await cloudinary.uploader.upload(dbPath, {
+      resource_type: 'raw',
+      public_id: 'freshbread_db_backup.db',
+      overwrite: true,
+      invalidate: true
+    });
+    console.log('☁️ SQLite Database Auto-Backed up to Cloudinary');
+  } catch (err) {
+    console.error('⚠️ DB Backup warning:', err.message);
+  }
+}
+
+// ==========================================
+// AUTO-RESTORE DATABASE FROM CLOUDINARY
+// ==========================================
+async function restoreDatabaseFromCloudinary() {
+  if (!process.env.CLOUDINARY_CLOUD_NAME) return false;
+  
+  const backupUrl = `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/raw/upload/freshbread_db_backup.db`;
+  
+  return new Promise((resolve) => {
+    console.log('🔄 Checking for Database backup on Cloudinary...');
+    https.get(backupUrl, (res) => {
+      if (res.statusCode === 200) {
+        const fileStream = fs.createWriteStream(dbPath);
+        res.pipe(fileStream);
+        fileStream.on('finish', () => {
+          fileStream.close();
+          console.log('✅ SQLite Database restored from Cloudinary backup!');
+          resolve(true);
+        });
+      } else {
+        console.log('ℹ️ No existing Cloudinary DB backup found, initializing fresh DB.');
+        resolve(false);
+      }
+    }).on('error', (err) => {
+      console.log('⚠️ Could not fetch backup from Cloudinary:', err.message);
+      resolve(false);
+    });
+  });
+}
 
 let db;
 
@@ -25,6 +83,11 @@ function getDb() {
 }
 
 async function initializeDatabase() {
+  // Check if database file exists, if not -> Restore from Cloudinary first!
+  if (!fs.existsSync(dbPath)) {
+    await restoreDatabaseFromCloudinary();
+  }
+
   return new Promise((resolve, reject) => {
     const database = getDb();
     
@@ -153,4 +216,4 @@ async function initializeDatabase() {
   });
 }
 
-module.exports = { initializeDatabase, getDb };
+module.exports = { initializeDatabase, getDb, backupDatabaseToCloudinary };

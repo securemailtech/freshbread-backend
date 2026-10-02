@@ -1,13 +1,13 @@
 // ========================================
 // IMAGE UPLOAD ROUTES - routes/images.js
-// With Cloudinary Integration
+// With Cloudinary Integration & Auto-Backup
 // ========================================
 
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
-const { getDb } = require('../models/initDb');
+const { getDb, backupDatabaseToCloudinary } = require('../models/initDb');
 
 // Import auth middleware
 let authenticateToken;
@@ -109,6 +109,9 @@ router.post('/upload', authenticateToken, upload.single('image'), async (req, re
           url: result.secure_url,
           message: 'Image uploaded successfully'
         });
+        
+        // TRIGGER AUTO BACKUP!
+        backupDatabaseToCloudinary();
       }
     );
 
@@ -173,6 +176,9 @@ router.delete('/:key', authenticateToken, (req, res) => {
         return res.status(500).json({ error: 'Failed to delete image' });
       }
       res.json({ success: true, message: 'Image deleted' });
+      
+      // TRIGGER AUTO BACKUP!
+      backupDatabaseToCloudinary();
     }
   );
 });
