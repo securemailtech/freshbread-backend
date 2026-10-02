@@ -457,7 +457,109 @@ document.addEventListener("DOMContentLoaded", function() {
     }
   }
 
-  // Load dynamic images
+    // ========== LOAD DYNAMIC TEXT CONTENT FROM DATABASE ==========
+  async function loadDynamicContent() {
+    try {
+      const response = await fetch(API_URL + '/api/content');
+      if (!response.ok) return;
+      
+      const data = await response.json();
+      
+      // Handle both formats: { content: {...} } or direct object
+      const content = data.content || data;
+      if (!content || typeof content !== 'object') return;
+
+      console.log('📦 Loading dynamic content:', content);
+
+      // ----- HERO SECTION -----
+      if (content.hero_title) {
+        const heroH1 = document.querySelector('.hero-text h1');
+        if (heroH1) {
+          // Keep the highlight span if title is simple
+          heroH1.innerHTML = content.hero_title + '<br><span class="highlight">Bread</span>';
+        }
+      }
+      
+      if (content.hero_subtitle) {
+        const el = document.querySelector('.hero-subtitle');
+        if (el) el.textContent = content.hero_subtitle;
+      }
+      
+      if (content.hero_description) {
+        const el = document.querySelector('.hero-description');
+        if (el) el.textContent = content.hero_description;
+      }
+
+      // ----- SPECIAL OFFER BADGE -----
+      if (content.special_label) {
+        const el = document.querySelector('.special-label');
+        if (el) el.textContent = content.special_label;
+      }
+      
+      if (content.special_discount) {
+        const el = document.querySelector('.special-discount');
+        if (el) el.textContent = content.special_discount;
+      }
+      
+      if (content.special_text) {
+        const el = document.querySelector('.special-today');
+        if (el) el.textContent = content.special_text;
+      }
+
+      // ----- PRODUCT SECTION -----
+      if (content.product_name) {
+        const el = document.querySelector('.product-header h3');
+        if (el) el.textContent = content.product_name;
+      }
+      
+      if (content.product_description) {
+        const el = document.querySelector('.product-desc');
+        if (el) el.textContent = content.product_description;
+      }
+
+      // ----- CONTACT INFO -----
+      if (content.phone) {
+        const phoneLink = document.querySelector('.contact-card a[href^="tel:"]');
+        if (phoneLink) {
+          phoneLink.textContent = content.phone;
+          phoneLink.href = 'tel:' + content.phone.replace(/[^0-9+]/g, '');
+        }
+      }
+      
+      if (content.email) {
+        const emailLink = document.querySelector('.contact-card a[href^="mailto:"]');
+        if (emailLink) {
+          emailLink.textContent = content.email;
+          emailLink.href = 'mailto:' + content.email;
+        }
+      }
+      
+      if (content.location) {
+        // Location is in the 3rd contact-card
+        const contactCards = document.querySelectorAll('.contact-card');
+        if (contactCards[2]) {
+          const p = contactCards[2].querySelector('p');
+          if (p) p.innerHTML = content.location;
+        }
+      }
+      
+      if (content.business_hours) {
+        const contactCards = document.querySelectorAll('.contact-card');
+        if (contactCards[3]) {
+          const p = contactCards[3].querySelector('p');
+          if (p) p.innerHTML = content.business_hours;
+        }
+      }
+
+      console.log(' Dynamic content loaded successfully');
+      
+    } catch (error) {
+      console.log('Could not load dynamic content:', error);
+    }
+  }
+
+  // Load everything
   loadDynamicImages();
+  loadDynamicContent();
 
 });
