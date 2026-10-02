@@ -5,7 +5,7 @@ const https = require('https');
 const bcrypt = require('bcryptjs');
 const cloudinary = require('cloudinary').v2;
 
-// Configure Cloudinary if keys exist
+// Configure Cloudinary
 if (process.env.CLOUDINARY_CLOUD_NAME) {
   cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -21,54 +21,6 @@ if (!fs.existsSync(dbDir)) {
 
 const dbPath = process.env.DB_PATH || path.join(dbDir, 'freshbread.db');
 
-// ==========================================
-// AUTO-BACKUP DATABASE TO CLOUDINARY
-// ==========================================
-async function backupDatabaseToCloudinary() {
-  if (!process.env.CLOUDINARY_CLOUD_NAME || !fs.existsSync(dbPath)) return;
-  try {
-    await cloudinary.uploader.upload(dbPath, {
-      resource_type: 'raw',
-      public_id: 'freshbread_db_backup.db',
-      overwrite: true,
-      invalidate: true
-    });
-    console.log('☁️ SQLite Database Auto-Backed up to Cloudinary');
-  } catch (err) {
-    console.error('⚠️ DB Backup warning:', err.message);
-  }
-}
-
-// ==========================================
-// AUTO-RESTORE DATABASE FROM CLOUDINARY
-// ==========================================
-async function restoreDatabaseFromCloudinary() {
-  if (!process.env.CLOUDINARY_CLOUD_NAME) return false;
-  
-  const backupUrl = `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/raw/upload/freshbread_db_backup.db`;
-  
-  return new Promise((resolve) => {
-    console.log('🔄 Checking for Database backup on Cloudinary...');
-    https.get(backupUrl, (res) => {
-      if (res.statusCode === 200) {
-        const fileStream = fs.createWriteStream(dbPath);
-        res.pipe(fileStream);
-        fileStream.on('finish', () => {
-          fileStream.close();
-          console.log('✅ SQLite Database restored from Cloudinary backup!');
-          resolve(true);
-        });
-      } else {
-        console.log('ℹ️ No existing Cloudinary DB backup found, initializing fresh DB.');
-        resolve(false);
-      }
-    }).on('error', (err) => {
-      console.log('⚠️ Could not fetch backup from Cloudinary:', err.message);
-      resolve(false);
-    });
-  });
-}
-
 let db;
 
 function getDb() {
@@ -82,19 +34,96 @@ function getDb() {
   return db;
 }
 
-async function initializeDatabase() {
-  // Check if database file exists, if not -> Restore from Cloudinary first!
-  if (!fs.existsSync(dbPath)) {
-    await restoreDatabaseFromCloudinary();
-  }
+// ==========================================
+// AUTO-BACKUP DATA TO CLOUDINARY (JSON FORMAT)
+// ==========================================
+async function backupDatabaseToCloudinary() {
+  if (!process.env.CLOUDINARY_CLOUD_NAME) return;
+  const database = getDb();
+  
+  try {
+    const content = await new Promise((res, rej) => database.all("SELECT * FROM site_content", (e, r) => e ? rej(e) : res(r || [])));
+    const orders = await new Promise((res, rej) => database.all("SELECT * FROM orders", (e, r) => e ? rej(e) : res(r || [])));
+    const images = await new Promise((res, rej) => database.all("SELECT * FROM site_images", (e, r) => e ? rej(e) : res(r || [])));
 
+    const backupObj = { content, orders, images };
+    const base64Data = `data:text/plain;base64,${Buffer.from(JSON.stringify(backupObj)).toString('base64')}`;
+
+    await cloudinary.uploader.upload(base64Data, {
+      resource_type: 'raw',
+      public_id: 'freshbread_data_backup.json',
+      overwrite: true,
+      invalidate: true
+    });
+    console.log('☁️ Database Data JSON Auto-Backed up to Cloudinary!');
+  } catch (err) {
+    console.error('⚠️ DB Backup warning:', err.message);
+  }
+}
+
+// ==========================================
+// AUTO-RESTORE DATA FROM CLOUDINARY
+// ==========================================
+async function restoreDatabaseFromCloudinary() {
+  if (!process.env.CLOUDINARY_CLOUD_NAME) return false;
+  
+  const backupUrl = `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/raw/upload/freshbread_data_backup.json`;
+  
+  return new Promise((resolve) => {
+    console.log('🔄 Checking for Database JSON backup on Cloudinary...');
+    https.get(backupUrl, (res) => {
+      let data = '';
+      if (res.statusCode === 200) {
+        res.on('data', chunk => data += chunk);
+        res.on('end', () => {
+          try {
+            const parsed = JSON.parse(data);
+            const database = getDb();
+
+            database.serialize(() => {
+              // Restore Content
+              if (parsed.content && parsed.content.length > 0) {
+                const stmt = database.prepare("INSERT OR REPLACE INTO site_content (id, key, value, updated_at) VALUES (?, ?, ?, ?)");
+                parsed.content.forEach(c => stmt.run(c.id, c.key, c.value, c.updated_at));
+                stmt.finalize();
+              }
+              // Restore Orders
+              if (parsed.orders && parsed.orders.length > 0) {
+                const stmt = database.prepare("INSERT OR REPLACE INTO orders (id, customer_name, customer_phone, customer_email, items, total, status, notes, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                parsed.orders.forEach(o => stmt.run(o.id, o.customer_name, o.customer_phone, o.customer_email, o.items, o.total, o.status, o.notes, o.created_at, o.updated_at));
+                stmt.finalize();
+              }
+              // Restore Images
+              if (parsed.images && parsed.images.length > 0) {
+                const stmt = database.prepare("INSERT OR REPLACE INTO site_images (id, key, filename, url, updated_at) VALUES (?, ?, ?, ?, ?)");
+                parsed.images.forEach(img => stmt.run(img.id, img.key, img.filename, img.url, img.updated_at));
+                stmt.finalize();
+              }
+            });
+            console.log('✅ SQLite Database successfully restored from Cloudinary JSON backup!');
+            resolve(true);
+          } catch (e) {
+            console.log('⚠️ Failed to parse backup JSON:', e.message);
+            resolve(false);
+          }
+        });
+      } else {
+        console.log('ℹ️ No existing Cloudinary JSON backup found, starting fresh.');
+        resolve(false);
+      }
+    }).on('error', (err) => {
+      console.log('⚠️ Could not fetch backup from Cloudinary:', err.message);
+      resolve(false);
+    });
+  });
+}
+
+async function initializeDatabase() {
   return new Promise((resolve, reject) => {
     const database = getDb();
     
-    database.serialize(() => {
-      // ========================================
-      // ADMIN USERS TABLE
-      // ========================================
+    database.serialize(async () => {
+      // Create Tables
       database.run(`
         CREATE TABLE IF NOT EXISTS admin_users (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -104,9 +133,6 @@ async function initializeDatabase() {
         )
       `);
 
-      // ========================================
-      // SITE CONTENT TABLE
-      // ========================================
       database.run(`
         CREATE TABLE IF NOT EXISTS site_content (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -116,9 +142,6 @@ async function initializeDatabase() {
         )
       `);
 
-      // ========================================
-      // SITE IMAGES TABLE
-      // ========================================
       database.run(`
         CREATE TABLE IF NOT EXISTS site_images (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -129,9 +152,6 @@ async function initializeDatabase() {
         )
       `);
 
-      // ========================================
-      // ORDERS TABLE (NEW!)
-      // ========================================
       database.run(`
         CREATE TABLE IF NOT EXISTS orders (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -145,17 +165,9 @@ async function initializeDatabase() {
           created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
           updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )
-      `, (err) => {
-        if (err) {
-          console.log('Orders table may already exist');
-        } else {
-          console.log('✅ Orders table ready');
-        }
-      });
+      `);
 
-      // ========================================
-      // DEFAULT CONTENT
-      // ========================================
+      // Default Content
       const defaultContent = [
         ['hero_title', 'Señorita'],
         ['hero_subtitle', 'Made Fresh Daily'],
@@ -171,45 +183,23 @@ async function initializeDatabase() {
         ['location', '2233 Grand Canal Blvd UNIT 102, Stockton, CA 95207']
       ];
 
-      const insertContent = database.prepare(`
-        INSERT OR IGNORE INTO site_content (key, value) VALUES (?, ?)
-      `);
-
-      defaultContent.forEach(([key, value]) => {
-        insertContent.run(key, value);
-      });
+      const insertContent = database.prepare(`INSERT OR IGNORE INTO site_content (key, value) VALUES (?, ?)`);
+      defaultContent.forEach(([key, value]) => insertContent.run(key, value));
       insertContent.finalize();
 
-      // ========================================
-      // DEFAULT ADMIN USER
-      // ========================================
+      // RESTORE FROM CLOUDINARY BACKUP
+      await restoreDatabaseFromCloudinary();
+
+      // Admin Password Management
       const adminUsername = process.env.ADMIN_USERNAME || 'admin';
       const adminPassword = process.env.ADMIN_PASSWORD || 'Blues@13';
       const hashedPassword = bcrypt.hashSync(adminPassword, 10);
 
       database.get(`SELECT id FROM admin_users WHERE username = ?`, [adminUsername], (err, row) => {
-        if (err) return console.error(err);
-
         if (row) {
-          // Admin exists → update password
-          database.run(
-            `UPDATE admin_users SET password = ? WHERE username = ?`,
-            [hashedPassword, adminUsername],
-            (err) => {
-              if (!err) console.log('🔁 Admin password updated from ENV');
-              resolve(database);
-            }
-          );
+          database.run(`UPDATE admin_users SET password = ? WHERE username = ?`, [hashedPassword, adminUsername], () => resolve(database));
         } else {
-          // Admin does not exist → insert
-          database.run(
-            `INSERT INTO admin_users (username, password) VALUES (?, ?)`,
-            [adminUsername, hashedPassword],
-            (err) => {
-              if (!err) console.log('✅ Default admin user created');
-              resolve(database);
-            }
-          );
+          database.run(`INSERT INTO admin_users (username, password) VALUES (?, ?)`, [adminUsername, hashedPassword], () => resolve(database));
         }
       });
     });
