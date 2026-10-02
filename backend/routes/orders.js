@@ -15,14 +15,21 @@ let transporter = null;
 function initializeEmail() {
   if (process.env.EMAIL_USER && process.env.EMAIL_APP_PASS) {
     try {
+      // Spaces hata kar clean password
+      const cleanPass = process.env.EMAIL_APP_PASS.replace(/\s+/g, '');
+
       transporter = nodemailer.createTransport({
-        service: 'gmail',
+        host: 'smtp.gmail.com',
+        port: 465,             // 👈 Gmail Direct SSL Port (Render timeouts fixed!)
+        secure: true,
         auth: {
           user: process.env.EMAIL_USER,
-          pass: process.env.EMAIL_APP_PASS
-        }
+          pass: cleanPass
+        },
+        connectionTimeout: 10000,
+        socketTimeout: 10000
       });
-      console.log('✅ Email notifications enabled');
+      console.log('✅ Email notifications enabled (Port 465 SSL)');
     } catch (error) {
       console.log('⚠️ Email setup failed:', error.message);
     }
