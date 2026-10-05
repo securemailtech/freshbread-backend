@@ -462,7 +462,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
   </section>
 
-  <!-- Gallery Section -->
+     <!-- Gallery Section -->
   <section id="gallery" class="gallery-section">
     <div class="container">
       <div class="section-header fade-in">
@@ -470,31 +470,25 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <h2>Fresh From Our Bakery</h2>
       </div>
 
-      <div class="gallery-grid">
-        <div class="gallery-item fade-in">
-          <img src="images/hq720.jpg" alt="Fresh Señorita Bread" loading="lazy">
-          <div class="gallery-overlay">
-            <span>Fresh Daily</span>
+      <!-- CAROUSEL WRAPPER -->
+      <div class="gallery-carousel-wrapper fade-in">
+        <button class="gallery-arrow prev-arrow" id="gallery-prev" aria-label="Previous image">❮</button>
+        
+        <div class="gallery-track-container">
+          <div class="gallery-track" id="gallery-track">
+            <!-- 8 Items -->
+            <div class="gallery-item"><img src="images/hq720.jpg" alt="Fresh Bread 1" loading="lazy"><div class="gallery-overlay"><span>Fresh Daily</span></div></div>
+            <div class="gallery-item"><img src="images/bread 2.jpg" alt="Fresh Bread 2" loading="lazy"><div class="gallery-overlay"><span>Golden Perfection</span></div></div>
+            <div class="gallery-item"><img src="images/Screenshot 2025-12-04 123539.png" alt="Fresh Bread 3" loading="lazy"><div class="gallery-overlay"><span>Homemade Love</span></div></div>
+            <div class="gallery-item"><img src="images/frontview.webp" alt="Fresh Bread 4" loading="lazy"><div class="gallery-overlay"><span>Buttery Delight</span></div></div>
+            <div class="gallery-item"><img src="images/hq720.jpg" alt="Fresh Bread 5" loading="lazy"><div class="gallery-overlay"><span>Oven Fresh</span></div></div>
+            <div class="gallery-item"><img src="images/bread 2.jpg" alt="Fresh Bread 6" loading="lazy"><div class="gallery-overlay"><span>Baked with Joy</span></div></div>
+            <div class="gallery-item"><img src="images/Screenshot 2025-12-04 123539.png" alt="Fresh Bread 7" loading="lazy"><div class="gallery-overlay"><span>Stockton Favorite</span></div></div>
+            <div class="gallery-item"><img src="images/frontview.webp" alt="Fresh Bread 8" loading="lazy"><div class="gallery-overlay"><span>Perfect Snack</span></div></div>
           </div>
         </div>
-        <div class="gallery-item fade-in">
-          <img src="images/bread 2.jpg" alt="Golden Señorita Bread" loading="lazy">
-          <div class="gallery-overlay">
-            <span>Golden Perfection</span>
-          </div>
-        </div>
-        <div class="gallery-item fade-in">
-          <img src="images/Screenshot 2025-12-04 123539.png" alt="Homemade Señorita Bread" loading="lazy">
-          <div class="gallery-overlay">
-            <span>Homemade Love</span>
-          </div>
-        </div>
-        <div class="gallery-item fade-in">
-          <img src="images/frontview.webp" alt="Best Seller Señorita Bread" loading="lazy">
-          <div class="gallery-overlay">
-            <span>Buttery Delight</span>
-          </div>
-        </div>
+
+        <button class="gallery-arrow next-arrow" id="gallery-next" aria-label="Next image">❯</button>
       </div>
     </div>
   </section>

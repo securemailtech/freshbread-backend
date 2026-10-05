@@ -459,6 +459,7 @@ document.addEventListener("DOMContentLoaded", function() {
   loadSpecialOfferVisibility();
 
   // ========== LOAD DYNAMIC IMAGES FROM DATABASE ==========
+    // ========== LOAD DYNAMIC IMAGES FROM DATABASE ==========
   async function loadDynamicImages() {
     const imageMap = {
       'hero': '.hero-image-wrapper img',
@@ -468,10 +469,14 @@ document.addEventListener("DOMContentLoaded", function() {
       'feature1': '.feature-card:nth-child(1) .feature-image img',
       'feature2': '.feature-card:nth-child(2) .feature-image img',
       'feature3': '.feature-card:nth-child(3) .feature-image img',
-      'gallery1': '.gallery-item:nth-child(1) img',
-      'gallery2': '.gallery-item:nth-child(2) img',
-      'gallery3': '.gallery-item:nth-child(3) img',
-      'gallery4': '.gallery-item:nth-child(4) img'
+      'gallery1': '#gallery-track .gallery-item:nth-child(1) img',
+      'gallery2': '#gallery-track .gallery-item:nth-child(2) img',
+      'gallery3': '#gallery-track .gallery-item:nth-child(3) img',
+      'gallery4': '#gallery-track .gallery-item:nth-child(4) img',
+      'gallery5': '#gallery-track .gallery-item:nth-child(5) img',
+      'gallery6': '#gallery-track .gallery-item:nth-child(6) img',
+      'gallery7': '#gallery-track .gallery-item:nth-child(7) img',
+      'gallery8': '#gallery-track .gallery-item:nth-child(8) img'
     };
 
     for (const key in imageMap) {
@@ -487,9 +492,69 @@ document.addEventListener("DOMContentLoaded", function() {
           }
         }
       } catch (error) {
-        // Use default image if fetch fails - silently continue
+        // Continue silently if image not found
       }
     }
+  }
+
+    // ========== GALLERY CAROUSEL LOGIC ==========
+  const track = document.getElementById('gallery-track');
+  const prevBtn = document.getElementById('gallery-prev');
+  const nextBtn = document.getElementById('gallery-next');
+
+  if (track && prevBtn && nextBtn) {
+    let currentIndex = 0;
+
+    function updateSlider() {
+      // Calculate how many items show on screen
+      let itemsVisible = 4;
+      if (window.innerWidth <= 992) itemsVisible = 3;
+      if (window.innerWidth <= 768) itemsVisible = 2;
+      if (window.innerWidth <= 480) itemsVisible = 1;
+      
+      const totalItems = track.children.length;
+      const maxIndex = Math.max(0, totalItems - itemsVisible);
+      
+      if (currentIndex > maxIndex) currentIndex = maxIndex;
+
+      // Calculate width to slide
+      if (track.children[0]) {
+        const itemWidth = track.children[0].getBoundingClientRect().width;
+        const gap = parseInt(window.getComputedStyle(track).gap) || 20;
+        const moveAmount = itemWidth + gap;
+        track.style.transform = 'translateX(-' + (currentIndex * moveAmount) + 'px)';
+      }
+      
+      // Arrow states
+      prevBtn.disabled = currentIndex === 0;
+      nextBtn.disabled = currentIndex >= maxIndex;
+      
+      prevBtn.style.opacity = currentIndex === 0 ? "0.5" : "1";
+      nextBtn.style.opacity = currentIndex >= maxIndex ? "0.5" : "1";
+    }
+
+    nextBtn.addEventListener('click', function() {
+      let itemsVisible = 4;
+      if (window.innerWidth <= 992) itemsVisible = 3;
+      if (window.innerWidth <= 768) itemsVisible = 2;
+      if (window.innerWidth <= 480) itemsVisible = 1;
+      
+      const maxIndex = Math.max(0, track.children.length - itemsVisible);
+      if (currentIndex < maxIndex) {
+        currentIndex++;
+        updateSlider();
+      }
+    });
+
+    prevBtn.addEventListener('click', function() {
+      if (currentIndex > 0) {
+        currentIndex--;
+        updateSlider();
+      }
+    });
+
+    window.addEventListener('resize', updateSlider);
+    setTimeout(updateSlider, 500); // Init after load
   }
 
     // ========== LOAD DYNAMIC TEXT CONTENT FROM DATABASE ==========
