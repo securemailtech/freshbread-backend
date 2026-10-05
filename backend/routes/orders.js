@@ -12,29 +12,33 @@ const authMiddleware = require('../middleware/auth');
 let transporter = null;
 
 // Initialize email transporter
+// Initialize email transporter (Supports Brevo SMTP or Gmail fallback)
 function initializeEmail() {
-  if (process.env.EMAIL_USER && process.env.EMAIL_APP_PASS) {
-    try {
-      // Spaces hata kar clean password
-      const cleanPass = process.env.EMAIL_APP_PASS.replace(/\s+/g, '');
+  const smtpHost = process.env.SMTP_HOST || 'smtp.gmail.com';
+  const smtpPort = parseInt(process.env.SMTP_PORT) || 465;
+  const smtpUser = process.env.SMTP_USER || process.env.EMAIL_USER;
+  const smtpPass = (process.env.SMTP_PASS || process.env.EMAIL_APP_PASS || '').replace(/\s+/g, '');
 
+  if (smtpUser && smtpPass) {
+    try {
       transporter = nodemailer.createTransport({
-        host: 'smtp.gmail.com',
-        port: 465,             // 👈 Gmail Direct SSL Port (Render timeouts fixed!)
-        secure: true,
+        host: smtpHost,
+        port: smtpPort,
+        secure: smtpPort === 465, // true for 465, false for 587
         auth: {
-          user: process.env.EMAIL_USER,
-          pass: cleanPass
+          user: smtpUser,
+          pass: smtpPass
         },
-        connectionTimeout: 10000,
-        socketTimeout: 10000
+        connectionTimeout: 15000,
+        greetingTimeout: 10000,
+        socketTimeout: 15000
       });
-      console.log('✅ Email notifications enabled (Port 465 SSL)');
+      console.log(`✅ Email transporter initialized using ${smtpHost}:${smtpPort}`);
     } catch (error) {
       console.log('⚠️ Email setup failed:', error.message);
     }
   } else {
-    console.log('⚠️ Email not configured - add EMAIL_USER and EMAIL_APP_PASS to .env');
+    console.log('⚠️ Email not configured - missing SMTP/Gmail credentials');
   }
 }
 
