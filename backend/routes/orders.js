@@ -5,22 +5,20 @@ const { getDb, backupDatabaseToCloudinary } = require('../models/initDb');
 const authMiddleware = require('../middleware/auth');
 
 // ========================================
-// ORDER NOTIFICATION SYSTEM
+// ORDER NOTIFICATION SYSTEM SETUP
 // ========================================
 
-// Email transporter (Gmail / Nodemailer Fallback)
 let transporter = null;
 
-// Initialize email transporter
+// Initialize Nodemailer transporter (Gmail SSL Port 465)
 function initializeEmail() {
   if (process.env.EMAIL_USER && process.env.EMAIL_APP_PASS) {
     try {
-      // Spaces hata kar clean password
       const cleanPass = process.env.EMAIL_APP_PASS.replace(/\s+/g, '');
 
       transporter = nodemailer.createTransport({
         host: 'smtp.gmail.com',
-        port: 465,             // Gmail Direct SSL Port
+        port: 465,
         secure: true,
         auth: {
           user: process.env.EMAIL_USER,
@@ -29,16 +27,15 @@ function initializeEmail() {
         connectionTimeout: 10000,
         socketTimeout: 10000
       });
-      console.log('✅ Nodemailer initialized (Port 465 SSL)');
+      console.log('Nodemailer initialized (Port 465 SSL)');
     } catch (error) {
-      console.log('⚠️ Email setup failed:', error.message);
+      console.log('Email setup failed:', error.message);
     }
   } else {
-    console.log('⚠️ Email not configured - add EMAIL_USER and EMAIL_APP_PASS to .env');
+    console.log('Email not configured - missing EMAIL_USER or EMAIL_APP_PASS');
   }
 }
 
-// Initialize on module load
 initializeEmail();
 
 // Helper: Get current time in Pacific timezone
@@ -59,7 +56,7 @@ async function safeBackup() {
     try {
       await backupDatabaseToCloudinary();
     } catch (err) {
-      console.error('⚠️ Backup trigger error:', err.message);
+      console.error('Backup trigger error:', err.message);
     }
   }
 }
@@ -68,12 +65,11 @@ async function safeBackup() {
 // PUBLIC ROUTES
 // ========================================
 
-// POST /api/orders - Create new order (public)
+// POST /api/orders - Create new order
 router.post('/', async (req, res) => {
   try {
     const { customerName, customerPhone, customerEmail, pickupTime, items, total, notes } = req.body;
 
-    // Validate required fields
     if (!customerName || !customerPhone || !items || !total) {
       return res.status(400).json({ 
         error: 'Missing required fields: name, phone, items, and total are required' 
@@ -83,10 +79,9 @@ router.post('/', async (req, res) => {
     const db = getDb();
     const pacificTime = getPacificTime();
 
-    // Save pickup time inside notes (no DB schema change needed)
+    // Save pickup time inside notes
     const formattedNotes = `⏰ Pickup Time: ${pickupTime || 'ASAP'}${notes ? ' | Notes: ' + notes : ''}`;
 
-    // Save order to database
     db.run(
       `INSERT INTO orders (customer_name, customer_phone, customer_email, items, total, notes, status, created_at) 
        VALUES (?, ?, ?, ?, ?, ?, 'pending', ?)`,
@@ -99,29 +94,27 @@ router.post('/', async (req, res) => {
 
         const orderId = this.lastID;
 
-        // Logging
-        console.log(`\n📦 ════════════════════════════════════`);
-        console.log(`   NEW ORDER #${orderId}`);
-        console.log('════════════════════════════════════');
-        console.log(`   Customer: ${customerName}`);
-        console.log(`   Phone: ${customerPhone}`);
-        console.log(`   Pickup: ${pickupTime || 'ASAP'}`);
-        console.log(`   Items: ${items}`);
-        console.log(`   Total: $${parseFloat(total).toFixed(2)}`);
-        console.log(`   Time: ${pacificTime}`);
-        console.log('════════════════════════════════════\n');
+        console.log(`\n====================================`);
+        console.log(`NEW ORDER #${orderId}`);
+        console.log(`Customer: ${customerName}`);
+        console.log(`Phone: ${customerPhone}`);
+        console.log(`Pickup: ${pickupTime || 'ASAP'}`);
+        console.log(`Items: ${items}`);
+        console.log(`Total: $${parseFloat(total).toFixed(2)}`);
+        console.log(`Time: ${pacificTime}`);
+        console.log(`====================================\n`);
 
-        // 1️⃣ RESPOND TO CLIENT IMMEDIATELY
+        // 1. Send response to client immediately
         res.json({
           success: true,
           message: 'Order placed successfully! We will call you to confirm pickup.',
           orderId
         });
 
-        // 2️⃣ BACKUP DATABASE TO CLOUDINARY (CRITICAL FOR PERSISTENCE)
+        // 2. Trigger Cloudinary database backup
         await safeBackup();
 
-        // 3️⃣ SEND EMAIL IN BACKGROUND (NON-BLOCKING)
+        // 3. Send email in background
         setImmediate(async () => {
           try {
             await sendOrderEmail({
@@ -134,9 +127,9 @@ router.post('/', async (req, res) => {
               total,
               notes: notes || ''
             });
-            console.log('✅ Email notification attempt completed');
+            console.log('Email notification attempt completed');
           } catch (emailError) {
-            console.log('⚠️ Email failed (order still saved in DB):', emailError.message);
+            console.log('Email failed (order saved in DB):', emailError.message);
           }
         });
       }
@@ -223,7 +216,7 @@ router.get('/stats', authMiddleware, (req, res) => {
 
 // POST /api/orders/adjust-revenue - Add/adjust manual revenue
 router.post('/adjust-revenue', authMiddleware, (req, res) => {
-  const { amount, action } = req.body; // action: 'add', 'set', 'reset'
+  const { amount, action } = req.body;
   const db = getDb();
 
   if (amount === undefined && action !== 'reset') {
@@ -299,13 +292,13 @@ router.put('/:id', authMiddleware, (req, res) => {
   db.run(query, params, async function(err) {
     if (err) return res.status(500).json({ error: 'Database error' });
     if (this.changes === 0) return res.status(404).json({ error: 'Order not found' });
-    console.log(`📝 Order #${id} updated to: ${status || 'no status change'}`);
+    console.log(`Order #${id} updated to: ${status || 'no status change'}`);
     res.json({ success: true, id, status, notes });
     await safeBackup();
   });
 });
 
-// POST /api/orders/import - Import historical orders (Admin Only)
+// POST /api/orders/import - Import historical orders
 router.post('/import', authMiddleware, async (req, res) => {
   try {
     const { orders } = req.body;
@@ -335,8 +328,8 @@ router.post('/import', authMiddleware, async (req, res) => {
     });
 
     stmt.finalize(async () => {
-      console.log(`📦 Imported ${orders.length} orders into Database`);
-      await safeBackup(); // Cloudinary par instant backup!
+      console.log(`Imported ${orders.length} orders into Database`);
+      await safeBackup();
       res.json({ success: true, count: orders.length });
     });
 
@@ -353,23 +346,19 @@ router.delete('/:id', authMiddleware, (req, res) => {
   db.run('DELETE FROM orders WHERE id = ?', [req.params.id], async function(err) {
     if (err) return res.status(500).json({ error: 'Database error' });
     if (this.changes === 0) return res.status(404).json({ error: 'Order not found' });
-    console.log(`🗑️ Order #${req.params.id} deleted`);
+    console.log(`Order #${req.params.id} deleted`);
     res.json({ success: true });
     await safeBackup();
   });
 });
 
 // ========================================
-// EMAIL FUNCTION
-// ========================================
-
-// ========================================
-// EMAIL FUNCTION (WITH CC SUPPORT)
+// EMAIL DISPATCH FUNCTION (Resend / Brevo / Nodemailer with CC support)
 // ========================================
 
 async function sendOrderEmail(order) {
   const ownerEmail = process.env.OWNER_EMAIL || process.env.EMAIL_USER || 'nicholasaambriz@gmail.com';
-  const ccEmail = process.env.CC_EMAIL; // 👈 Aapka CC Email
+  const ccEmail = process.env.CC_EMAIL;
   const pacificTime = getPacificTime();
 
   const htmlContent = `
@@ -402,7 +391,7 @@ async function sendOrderEmail(order) {
     <body>
       <div class="container">
         <div class="header">
-          <h1>🍞 New Order Received!</h1>
+          <h1>New Order Received!</h1>
           <div class="order-id">Order #${order.id}</div>
         </div>
         <div class="content">
@@ -412,20 +401,20 @@ async function sendOrderEmail(order) {
             <div class="info-row"><span class="info-label">Phone</span><span class="info-value">${order.customerPhone}</span></div>
             <div class="info-row"><span class="info-label">Email</span><span class="info-value">${order.customerEmail}</span></div>
             <div class="info-row pickup-highlight">
-              <span class="info-label">⏰ Preferred Pickup</span>
+              <span class="info-label">Preferred Pickup</span>
               <span class="info-value" style="color:#960909;font-weight:bold;font-size:16px;">${order.pickupTime || 'ASAP'}</span>
             </div>
           </div>
           <div class="section">
             <div class="section-title">Order Details</div>
             <div class="info-row"><span class="info-label">Items</span><span class="info-value">${order.items}</span></div>
-            ${order.notes ? `<div class="notes"><strong>📝 Notes:</strong><br>${order.notes}</div>` : ''}
+            ${order.notes ? `<div class="notes"><strong>Notes:</strong><br>${order.notes}</div>` : ''}
           </div>
           <div class="total-row">
             <span class="total-label">Total</span>
             <span class="total-value">$${parseFloat(order.total).toFixed(2)}</span>
           </div>
-          <a href="tel:${order.customerPhone.replace(/[^0-9]/g, '')}" class="cta">📞 Call Customer Now</a>
+          <a href="tel:${order.customerPhone.replace(/[^0-9]/g, '')}" class="cta">Call Customer Now</a>
         </div>
         <div class="footer">
           Fresh Hot Bread All Day • Stockton, CA<br>
@@ -436,13 +425,13 @@ async function sendOrderEmail(order) {
     </html>
   `;
 
-  // 1️⃣ RESEND HTTP API
+  // 1️⃣ RESEND HTTP API (Fastest on cloud platforms)
   if (process.env.RESEND_API_KEY) {
     try {
       const resendPayload = {
         from: 'Fresh Hot Bread <onboarding@resend.dev>',
         to: [ownerEmail],
-        subject: `🍞 New Order #${order.id} - $${parseFloat(order.total).toFixed(2)} - ${order.customerName}`,
+        subject: `New Order #${order.id} - $${parseFloat(order.total).toFixed(2)} - ${order.customerName}`,
         html: htmlContent
       };
 
@@ -461,11 +450,11 @@ async function sendOrderEmail(order) {
 
       const resData = await response.json();
       if (response.ok) {
-        console.log('⚡ Email sent instantly via Resend API with CC:', resData.id);
+        console.log('Email sent instantly via Resend API with CC ID:', resData.id);
         return;
       }
     } catch (err) {
-      console.error('⚠️ Resend fetch failed:', err.message);
+      console.error('Resend API fetch failed:', err.message);
     }
   }
 
@@ -473,9 +462,9 @@ async function sendOrderEmail(order) {
   if (process.env.BREVO_API_KEY) {
     try {
       const brevoPayload = {
-        sender: { name: 'Fresh Hot Bread 🍞', email: 'nicholasaambriz@gmail.com' },
+        sender: { name: 'Fresh Hot Bread', email: 'nicholasaambriz@gmail.com' },
         to: [{ email: ownerEmail }],
-        subject: `🍞 New Order #${order.id} - $${parseFloat(order.total).toFixed(2)} - ${order.customerName}`,
+        subject: `New Order #${order.id} - $${parseFloat(order.total).toFixed(2)} - ${order.customerName}`,
         htmlContent: htmlContent
       };
 
@@ -492,20 +481,20 @@ async function sendOrderEmail(order) {
         body: JSON.stringify(brevoPayload)
       });
       if (response.ok) {
-        console.log('⚡ Email sent instantly via Brevo API with CC');
+        console.log('Email sent instantly via Brevo API with CC');
         return;
       }
     } catch (err) {
-      console.error('⚠️ Brevo fetch failed:', err.message);
+      console.error('Brevo API fetch failed:', err.message);
     }
   }
 
-  // 3️⃣ NODEMAILER FALLBACK (GMAIL / LOCAL)
+  // 3️⃣ NODEMAILER FALLBACK (Gmail / Local Dev)
   if (transporter) {
     const mailOptions = {
-      from: `"Fresh Hot Bread 🍞" <${process.env.EMAIL_USER}>`,
+      from: `"Fresh Hot Bread" <${process.env.EMAIL_USER}>`,
       to: ownerEmail,
-      subject: `🍞 New Order #${order.id} - $${parseFloat(order.total).toFixed(2)} - ${order.customerName}`,
+      subject: `New Order #${order.id} - $${parseFloat(order.total).toFixed(2)} - ${order.customerName}`,
       html: htmlContent
     };
 
@@ -514,7 +503,7 @@ async function sendOrderEmail(order) {
     }
 
     await transporter.sendMail(mailOptions);
-    console.log('✉️ Email sent via Nodemailer with CC');
+    console.log('Email sent via Nodemailer with CC');
   }
 }
 
