@@ -1,14 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const nodemailer = require('nodemailer');
-const { getDb } = require('../models/initDb');
+const { getDb, backupDatabaseToCloudinary } = require('../models/initDb');
 const authMiddleware = require('../middleware/auth');
 
 // ========================================
 // ORDER NOTIFICATION SYSTEM
 // ========================================
 
-// Email transporter (Gmail)
+// Email transporter (Gmail / Nodemailer Fallback)
 let transporter = null;
 
 // Initialize email transporter
@@ -20,7 +20,7 @@ function initializeEmail() {
 
       transporter = nodemailer.createTransport({
         host: 'smtp.gmail.com',
-        port: 465,             // 👈 Gmail Direct SSL Port (Render timeouts fixed!)
+        port: 465,             // Gmail Direct SSL Port
         secure: true,
         auth: {
           user: process.env.EMAIL_USER,
@@ -29,7 +29,7 @@ function initializeEmail() {
         connectionTimeout: 10000,
         socketTimeout: 10000
       });
-      console.log('✅ Email notifications enabled (Port 465 SSL)');
+      console.log('✅ Nodemailer initialized (Port 465 SSL)');
     } catch (error) {
       console.log('⚠️ Email setup failed:', error.message);
     }
@@ -53,11 +53,21 @@ function getPacificDateString() {
   return pacific.toISOString().split('T')[0];
 }
 
+// Helper: Safe Cloudinary Backup Trigger
+async function safeBackup() {
+  if (typeof backupDatabaseToCloudinary === 'function') {
+    try {
+      await backupDatabaseToCloudinary();
+    } catch (err) {
+      console.error('⚠️ Backup trigger error:', err.message);
+    }
+  }
+}
+
 // ========================================
 // PUBLIC ROUTES
 // ========================================
 
-// POST /api/orders - Create new order (public)
 // POST /api/orders - Create new order (public)
 router.post('/', async (req, res) => {
   try {
@@ -81,7 +91,7 @@ router.post('/', async (req, res) => {
       `INSERT INTO orders (customer_name, customer_phone, customer_email, items, total, notes, status, created_at) 
        VALUES (?, ?, ?, ?, ?, ?, 'pending', ?)`,
       [customerName, customerPhone, customerEmail || '', items, total, formattedNotes, pacificTime],
-      function(err) {
+      async function(err) {
         if (err) {
           console.error('Database error:', err);
           return res.status(500).json({ error: 'Failed to save order' });
@@ -101,40 +111,34 @@ router.post('/', async (req, res) => {
         console.log(`   Time: ${pacificTime}`);
         console.log('════════════════════════════════════\n');
 
-        // 1️⃣ RESPOND IMMEDIATELY
+        // 1️⃣ RESPOND TO CLIENT IMMEDIATELY
         res.json({
           success: true,
           message: 'Order placed successfully! We will call you to confirm pickup.',
           orderId
         });
 
-        // 2️⃣ BACKUP DATABASE
-        if (typeof backupDatabaseToCloudinary === 'function') {
-          backupDatabaseToCloudinary();
-        }
+        // 2️⃣ BACKUP DATABASE TO CLOUDINARY (CRITICAL FOR PERSISTENCE)
+        await safeBackup();
 
-        // 3️⃣ SEND EMAIL IN BACKGROUND
-        if (transporter && (process.env.OWNER_EMAIL || process.env.EMAIL_USER)) {
-          setImmediate(async () => {
-            try {
-              await sendOrderEmail({
-                id: orderId,
-                customerName,
-                customerPhone,
-                customerEmail: customerEmail || 'Not provided',
-                pickupTime: pickupTime || 'ASAP',
-                items,
-                total,
-                notes: notes || ''
-              });
-              console.log('✅ Email notification sent to owner');
-            } catch (emailError) {
-              console.log('⚠️ Email failed (order still saved):', emailError.message);
-            }
-          });
-        } else {
-          console.log('⚠️ Email skipped: OWNER_EMAIL or EMAIL_USER not set');
-        }
+        // 3️⃣ SEND EMAIL IN BACKGROUND (NON-BLOCKING)
+        setImmediate(async () => {
+          try {
+            await sendOrderEmail({
+              id: orderId,
+              customerName,
+              customerPhone,
+              customerEmail: customerEmail || 'Not provided',
+              pickupTime: pickupTime || 'ASAP',
+              items,
+              total,
+              notes: notes || ''
+            });
+            console.log('✅ Email notification attempt completed');
+          } catch (emailError) {
+            console.log('⚠️ Email failed (order still saved in DB):', emailError.message);
+          }
+        });
       }
     );
 
@@ -230,9 +234,10 @@ router.post('/adjust-revenue', authMiddleware, (req, res) => {
     db.run(
       `INSERT INTO site_content (key, value, updated_at) VALUES ('manual_revenue', '0', CURRENT_TIMESTAMP)
        ON CONFLICT(key) DO UPDATE SET value = '0', updated_at = CURRENT_TIMESTAMP`,
-      function(err) {
+      async function(err) {
         if (err) return res.status(500).json({ error: 'Database error' });
         res.json({ success: true, manual_revenue: 0 });
+        await safeBackup();
       }
     );
   } else if (action === 'set') {
@@ -240,9 +245,10 @@ router.post('/adjust-revenue', authMiddleware, (req, res) => {
       `INSERT INTO site_content (key, value, updated_at) VALUES ('manual_revenue', ?, CURRENT_TIMESTAMP)
        ON CONFLICT(key) DO UPDATE SET value = ?, updated_at = CURRENT_TIMESTAMP`,
       [amount.toString(), amount.toString()],
-      function(err) {
+      async function(err) {
         if (err) return res.status(500).json({ error: 'Database error' });
         res.json({ success: true, manual_revenue: amount });
+        await safeBackup();
       }
     );
   } else {
@@ -254,9 +260,10 @@ router.post('/adjust-revenue', authMiddleware, (req, res) => {
         `INSERT INTO site_content (key, value, updated_at) VALUES ('manual_revenue', ?, CURRENT_TIMESTAMP)
          ON CONFLICT(key) DO UPDATE SET value = ?, updated_at = CURRENT_TIMESTAMP`,
         [newManual.toString(), newManual.toString()],
-        function(err) {
+        async function(err) {
           if (err) return res.status(500).json({ error: 'Database error' });
           res.json({ success: true, manual_revenue: newManual });
+          await safeBackup();
         }
       );
     });
@@ -289,11 +296,12 @@ router.put('/:id', authMiddleware, (req, res) => {
   params.push(id);
   const query = `UPDATE orders SET ${updates.join(', ')} WHERE id = ?`;
 
-  db.run(query, params, function(err) {
+  db.run(query, params, async function(err) {
     if (err) return res.status(500).json({ error: 'Database error' });
     if (this.changes === 0) return res.status(404).json({ error: 'Order not found' });
     console.log(`📝 Order #${id} updated to: ${status || 'no status change'}`);
     res.json({ success: true, id, status, notes });
+    await safeBackup();
   });
 });
 
@@ -301,20 +309,17 @@ router.put('/:id', authMiddleware, (req, res) => {
 router.delete('/:id', authMiddleware, (req, res) => {
   const db = getDb();
 
-  db.run('DELETE FROM orders WHERE id = ?', [req.params.id], function(err) {
+  db.run('DELETE FROM orders WHERE id = ?', [req.params.id], async function(err) {
     if (err) return res.status(500).json({ error: 'Database error' });
     if (this.changes === 0) return res.status(404).json({ error: 'Order not found' });
     console.log(`🗑️ Order #${req.params.id} deleted`);
     res.json({ success: true });
+    await safeBackup();
   });
 });
 
 // ========================================
 // EMAIL FUNCTION
-// ========================================
-
-// ========================================
-// EMAIL FUNCTION (HTTP API - ZERO TIMEOUTS ON RENDER)
 // ========================================
 
 async function sendOrderEmail(order) {
@@ -385,7 +390,7 @@ async function sendOrderEmail(order) {
     </html>
   `;
 
-  // 1️⃣ RESEND HTTP API (SUPER FAST - NO TIMEOUTS)
+  // 1️⃣ RESEND HTTP API (FASTEST FOR RENDER)
   if (process.env.RESEND_API_KEY) {
     try {
       const response = await fetch('https://api.resend.com/emails', {
@@ -439,7 +444,7 @@ async function sendOrderEmail(order) {
     }
   }
 
-  // 3️⃣ NODEMAILER FALLBACK (LOCAL DEV)
+  // 3️⃣ NODEMAILER FALLBACK (LOCAL DEV / GMAIL)
   if (transporter) {
     await transporter.sendMail({
       from: `"Fresh Hot Bread 🍞" <${process.env.EMAIL_USER}>`,
@@ -447,6 +452,7 @@ async function sendOrderEmail(order) {
       subject: `🍞 New Order #${order.id} - $${parseFloat(order.total).toFixed(2)} - ${order.customerName}`,
       html: htmlContent
     });
+    console.log('✉️ Email sent via Nodemailer Transporter');
   }
 }
 

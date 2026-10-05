@@ -38,7 +38,10 @@ function getDb() {
 // AUTO-BACKUP DATA TO CLOUDINARY (JSON FORMAT)
 // ==========================================
 async function backupDatabaseToCloudinary() {
-  if (!process.env.CLOUDINARY_CLOUD_NAME) return;
+  if (!process.env.CLOUDINARY_CLOUD_NAME) {
+    console.log('⚠️ Cloudinary keys not found, skipping backup.');
+    return;
+  }
   const database = getDb();
   
   try {
@@ -46,7 +49,7 @@ async function backupDatabaseToCloudinary() {
     const orders = await new Promise((res, rej) => database.all("SELECT * FROM orders", (e, r) => e ? rej(e) : res(r || [])));
     const images = await new Promise((res, rej) => database.all("SELECT * FROM site_images", (e, r) => e ? rej(e) : res(r || [])));
 
-    const backupObj = { content, orders, images };
+    const backupObj = { content, orders, images, timestamp: new Date().toISOString() };
     const base64Data = `data:text/plain;base64,${Buffer.from(JSON.stringify(backupObj)).toString('base64')}`;
 
     await cloudinary.uploader.upload(base64Data, {
@@ -55,7 +58,7 @@ async function backupDatabaseToCloudinary() {
       overwrite: true,
       invalidate: true
     });
-    console.log('☁️ Database Data JSON Auto-Backed up to Cloudinary!');
+    console.log(`☁️ Cloudinary Auto-Backup SUCCESS! (${orders.length} orders, ${content.length} content keys backed up)`);
   } catch (err) {
     console.error('⚠️ DB Backup warning:', err.message);
   }
@@ -67,7 +70,8 @@ async function backupDatabaseToCloudinary() {
 async function restoreDatabaseFromCloudinary() {
   if (!process.env.CLOUDINARY_CLOUD_NAME) return false;
   
-  const backupUrl = `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/raw/upload/freshbread_data_backup.json`;
+  // Appending timestamp to bypass CDN cache and get FRESH backup
+  const backupUrl = `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/raw/upload/freshbread_data_backup.json?t=${Date.now()}`;
   
   return new Promise((resolve) => {
     console.log('🔄 Checking for Database JSON backup on Cloudinary...');
@@ -84,23 +88,23 @@ async function restoreDatabaseFromCloudinary() {
               // Restore Content
               if (parsed.content && parsed.content.length > 0) {
                 const stmt = database.prepare("INSERT OR REPLACE INTO site_content (id, key, value, updated_at) VALUES (?, ?, ?, ?)");
-                parsed.content.forEach(c => stmt.run(c.id, c.key, c.value, c.updated_at));
+                parsed.content.forEach(c => stmt.run(c.id, c.key, c.value, c.updated_at || new Date().toISOString()));
                 stmt.finalize();
               }
               // Restore Orders
               if (parsed.orders && parsed.orders.length > 0) {
                 const stmt = database.prepare("INSERT OR REPLACE INTO orders (id, customer_name, customer_phone, customer_email, items, total, status, notes, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-                parsed.orders.forEach(o => stmt.run(o.id, o.customer_name, o.customer_phone, o.customer_email, o.items, o.total, o.status, o.notes, o.created_at, o.updated_at));
+                parsed.orders.forEach(o => stmt.run(o.id, o.customer_name, o.customer_phone, o.customer_email || '', o.items, o.total, o.status || 'pending', o.notes || '', o.created_at || new Date().toISOString(), o.updated_at || new Date().toISOString()));
                 stmt.finalize();
               }
               // Restore Images
               if (parsed.images && parsed.images.length > 0) {
                 const stmt = database.prepare("INSERT OR REPLACE INTO site_images (id, key, filename, url, updated_at) VALUES (?, ?, ?, ?, ?)");
-                parsed.images.forEach(img => stmt.run(img.id, img.key, img.filename, img.url, img.updated_at));
+                parsed.images.forEach(img => stmt.run(img.id, img.key, img.filename, img.url, img.updated_at || new Date().toISOString()));
                 stmt.finalize();
               }
             });
-            console.log('✅ SQLite Database successfully restored from Cloudinary JSON backup!');
+            console.log(`✅ SQLite Database successfully restored from Cloudinary! (${parsed.orders ? parsed.orders.length : 0} orders loaded)`);
             resolve(true);
           } catch (e) {
             console.log('⚠️ Failed to parse backup JSON:', e.message);
@@ -108,7 +112,7 @@ async function restoreDatabaseFromCloudinary() {
           }
         });
       } else {
-        console.log('ℹ️ No existing Cloudinary JSON backup found, starting fresh.');
+        console.log('ℹ️ No existing Cloudinary JSON backup found, starting with default DB.');
         resolve(false);
       }
     }).on('error', (err) => {
@@ -118,12 +122,15 @@ async function restoreDatabaseFromCloudinary() {
   });
 }
 
+// ==========================================
+// INITIALIZE DATABASE TABLES & DEFAULT DATA
+// ==========================================
 async function initializeDatabase() {
-  return new Promise((resolve, reject) => {
-    const database = getDb();
-    
-    database.serialize(async () => {
-      // Create Tables
+  const database = getDb();
+
+  // 1. Create Tables First
+  await new Promise((resolve, reject) => {
+    database.serialize(() => {
       database.run(`
         CREATE TABLE IF NOT EXISTS admin_users (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -165,9 +172,15 @@ async function initializeDatabase() {
           created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
           updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )
-      `);
+      `, (err) => {
+        if (err) {
+          console.log('Orders table check complete');
+        } else {
+          console.log('✅ Orders table ready');
+        }
+      });
 
-      // Default Content
+      // Default Content Insertion
       const defaultContent = [
         ['hero_title', 'Señorita'],
         ['hero_subtitle', 'Made Fresh Daily'],
@@ -185,23 +198,44 @@ async function initializeDatabase() {
 
       const insertContent = database.prepare(`INSERT OR IGNORE INTO site_content (key, value) VALUES (?, ?)`);
       defaultContent.forEach(([key, value]) => insertContent.run(key, value));
-      insertContent.finalize();
+      insertContent.finalize(() => resolve());
+    });
+  });
 
-      // RESTORE FROM CLOUDINARY BACKUP
-      await restoreDatabaseFromCloudinary();
+  // 2. Restore data from Cloudinary (if available)
+  await restoreDatabaseFromCloudinary();
 
-      // Admin Password Management
-      const adminUsername = process.env.ADMIN_USERNAME || 'admin';
-      const adminPassword = process.env.ADMIN_PASSWORD || 'Blues@13';
-      const hashedPassword = bcrypt.hashSync(adminPassword, 10);
+  // 3. Default Admin User Creation/Update
+  return new Promise((resolve) => {
+    const adminUsername = process.env.ADMIN_USERNAME || 'admin';
+    const adminPassword = process.env.ADMIN_PASSWORD || 'Blues@13';
+    const hashedPassword = bcrypt.hashSync(adminPassword, 10);
 
-      database.get(`SELECT id FROM admin_users WHERE username = ?`, [adminUsername], (err, row) => {
-        if (row) {
-          database.run(`UPDATE admin_users SET password = ? WHERE username = ?`, [hashedPassword, adminUsername], () => resolve(database));
-        } else {
-          database.run(`INSERT INTO admin_users (username, password) VALUES (?, ?)`, [adminUsername, hashedPassword], () => resolve(database));
-        }
-      });
+    database.get(`SELECT id FROM admin_users WHERE username = ?`, [adminUsername], (err, row) => {
+      if (err) {
+        console.error('Admin user check error:', err);
+        return resolve(database);
+      }
+
+      if (row) {
+        database.run(
+          `UPDATE admin_users SET password = ? WHERE username = ?`,
+          [hashedPassword, adminUsername],
+          (err) => {
+            if (!err) console.log('🔁 Admin password updated from ENV');
+            resolve(database);
+          }
+        );
+      } else {
+        database.run(
+          `INSERT INTO admin_users (username, password) VALUES (?, ?)`,
+          [adminUsername, hashedPassword],
+          (err) => {
+            if (!err) console.log('✅ Default admin user created');
+            resolve(database);
+          }
+        );
+      }
     });
   });
 }
