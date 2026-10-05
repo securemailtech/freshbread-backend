@@ -305,6 +305,47 @@ router.put('/:id', authMiddleware, (req, res) => {
   });
 });
 
+// POST /api/orders/import - Import historical orders (Admin Only)
+router.post('/import', authMiddleware, async (req, res) => {
+  try {
+    const { orders } = req.body;
+    if (!Array.isArray(orders) || orders.length === 0) {
+      return res.status(400).json({ error: 'No orders array provided' });
+    }
+
+    const db = getDb();
+    const stmt = db.prepare(`
+      INSERT OR REPLACE INTO orders (id, customer_name, customer_phone, customer_email, items, total, status, notes, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `);
+
+    orders.forEach(o => {
+      stmt.run(
+        o.id,
+        o.customer_name,
+        o.customer_phone,
+        o.customer_email || '',
+        o.items,
+        o.total,
+        o.status || 'pending',
+        o.notes || '',
+        o.created_at || new Date().toISOString(),
+        o.updated_at || new Date().toISOString()
+      );
+    });
+
+    stmt.finalize(async () => {
+      console.log(`📦 Imported ${orders.length} orders into Database`);
+      await safeBackup(); // Cloudinary par instant backup!
+      res.json({ success: true, count: orders.length });
+    });
+
+  } catch (err) {
+    console.error('Import Error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // DELETE /api/orders/:id - Delete order
 router.delete('/:id', authMiddleware, (req, res) => {
   const db = getDb();
