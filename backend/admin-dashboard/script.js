@@ -737,7 +737,11 @@ function setupImageUploads() {
     'gallery1': { path: 'images/hq720.jpg', previewId: 'preview-gallery1' },
     'gallery2': { path: 'images/bread 2.jpg', previewId: 'preview-gallery2' },
     'gallery3': { path: 'images/Screenshot 2025-12-04 123539.png', previewId: 'preview-gallery3' },
-    'gallery4': { path: 'images/frontview.webp', previewId: 'preview-gallery4' }
+    'gallery4': { path: 'images/frontview.webp', previewId: 'preview-gallery4' },
+    'gallery5': { path: 'images/hq720.jpg', previewId: 'preview-gallery5' },
+    'gallery6': { path: 'images/bread 2.jpg', previewId: 'preview-gallery6' },
+    'gallery7': { path: 'images/Screenshot 2025-12-04 123539.png', previewId: 'preview-gallery7' },
+    'gallery8': { path: 'images/frontview.webp', previewId: 'preview-gallery8' }
   };
   
   // Set up file input handlers
@@ -829,7 +833,7 @@ async function loadImagePreviews() {
     // Check for custom image paths
     const imageKeys = ['hero', 'logo', 'product', 'coffee-machine', 'coffee-menu', 
                        'feature1', 'feature2', 'feature3', 
-                       'gallery1', 'gallery2', 'gallery3', 'gallery4'];
+                       'gallery1', 'gallery2', 'gallery3', 'gallery4', 'gallery5', 'gallery6', 'gallery7', 'gallery8'];
     
     imageKeys.forEach(key => {
       const customPath = content[`image_${key}`];
