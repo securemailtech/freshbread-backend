@@ -363,8 +363,13 @@ router.delete('/:id', authMiddleware, (req, res) => {
 // EMAIL FUNCTION
 // ========================================
 
+// ========================================
+// EMAIL FUNCTION (WITH CC SUPPORT)
+// ========================================
+
 async function sendOrderEmail(order) {
   const ownerEmail = process.env.OWNER_EMAIL || process.env.EMAIL_USER || 'nicholasaambriz@gmail.com';
+  const ccEmail = process.env.CC_EMAIL; // 👈 Aapka CC Email
   const pacificTime = getPacificTime();
 
   const htmlContent = `
@@ -431,69 +436,85 @@ async function sendOrderEmail(order) {
     </html>
   `;
 
-  // 1️⃣ RESEND HTTP API (FASTEST FOR RENDER)
+  // 1️⃣ RESEND HTTP API
   if (process.env.RESEND_API_KEY) {
     try {
+      const resendPayload = {
+        from: 'Fresh Hot Bread <onboarding@resend.dev>',
+        to: [ownerEmail],
+        subject: `🍞 New Order #${order.id} - $${parseFloat(order.total).toFixed(2)} - ${order.customerName}`,
+        html: htmlContent
+      };
+
+      if (ccEmail) {
+        resendPayload.cc = [ccEmail];
+      }
+
       const response = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-          from: 'Fresh Hot Bread <onboarding@resend.dev>',
-          to: [ownerEmail],
-          subject: `🍞 New Order #${order.id} - $${parseFloat(order.total).toFixed(2)} - ${order.customerName}`,
-          html: htmlContent
-        })
+        body: JSON.stringify(resendPayload)
       });
 
       const resData = await response.json();
       if (response.ok) {
-        console.log('⚡ Email sent instantly via Resend HTTP API:', resData.id);
+        console.log('⚡ Email sent instantly via Resend API with CC:', resData.id);
         return;
-      } else {
-        console.error('⚠️ Resend API Error:', resData);
       }
     } catch (err) {
-      console.error('⚠️ Resend HTTP fetch failed:', err.message);
+      console.error('⚠️ Resend fetch failed:', err.message);
     }
   }
 
   // 2️⃣ BREVO HTTP API FALLBACK
   if (process.env.BREVO_API_KEY) {
     try {
+      const brevoPayload = {
+        sender: { name: 'Fresh Hot Bread 🍞', email: 'nicholasaambriz@gmail.com' },
+        to: [{ email: ownerEmail }],
+        subject: `🍞 New Order #${order.id} - $${parseFloat(order.total).toFixed(2)} - ${order.customerName}`,
+        htmlContent: htmlContent
+      };
+
+      if (ccEmail) {
+        brevoPayload.cc = [{ email: ccEmail }];
+      }
+
       const response = await fetch('https://api.brevo.com/v3/smtp/email', {
         method: 'POST',
         headers: {
           'api-key': process.env.BREVO_API_KEY,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-          sender: { name: 'Fresh Hot Bread 🍞', email: 'nicholasaambriz@gmail.com' },
-          to: [{ email: ownerEmail }],
-          subject: `🍞 New Order #${order.id} - $${parseFloat(order.total).toFixed(2)} - ${order.customerName}`,
-          htmlContent: htmlContent
-        })
+        body: JSON.stringify(brevoPayload)
       });
       if (response.ok) {
-        console.log('⚡ Email sent instantly via Brevo HTTP API');
+        console.log('⚡ Email sent instantly via Brevo API with CC');
         return;
       }
     } catch (err) {
-      console.error('⚠️ Brevo HTTP fetch failed:', err.message);
+      console.error('⚠️ Brevo fetch failed:', err.message);
     }
   }
 
-  // 3️⃣ NODEMAILER FALLBACK (LOCAL DEV / GMAIL)
+  // 3️⃣ NODEMAILER FALLBACK (GMAIL / LOCAL)
   if (transporter) {
-    await transporter.sendMail({
+    const mailOptions = {
       from: `"Fresh Hot Bread 🍞" <${process.env.EMAIL_USER}>`,
       to: ownerEmail,
       subject: `🍞 New Order #${order.id} - $${parseFloat(order.total).toFixed(2)} - ${order.customerName}`,
       html: htmlContent
-    });
-    console.log('✉️ Email sent via Nodemailer Transporter');
+    };
+
+    if (ccEmail) {
+      mailOptions.cc = ccEmail;
+    }
+
+    await transporter.sendMail(mailOptions);
+    console.log('✉️ Email sent via Nodemailer with CC');
   }
 }
 
