@@ -2812,3 +2812,10 @@ h1, h2, h3, h4 {
     display: flex !important;
   }
 }
+
+.phone-confirm-notice {
+  background: #EBF8FF;
+  border-left: 4px solid #3182CE;
+  color: #2C5282;
+  margin-top: 10px;
+}

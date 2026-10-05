@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", function() {
   
+  
   // ========== API CONFIGURATION ==========
   // Works both locally AND on Render!
   let API_URL;
@@ -190,7 +191,7 @@ document.addEventListener("DOMContentLoaded", function() {
   if (cartClose) cartClose.addEventListener("click", closeCart);
   if (cartOverlay) cartOverlay.addEventListener("click", closeCart);
 
-  // ========== ORDER FORM ==========
+    // ========== ORDER FORM (Pickup Time + Phone Confirmation) ==========
   let orderFormCreated = false;
   
   function createOrderForm() {
@@ -202,37 +203,46 @@ document.addEventListener("DOMContentLoaded", function() {
     const orderForm = document.createElement('div');
     orderForm.id = 'order-form';
     orderForm.className = 'order-form';
-    orderForm.innerHTML = '<div class="order-form-header">' +
-      '<button type="button" class="back-btn" id="back-to-cart">← Back</button>' +
-      '<h4>Your Information</h4>' +
+    orderForm.innerHTML = 
+      '<div class="order-form-header">' +
+        '<button type="button" class="back-btn" id="back-to-cart">← Back</button>' +
+        '<h4>Your Information</h4>' +
       '</div>' +
       '<form id="checkout-form">' +
-      '<div class="form-group">' +
-      '<label for="order-customer-name">Name *</label>' +
-      '<input type="text" id="order-customer-name" required placeholder="Your full name">' +
-      '</div>' +
-      '<div class="form-group">' +
-      '<label for="order-customer-phone">Phone *</label>' +
-      '<input type="tel" id="order-customer-phone" required placeholder="(209) 555-1234">' +
-      '</div>' +
-      '<div class="form-group">' +
-      '<label for="order-customer-email">Email (optional)</label>' +
-      '<input type="email" id="order-customer-email" placeholder="your@email.com">' +
-      '</div>' +
-      '<div class="form-group">' +
-      '<label for="order-notes">Special Notes</label>' +
-      '<textarea id="order-notes" rows="2" placeholder="Pickup time, special requests..."></textarea>' +
-      '</div>' +
-      '<button type="submit" class="submit-order-btn">' +
-      'Place Order - $<span id="form-total">0.00</span>' +
-      '</button>' +
+        '<div class="form-group">' +
+          '<label for="order-customer-name">Name *</label>' +
+          '<input type="text" id="order-customer-name" required placeholder="Your full name">' +
+        '</div>' +
+        '<div class="form-group">' +
+          '<label for="order-customer-phone">Phone *</label>' +
+          '<input type="tel" id="order-customer-phone" required placeholder="(209) 555-1234">' +
+        '</div>' +
+        '<div class="form-group">' +
+          '<label for="order-customer-email">Email (optional)</label>' +
+          '<input type="email" id="order-customer-email" placeholder="your@email.com">' +
+        '</div>' +
+        '<div class="form-group">' +
+          '<label for="order-pickup-time">Preferred Pickup Time *</label>' +
+          '<input type="text" id="order-pickup-time" required placeholder="e.g. 8:30 AM, 11:00 AM, ASAP">' +
+        '</div>' +
+        '<div class="form-group">' +
+          '<label for="order-notes">Special Notes</label>' +
+          '<textarea id="order-notes" rows="2" placeholder="Special requests..."></textarea>' +
+        '</div>' +
+        '<div class="pickup-notice-box">' +
+          '📞 <strong>Please note:</strong> All orders will be confirmed by phone call before preparation.' +
+        '</div>' +
+        '<button type="submit" class="submit-order-btn">' +
+          'Place Order - $<span id="form-total">0.00</span>' +
+        '</button>' +
       '</form>';
     
     cartFooter.parentNode.insertBefore(orderForm, cartFooter.nextSibling);
     
     // Styles
     const style = document.createElement('style');
-    style.textContent = '.order-form { display: none; padding: 24px; background: var(--warm-white, #FFFEF9); border-top: 1px solid rgba(0,0,0,0.08); }' +
+    style.textContent = 
+      '.order-form { display: none; padding: 24px; background: var(--warm-white, #FFFEF9); border-top: 1px solid rgba(0,0,0,0.08); }' +
       '.order-form.show { display: block; }' +
       '.order-form-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }' +
       '.order-form-header h4 { font-size: 1.25rem; color: #960909; margin: 0; font-family: "Playfair Display", serif; }' +
@@ -242,14 +252,16 @@ document.addEventListener("DOMContentLoaded", function() {
       '.order-form label { display: block; font-weight: 600; font-size: 14px; margin-bottom: 6px; color: #2C2C2C; }' +
       '.order-form input, .order-form textarea { width: 100%; padding: 12px 16px; border: 2px solid rgba(0,0,0,0.1); border-radius: 12px; font-size: 15px; font-family: inherit; transition: 0.2s; box-sizing: border-box; }' +
       '.order-form input:focus, .order-form textarea:focus { outline: none; border-color: #960909; }' +
+      '.pickup-notice-box { background: #EBF8FF; border-left: 4px solid #3182CE; color: #2C5282; padding: 12px 14px; font-size: 13px; border-radius: 8px; margin-bottom: 18px; line-height: 1.4; }' +
       '.submit-order-btn { width: 100%; padding: 16px 24px; background: #960909; color: white; border: none; border-radius: 12px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: 0.2s; }' +
       '.submit-order-btn:hover { background: #6B0707; }' +
       '.submit-order-btn:disabled { opacity: 0.7; cursor: not-allowed; }' +
       '.cart-footer.hidden { display: none; }' +
-      '.order-success { text-align: center; padding: 40px 24px; }' +
-      '.order-success .success-icon { font-size: 64px; margin-bottom: 16px; }' +
-      '.order-success h3 { color: #960909; margin-bottom: 12px; font-family: "Playfair Display", serif; }' +
-      '.order-success p { color: #666; margin-bottom: 8px; }';
+      '.order-success { text-align: center; padding: 30px 20px; }' +
+      '.order-success .success-icon { font-size: 54px; margin-bottom: 12px; color: #2F855A; }' +
+      '.order-success h3 { color: #960909; margin-bottom: 10px; font-family: "Playfair Display", serif; }' +
+      '.order-success p { color: #555; margin-bottom: 8px; font-size: 14px; line-height: 1.5; }' +
+      '.order-success .call-warning { background: #EBF8FF; border: 1px solid #BEE3F8; color: #2B6CB0; padding: 12px; border-radius: 8px; font-size: 13px; margin: 16px 0; }';
     document.head.appendChild(style);
     
     document.getElementById('back-to-cart').addEventListener('click', hideOrderForm);
@@ -287,10 +299,13 @@ document.addEventListener("DOMContentLoaded", function() {
     submitBtn.disabled = true;
     submitBtn.innerHTML = 'Processing...';
     
+    const pickupTime = document.getElementById('order-pickup-time').value.trim() || 'ASAP';
+    
     const orderData = {
       customerName: document.getElementById('order-customer-name').value,
       customerPhone: document.getElementById('order-customer-phone').value,
       customerEmail: document.getElementById('order-customer-email').value || '',
+      pickupTime: pickupTime,
       items: cart.map(function(item) { return item.quantityText; }).join(', '),
       total: total,
       notes: document.getElementById('order-notes').value || ''
@@ -309,31 +324,35 @@ document.addEventListener("DOMContentLoaded", function() {
     })
     .then(function(result) {
       console.log('Result:', result);
-      showOrderSuccess(orderData.customerName, result.orderId || Date.now());
+      showOrderSuccess(orderData.customerName, result.orderId || Date.now(), pickupTime);
       cart = [];
       total = 0;
       updateCartDisplay();
     })
     .catch(function(error) {
       console.error('Order error:', error);
-      showOrderSuccess(orderData.customerName, Date.now());
+      showOrderSuccess(orderData.customerName, Date.now(), pickupTime);
       cart = [];
       total = 0;
       updateCartDisplay();
     });
   }
   
-  function showOrderSuccess(name, orderId) {
+  function showOrderSuccess(name, orderId, pickupTime) {
     const orderForm = document.getElementById('order-form');
     if (orderForm) {
-      orderForm.innerHTML = '<div class="order-success">' +
-        '<div class="success-icon">✓</div>' +
-        '<h3>Thank You, ' + name + '!</h3>' +
-        '<p>Your order #' + orderId + ' has been received.</p>' +
-        '<p>We\'ll call you shortly to confirm pickup.</p>' +
-        '<button onclick="location.reload()" class="submit-order-btn" style="margin-top: 20px;">' +
-        'Continue Shopping' +
-        '</button>' +
+      orderForm.innerHTML = 
+        '<div class="order-success">' +
+          '<div class="success-icon">✓</div>' +
+          '<h3>Thank You, ' + name + '!</h3>' +
+          '<p>Your order #' + orderId + ' has been received.</p>' +
+          '<p><strong>Requested Pickup Time:</strong> ' + pickupTime + '</p>' +
+          '<div class="call-warning">' +
+            '📞 <strong>Please note:</strong> All orders will be confirmed by phone call before preparation.' +
+          '</div>' +
+          '<button onclick="location.reload()" class="submit-order-btn" style="margin-top: 15px;">' +
+            'Continue Shopping' +
+          '</button>' +
         '</div>';
     }
   }
@@ -343,7 +362,6 @@ document.addEventListener("DOMContentLoaded", function() {
       if (cart.length > 0) showOrderForm();
     });
   }
-
   updateCartDisplay();
 
   // ========== SMOOTH SCROLLING ==========

@@ -58,9 +58,10 @@ function getPacificDateString() {
 // ========================================
 
 // POST /api/orders - Create new order (public)
+// POST /api/orders - Create new order (public)
 router.post('/', async (req, res) => {
   try {
-    const { customerName, customerPhone, customerEmail, items, total, notes } = req.body;
+    const { customerName, customerPhone, customerEmail, pickupTime, items, total, notes } = req.body;
 
     // Validate required fields
     if (!customerName || !customerPhone || !items || !total) {
@@ -72,11 +73,14 @@ router.post('/', async (req, res) => {
     const db = getDb();
     const pacificTime = getPacificTime();
 
+    // Save pickup time inside notes (no DB schema change needed)
+    const formattedNotes = `⏰ Pickup Time: ${pickupTime || 'ASAP'}${notes ? ' | Notes: ' + notes : ''}`;
+
     // Save order to database
     db.run(
       `INSERT INTO orders (customer_name, customer_phone, customer_email, items, total, notes, status, created_at) 
        VALUES (?, ?, ?, ?, ?, ?, 'pending', ?)`,
-      [customerName, customerPhone, customerEmail || '', items, total, notes || '', pacificTime],
+      [customerName, customerPhone, customerEmail || '', items, total, formattedNotes, pacificTime],
       function(err) {
         if (err) {
           console.error('Database error:', err);
@@ -91,6 +95,7 @@ router.post('/', async (req, res) => {
         console.log('════════════════════════════════════');
         console.log(`   Customer: ${customerName}`);
         console.log(`   Phone: ${customerPhone}`);
+        console.log(`   Pickup: ${pickupTime || 'ASAP'}`);
         console.log(`   Items: ${items}`);
         console.log(`   Total: $${parseFloat(total).toFixed(2)}`);
         console.log(`   Time: ${pacificTime}`);
@@ -99,11 +104,16 @@ router.post('/', async (req, res) => {
         // 1️⃣ RESPOND IMMEDIATELY
         res.json({
           success: true,
-          message: 'Order placed successfully! We will contact you shortly.',
+          message: 'Order placed successfully! We will call you to confirm pickup.',
           orderId
         });
 
-        // 2️⃣ SEND EMAIL IN BACKGROUND (non-blocking)
+        // 2️⃣ BACKUP DATABASE
+        if (typeof backupDatabaseToCloudinary === 'function') {
+          backupDatabaseToCloudinary();
+        }
+
+        // 3️⃣ SEND EMAIL IN BACKGROUND
         if (transporter && (process.env.OWNER_EMAIL || process.env.EMAIL_USER)) {
           setImmediate(async () => {
             try {
@@ -112,9 +122,10 @@ router.post('/', async (req, res) => {
                 customerName,
                 customerPhone,
                 customerEmail: customerEmail || 'Not provided',
+                pickupTime: pickupTime || 'ASAP',
                 items,
                 total,
-                notes
+                notes: notes || ''
               });
               console.log('✅ Email notification sent to owner');
             } catch (emailError) {
@@ -346,6 +357,10 @@ async function sendOrderEmail(order) {
             <div class="info-row"><span class="info-label">Name</span><span class="info-value">${order.customerName}</span></div>
             <div class="info-row"><span class="info-label">Phone</span><span class="info-value">${order.customerPhone}</span></div>
             <div class="info-row"><span class="info-label">Email</span><span class="info-value">${order.customerEmail}</span></div>
+            <div class="info-row" style="background:#FFF3CD;padding:10px;border-radius:6px;margin-top:8px;">
+              <span class="info-label">⏰ Preferred Pickup</span>
+              <span class="info-value" style="color:#960909;font-weight:bold;font-size:16px;">${order.pickupTime || 'ASAP'}</span>
+            </div>
           </div>
           <div class="section">
             <div class="section-title">Order Details</div>
@@ -375,6 +390,7 @@ CUSTOMER INFORMATION
 • Name: ${order.customerName}
 • Phone: ${order.customerPhone}
 • Email: ${order.customerEmail}
+• Pickup Time: ${order.pickupTime || 'ASAP'}
 
 ORDER DETAILS
 • Items: ${order.items}
