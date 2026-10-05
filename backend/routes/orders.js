@@ -12,33 +12,29 @@ const authMiddleware = require('../middleware/auth');
 let transporter = null;
 
 // Initialize email transporter
-// Initialize email transporter (Supports Brevo SMTP or Gmail fallback)
 function initializeEmail() {
-  const smtpHost = process.env.SMTP_HOST || 'smtp.gmail.com';
-  const smtpPort = parseInt(process.env.SMTP_PORT) || 465;
-  const smtpUser = process.env.SMTP_USER || process.env.EMAIL_USER;
-  const smtpPass = (process.env.SMTP_PASS || process.env.EMAIL_APP_PASS || '').replace(/\s+/g, '');
-
-  if (smtpUser && smtpPass) {
+  if (process.env.EMAIL_USER && process.env.EMAIL_APP_PASS) {
     try {
+      // Spaces hata kar clean password
+      const cleanPass = process.env.EMAIL_APP_PASS.replace(/\s+/g, '');
+
       transporter = nodemailer.createTransport({
-        host: smtpHost,
-        port: smtpPort,
-        secure: smtpPort === 465, // true for 465, false for 587
+        host: 'smtp.gmail.com',
+        port: 465,             // 👈 Gmail Direct SSL Port (Render timeouts fixed!)
+        secure: true,
         auth: {
-          user: smtpUser,
-          pass: smtpPass
+          user: process.env.EMAIL_USER,
+          pass: cleanPass
         },
-        connectionTimeout: 15000,
-        greetingTimeout: 10000,
-        socketTimeout: 15000
+        connectionTimeout: 10000,
+        socketTimeout: 10000
       });
-      console.log(`✅ Email transporter initialized using ${smtpHost}:${smtpPort}`);
+      console.log('✅ Email notifications enabled (Port 465 SSL)');
     } catch (error) {
       console.log('⚠️ Email setup failed:', error.message);
     }
   } else {
-    console.log('⚠️ Email not configured - missing SMTP/Gmail credentials');
+    console.log('⚠️ Email not configured - add EMAIL_USER and EMAIL_APP_PASS to .env');
   }
 }
 
@@ -317,10 +313,12 @@ router.delete('/:id', authMiddleware, (req, res) => {
 // EMAIL FUNCTION
 // ========================================
 
-async function sendOrderEmail(order) {
-  if (!transporter) throw new Error('Email not configured');
+// ========================================
+// EMAIL FUNCTION (HTTP API - ZERO TIMEOUTS ON RENDER)
+// ========================================
 
-  const ownerEmail = process.env.OWNER_EMAIL || process.env.EMAIL_USER;
+async function sendOrderEmail(order) {
+  const ownerEmail = process.env.OWNER_EMAIL || process.env.EMAIL_USER || 'nicholasaambriz@gmail.com';
   const pacificTime = getPacificTime();
 
   const htmlContent = `
@@ -340,6 +338,7 @@ async function sendOrderEmail(order) {
         .info-row:last-child { border-bottom: none; }
         .info-label { color: #666; }
         .info-value { font-weight: 600; color: #333; text-align: right; }
+        .pickup-highlight { background: #FFF3CD; padding: 10px; border-radius: 6px; margin-top: 8px; }
         .total-row { background: #FDF6E8; padding: 20px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; margin-top: 20px; }
         .total-label { font-size: 18px; font-weight: bold; color: #333; }
         .total-value { font-size: 28px; font-weight: bold; color: #960909; }
@@ -352,7 +351,7 @@ async function sendOrderEmail(order) {
     <body>
       <div class="container">
         <div class="header">
-          <h1>🍞 New Order!</h1>
+          <h1>🍞 New Order Received!</h1>
           <div class="order-id">Order #${order.id}</div>
         </div>
         <div class="content">
@@ -361,7 +360,7 @@ async function sendOrderEmail(order) {
             <div class="info-row"><span class="info-label">Name</span><span class="info-value">${order.customerName}</span></div>
             <div class="info-row"><span class="info-label">Phone</span><span class="info-value">${order.customerPhone}</span></div>
             <div class="info-row"><span class="info-label">Email</span><span class="info-value">${order.customerEmail}</span></div>
-            <div class="info-row" style="background:#FFF3CD;padding:10px;border-radius:6px;margin-top:8px;">
+            <div class="info-row pickup-highlight">
               <span class="info-label">⏰ Preferred Pickup</span>
               <span class="info-value" style="color:#960909;font-weight:bold;font-size:16px;">${order.pickupTime || 'ASAP'}</span>
             </div>
@@ -369,7 +368,7 @@ async function sendOrderEmail(order) {
           <div class="section">
             <div class="section-title">Order Details</div>
             <div class="info-row"><span class="info-label">Items</span><span class="info-value">${order.items}</span></div>
-            ${order.notes ? `<div class="notes"><strong>📝 Customer Notes:</strong><br>${order.notes}</div>` : ''}
+            ${order.notes ? `<div class="notes"><strong>📝 Notes:</strong><br>${order.notes}</div>` : ''}
           </div>
           <div class="total-row">
             <span class="total-label">Total</span>
@@ -386,36 +385,69 @@ async function sendOrderEmail(order) {
     </html>
   `;
 
-  const textContent = `
-🍞 NEW ORDER #${order.id}
-═══════════════════════════
+  // 1️⃣ RESEND HTTP API (SUPER FAST - NO TIMEOUTS)
+  if (process.env.RESEND_API_KEY) {
+    try {
+      const response = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          from: 'Fresh Hot Bread <onboarding@resend.dev>',
+          to: [ownerEmail],
+          subject: `🍞 New Order #${order.id} - $${parseFloat(order.total).toFixed(2)} - ${order.customerName}`,
+          html: htmlContent
+        })
+      });
 
-CUSTOMER INFORMATION
-• Name: ${order.customerName}
-• Phone: ${order.customerPhone}
-• Email: ${order.customerEmail}
-• Pickup Time: ${order.pickupTime || 'ASAP'}
+      const resData = await response.json();
+      if (response.ok) {
+        console.log('⚡ Email sent instantly via Resend HTTP API:', resData.id);
+        return;
+      } else {
+        console.error('⚠️ Resend API Error:', resData);
+      }
+    } catch (err) {
+      console.error('⚠️ Resend HTTP fetch failed:', err.message);
+    }
+  }
 
-ORDER DETAILS
-• Items: ${order.items}
-• Total: $${parseFloat(order.total).toFixed(2)}
-${order.notes ? `\n📝 Notes: ${order.notes}` : ''}
+  // 2️⃣ BREVO HTTP API FALLBACK
+  if (process.env.BREVO_API_KEY) {
+    try {
+      const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+        method: 'POST',
+        headers: {
+          'api-key': process.env.BREVO_API_KEY,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          sender: { name: 'Fresh Hot Bread 🍞', email: 'nicholasaambriz@gmail.com' },
+          to: [{ email: ownerEmail }],
+          subject: `🍞 New Order #${order.id} - $${parseFloat(order.total).toFixed(2)} - ${order.customerName}`,
+          htmlContent: htmlContent
+        })
+      });
+      if (response.ok) {
+        console.log('⚡ Email sent instantly via Brevo HTTP API');
+        return;
+      }
+    } catch (err) {
+      console.error('⚠️ Brevo HTTP fetch failed:', err.message);
+    }
+  }
 
-═══════════════════════════
-📞 Call the customer to confirm pickup!
-
-Fresh Hot Bread All Day
-Stockton, CA
-Time: ${pacificTime}
-  `;
-
-  await transporter.sendMail({
-    from: `"Fresh Hot Bread 🍞" <${process.env.EMAIL_USER}>`,
-    to: ownerEmail,
-    subject: `🍞 New Order #${order.id} - $${parseFloat(order.total).toFixed(2)} - ${order.customerName}`,
-    text: textContent,
-    html: htmlContent
-  });
+  // 3️⃣ NODEMAILER FALLBACK (LOCAL DEV)
+  if (transporter) {
+    await transporter.sendMail({
+      from: `"Fresh Hot Bread 🍞" <${process.env.EMAIL_USER}>`,
+      to: ownerEmail,
+      subject: `🍞 New Order #${order.id} - $${parseFloat(order.total).toFixed(2)} - ${order.customerName}`,
+      html: htmlContent
+    });
+  }
 }
 
 module.exports = router;
