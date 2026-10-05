@@ -230,7 +230,7 @@ document.addEventListener("DOMContentLoaded", function() {
           '<textarea id="order-notes" rows="2" placeholder="Special requests..."></textarea>' +
         '</div>' +
         '<div class="pickup-notice-box">' +
-          '📞 <strong>Please note:</strong> All orders will be confirmed by phone call before preparation.' +
+          '<strong>Please note:</strong> All orders will be confirmed by phone call.' +
         '</div>' +
         '<button type="submit" class="submit-order-btn">' +
           'Place Order - $<span id="form-total">0.00</span>' +
@@ -240,29 +240,46 @@ document.addEventListener("DOMContentLoaded", function() {
     cartFooter.parentNode.insertBefore(orderForm, cartFooter.nextSibling);
     
     // Styles
+        // Styles (Fixed Scrolling & Bottom Button Cutoff)
     const style = document.createElement('style');
-    style.textContent = 
-      '.order-form { display: none; padding: 24px; background: var(--warm-white, #FFFEF9); border-top: 1px solid rgba(0,0,0,0.08); }' +
-      '.order-form.show { display: block; }' +
-      '.order-form-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }' +
-      '.order-form-header h4 { font-size: 1.25rem; color: #960909; margin: 0; font-family: "Playfair Display", serif; }' +
-      '.order-form .back-btn { background: none; border: none; color: #666; cursor: pointer; font-size: 14px; padding: 8px 0; }' +
-      '.order-form .back-btn:hover { color: #960909; }' +
-      '.order-form .form-group { margin-bottom: 16px; }' +
-      '.order-form label { display: block; font-weight: 600; font-size: 14px; margin-bottom: 6px; color: #2C2C2C; }' +
-      '.order-form input, .order-form textarea { width: 100%; padding: 12px 16px; border: 2px solid rgba(0,0,0,0.1); border-radius: 12px; font-size: 15px; font-family: inherit; transition: 0.2s; box-sizing: border-box; }' +
-      '.order-form input:focus, .order-form textarea:focus { outline: none; border-color: #960909; }' +
-      '.pickup-notice-box { background: #EBF8FF; border-left: 4px solid #3182CE; color: #2C5282; padding: 12px 14px; font-size: 13px; border-radius: 8px; margin-bottom: 18px; line-height: 1.4; }' +
-      '.submit-order-btn { width: 100%; padding: 16px 24px; background: #960909; color: white; border: none; border-radius: 12px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: 0.2s; }' +
-      '.submit-order-btn:hover { background: #6B0707; }' +
-      '.submit-order-btn:disabled { opacity: 0.7; cursor: not-allowed; }' +
-      '.cart-footer.hidden { display: none; }' +
-      '.order-success { text-align: center; padding: 30px 20px; }' +
-      '.order-success .success-icon { font-size: 54px; margin-bottom: 12px; color: #2F855A; }' +
-      '.order-success h3 { color: #960909; margin-bottom: 10px; font-family: "Playfair Display", serif; }' +
-      '.order-success p { color: #555; margin-bottom: 8px; font-size: 14px; line-height: 1.5; }' +
-      '.order-success .call-warning { background: #EBF8FF; border: 1px solid #BEE3F8; color: #2B6CB0; padding: 12px; border-radius: 8px; font-size: 13px; margin: 16px 0; }';
-    document.head.appendChild(style);
+    style.textContent = `
+      #mini-cart {
+        display: flex !important;
+        flex-direction: column !important;
+        height: 100vh !important;
+        max-height: 100vh !important;
+        overflow-y: auto !important; /* Enable scrolling on cart drawer */
+      }
+      .order-form { 
+        display: none; 
+        padding: 20px; 
+        padding-bottom: 80px !important; /* Extra bottom space so button is fully visible */
+        background: var(--warm-white, #FFFEF9); 
+        border-top: 1px solid rgba(0,0,0,0.08); 
+        overflow-y: auto !important;
+        max-height: calc(100vh - 70px);
+      }
+      .order-form.show { display: block; }
+      .order-form-header { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; }
+      .order-form-header h4 { font-size: 1.25rem; color: #960909; margin: 0; font-family: "Playfair Display", serif; }
+      .order-form .back-btn { background: none; border: none; color: #666; cursor: pointer; font-size: 14px; padding: 6px 0; }
+      .order-form .back-btn:hover { color: #960909; }
+      .order-form .form-group { margin-bottom: 12px; }
+      .order-form label { display: block; font-weight: 600; font-size: 13px; margin-bottom: 4px; color: #2C2C2C; }
+      .order-form input, .order-form textarea { width: 100%; padding: 10px 14px; border: 2px solid rgba(0,0,0,0.1); border-radius: 10px; font-size: 14px; font-family: inherit; box-sizing: border-box; }
+      .order-form input:focus, .order-form textarea:focus { outline: none; border-color: #960909; }
+      .pickup-notice-box { background: #EBF8FF; border-left: 4px solid #3182CE; color: #2C5282; padding: 10px 12px; font-size: 12px; border-radius: 8px; margin-bottom: 14px; line-height: 1.4; }
+      .submit-order-btn { width: 100%; padding: 15px 20px; background: #960909; color: white; border: none; border-radius: 12px; font-size: 1rem; font-weight: 700; cursor: pointer; margin-bottom: 20px; }
+      .submit-order-btn:hover { background: #6B0707; }
+      .submit-order-btn:disabled { opacity: 0.7; cursor: not-allowed; }
+      .cart-footer.hidden { display: none; }
+      .order-success { text-align: center; padding: 20px 15px; }
+      .order-success .success-icon { font-size: 48px; margin-bottom: 10px; color: #2F855A; }
+      .order-success h3 { color: #960909; margin-bottom: 8px; font-family: "Playfair Display", serif; }
+      .order-success p { color: #555; margin-bottom: 6px; font-size: 14px; line-height: 1.4; }
+      .order-success .call-warning { background: #EBF8FF; border: 1px solid #BEE3F8; color: #2B6CB0; padding: 10px; border-radius: 8px; font-size: 12px; margin: 14px 0; }
+    `;
+      document.head.appendChild(style);
     
     document.getElementById('back-to-cart').addEventListener('click', hideOrderForm);
     document.getElementById('checkout-form').addEventListener('submit', submitOrder);
@@ -348,7 +365,7 @@ document.addEventListener("DOMContentLoaded", function() {
           '<p>Your order #' + orderId + ' has been received.</p>' +
           '<p><strong>Requested Pickup Time:</strong> ' + pickupTime + '</p>' +
           '<div class="call-warning">' +
-            '📞 <strong>Please note:</strong> All orders will be confirmed by phone call before preparation.' +
+            '<strong>Please note:</strong> All orders will be confirmed by phone call.' +
           '</div>' +
           '<button onclick="location.reload()" class="submit-order-btn" style="margin-top: 15px;">' +
             'Continue Shopping' +
