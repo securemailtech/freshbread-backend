@@ -669,9 +669,63 @@ document.addEventListener("DOMContentLoaded", function() {
       console.log('Could not load dynamic content:', error);
     }
   }
+  
 
   // Load everything
   loadDynamicImages();
   loadDynamicContent();
 
 });
+
+async function loadGoogleReviews() {
+  const container = document.getElementById('google-reviews-container');
+  if (!container) return;
+
+  try {
+    // We use a free open-source worker to get reviews without API key
+    // Place ID: ChIJW0oFCgANkIARVKVkujvnbpc (Fresh Hot Bread All Day)
+    const response = await fetch('https://wd-847249219324.fresh-bread-api.workers.dev/reviews'); 
+    const data = await response.json();
+
+    if (data && data.length > 0) {
+      container.innerHTML = data.slice(0, 3).map(review => `
+        <div class="testimonial-card fade-in visible">
+          <div class="testimonial-card-header">
+            <div class="reviewer-info">
+              <span class="reviewer-avatar">${review.name.charAt(0)}</span>
+              <div>
+                <strong class="reviewer-name">${review.name}</strong>
+                <span class="review-date">${review.time}</span>
+              </div>
+            </div>
+            <span style="color:#4285F4; font-weight:bold;">G</span>
+          </div>
+          <div class="testimonial-rating">${'★'.repeat(review.rating)}</div>
+          <p>"${review.text.substring(0, 150)}${review.text.length > 150 ? '...' : ''}"</p>
+        </div>
+      `).join('');
+    }
+  } catch (error) {
+    console.log("Fallback to static reviews");
+    // Agar fetch fail ho jaye, toh purane 3 reviews dikha do taaki khali na dikhe
+    container.innerHTML = `
+      <div class="testimonial-card">
+        <div class="testimonial-rating">★★★★★</div>
+        <p>"The Señorita Bread is incredible — warm and perfectly sweet. Best in Stockton!"</p>
+        <span class="testimonial-author">Maria G.</span>
+      </div>
+      <div class="testimonial-card">
+        <div class="testimonial-rating">★★★★★</div>
+        <p>"Always fresh out of the oven. Fast pickup and super friendly staff."</p>
+        <span class="testimonial-author">Jamal R.</span>
+      </div>
+      <div class="testimonial-card">
+        <div class="testimonial-rating">★★★★★</div>
+        <p>"Amazing authentic flavor. Perfectly pairs with their fresh coffee."</p>
+        <span class="testimonial-author">Priya K.</span>
+      </div>
+    `;
+  }
+}
+
+loadGoogleReviews();
