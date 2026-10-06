@@ -86,4 +86,4 @@ Crawl-delay: 10
 User-agent: AhrefsBot
 Crawl-delay: 10
 
-Sitemap: 
+Sitemap: https://freshhotbreadallday.com/sitemap.xml
