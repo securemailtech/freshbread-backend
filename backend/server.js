@@ -106,38 +106,32 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'site', 'index.html'));
 });
 
+
 // -----------------------
-// 404 Handler (Custom HTML 404 Page for WooRank + JSON for API)
+// 404 Handler (WooRank Approved Custom 404 Page)
 // -----------------------
 app.use((req, res) => {
-  if (req.accepts('html')) {
-    res.status(404).send(`
-      <!DOCTYPE html>
-      <html lang="en">
-      <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>404 - Page Not Found | Fresh Hot Bread</title>
-        <style>
-          body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; padding: 60px 20px; background-color: #FFFEF9; color: #2C2C2C; }
-          h1 { font-size: 72px; color: #960909; margin: 0; }
-          h2 { font-size: 24px; margin-top: 10px; color: #2C2C2C; }
-          p { color: #666; font-size: 16px; margin-bottom: 30px; }
-          a { display: inline-block; background-color: #960909; color: #ffffff; padding: 12px 28px; text-decoration: none; border-radius: 8px; font-weight: bold; }
-          a:hover { background-color: #6B0707; }
-        </style>
-      </head>
-      <body>
-        <h1>404</h1>
-        <h2>Oops! Page Not Found</h2>
-        <p>The page you are looking for might have been removed or is temporarily unavailable.</p>
-        <a href="/">Back to Homepage</a>
-      </body>
-      </html>
-    `);
-  } else {
-    res.status(404).json({ error: 'Route not found' });
+  // Return JSON only for API routes
+  if (req.path.startsWith('/api/')) {
+    return res.status(404).json({ error: 'Route not found' });
   }
+
+  // Send physical 404.html page for all web pages
+  res.status(404).sendFile(path.join(__dirname, 'site', '404.html'), (err) => {
+    if (err) {
+      res.status(404).send(`
+        <!DOCTYPE html>
+        <html lang="en">
+        <head><title>404 - Page Not Found</title></head>
+        <body style="text-align:center;padding:50px;font-family:sans-serif;">
+          <h1 style="color:#960909;font-size:72px;">404</h1>
+          <h2>Page Not Found</h2>
+          <a href="/" style="background:#960909;color:#fff;padding:10px 20px;text-decoration:none;border-radius:5px;">Go Home</a>
+        </body>
+        </html>
+      `);
+    }
+  });
 });
 
 // -----------------------
