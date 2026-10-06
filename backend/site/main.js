@@ -677,44 +677,120 @@ document.addEventListener("DOMContentLoaded", function() {
 
 });
 
-  // ========== FETCH DYNAMIC GOOGLE REVIEWS VIA NODE.JS ==========
+   // ========== FETCH DYNAMIC GOOGLE REVIEWS & SLIDER ==========
   async function loadDynamicGoogleReviews() {
+    const track = document.getElementById('reviews-track');
+    if (!track) return;
+
+    let reviewsList = [];
+
     try {
       const response = await fetch(API_URL + '/api/reviews');
-      if (!response.ok) return;
-
-      const data = await response.json();
-      if (!data.reviews || data.reviews.length === 0) return;
-
-      const container = document.querySelector('.testimonials-grid');
-      if (container) {
-        container.innerHTML = data.reviews.slice(0, 3).map(function(review) {
-          const firstLetter = review.author ? review.author.charAt(0).toUpperCase() : 'G';
-          const stars = '★'.repeat(review.rating || 5);
-
-          return `
-            <div class="testimonial-card fade-in visible">
-              <div class="testimonial-card-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                <div class="reviewer-info" style="display:flex; align-items:center; gap:10px;">
-                  ${review.avatar ? 
-                    `<img src="${review.avatar}" style="width:38px; height:38px; border-radius:50%; object-fit:cover;" alt="${review.author}">` : 
-                    `<span style="width:38px; height:38px; border-radius:50%; background:#960909; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:bold;">${firstLetter}</span>`}
-                  <div>
-                    <strong style="display:block; color:#2C2C2C; font-size:14px;">${review.author}</strong>
-                    <span style="font-size:12px; color:#888;">${review.time || 'Google Review'}</span>
-                  </div>
-                </div>
-                <span style="font-weight:800; color:#4285F4; font-size:16px;">G</span>
-              </div>
-              <div class="testimonial-rating" style="color:#F59E0B; margin-bottom:8px;">${stars}</div>
-              <p style="font-size:14px; color:#555; line-height:1.5;">"${review.text}"</p>
-            </div>
-          `;
-        }).join('');
+      if (response.ok) {
+        const data = await response.json();
+        if (data.reviews && data.reviews.length > 0) {
+          reviewsList = data.reviews;
+        }
       }
     } catch (error) {
-      console.log('Using default reviews display');
+      console.log('Using fallback reviews for carousel');
     }
+
+    // Fallback reviews array if API returns empty
+    if (reviewsList.length === 0) {
+      reviewsList = [
+        { author: 'Maria G.', rating: 5, time: 'Local Guide', text: 'The Señorita Bread is incredible — warm, soft, and perfectly sweet! Liza and Nick are amazing.' },
+        { author: 'Jamal R.', rating: 5, time: 'Stockton, CA', text: 'Always fresh out of the oven! Best bakery in Stockton. Fast pickup and super friendly staff.' },
+        { author: 'Priya K.', rating: 5, time: 'Verified Customer', text: 'Amazing authentic Señorita bread and fresh brewed coffee! Perfect combination to start the morning.' },
+        { author: 'Chris M.', rating: 5, time: 'Regular Customer', text: 'Delicious bread, wonderful owners, and great service every single time. 10/10 recommend!' },
+        { author: 'Rene N.', rating: 5, time: 'Local Guide', text: 'Best bakery in town! Fresh hot bread made with love. Can\'t recommend enough!' }
+      ];
+    }
+
+    // Render cards into slider track
+    track.innerHTML = reviewsList.map(function(review) {
+      const firstLetter = review.author ? review.author.charAt(0).toUpperCase() : 'G';
+      const stars = '★'.repeat(review.rating || 5);
+
+      return `
+        <div class="testimonial-card">
+          <div class="testimonial-card-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <div class="reviewer-info" style="display:flex; align-items:center; gap:10px;">
+              ${review.avatar ? 
+                `<img src="${review.avatar}" style="width:38px; height:38px; border-radius:50%; object-fit:cover;" alt="${review.author}">` : 
+                `<span style="width:38px; height:38px; border-radius:50%; background:#960909; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:bold;">${firstLetter}</span>`}
+              <div>
+                <strong style="display:block; color:#2C2C2C; font-size:14px;">${review.author}</strong>
+                <span style="font-size:12px; color:#888;">${review.time || 'Google Review'}</span>
+              </div>
+            </div>
+            <span style="font-weight:800; color:#4285F4; font-size:16px;">G</span>
+          </div>
+          <div class="testimonial-rating" style="color:#F59E0B; margin-bottom:8px;">${stars}</div>
+          <p style="font-size:14px; color:#555; line-height:1.5;">"${review.text}"</p>
+        </div>
+      `;
+    }).join('');
+
+    // Initialize Reviews Slider Logic
+    initReviewsCarousel();
   }
 
+  // Reviews Slider Logic
+  function initReviewsCarousel() {
+    const track = document.getElementById('reviews-track');
+    const prevBtn = document.getElementById('reviews-prev');
+    const nextBtn = document.getElementById('reviews-next');
+
+    if (!track || !prevBtn || !nextBtn) return;
+
+    let currentIndex = 0;
+
+    function updateReviewsSlider() {
+      let itemsVisible = 3;
+      if (window.innerWidth <= 992) itemsVisible = 2;
+      if (window.innerWidth <= 600) itemsVisible = 1;
+
+      const totalItems = track.children.length;
+      const maxIndex = Math.max(0, totalItems - itemsVisible);
+
+      if (currentIndex > maxIndex) currentIndex = maxIndex;
+
+      if (track.children[0]) {
+        const itemWidth = track.children[0].getBoundingClientRect().width;
+        const gap = parseInt(window.getComputedStyle(track).gap) || 20;
+        const moveAmount = itemWidth + gap;
+        track.style.transform = 'translateX(-' + (currentIndex * moveAmount) + 'px)';
+      }
+
+      prevBtn.disabled = currentIndex === 0;
+      nextBtn.disabled = currentIndex >= maxIndex;
+      prevBtn.style.opacity = currentIndex === 0 ? "0.4" : "1";
+      nextBtn.style.opacity = currentIndex >= maxIndex ? "0.4" : "1";
+    }
+
+    nextBtn.onclick = function() {
+      let itemsVisible = 3;
+      if (window.innerWidth <= 992) itemsVisible = 2;
+      if (window.innerWidth <= 600) itemsVisible = 1;
+
+      const maxIndex = Math.max(0, track.children.length - itemsVisible);
+      if (currentIndex < maxIndex) {
+        currentIndex++;
+        updateReviewsSlider();
+      }
+    };
+
+    prevBtn.onclick = function() {
+      if (currentIndex > 0) {
+        currentIndex--;
+        updateReviewsSlider();
+      }
+    };
+
+    window.addEventListener('resize', updateReviewsSlider);
+    setTimeout(updateReviewsSlider, 300);
+  }
+
+  // Run function
   loadDynamicGoogleReviews();

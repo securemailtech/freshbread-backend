@@ -440,7 +440,7 @@
     </div>
   </section>
 
-    <!-- Testimonials / Google Reviews Section -->
+     <!-- Testimonials / Google Reviews Section Carousel -->
   <section id="testimonials" class="testimonials-section">
     <div class="container">
       <div class="section-header fade-in">
@@ -450,33 +450,28 @@
         <!-- Google Rating Badge -->
         <div class="google-badge-header" style="display:inline-flex; align-items:center; gap:8px; background:#FFF; padding:8px 18px; border-radius:30px; box-shadow:0 4px 12px rgba(0,0,0,0.06); margin-top:10px; border:1px solid rgba(0,0,0,0.08);">
           <span style="font-weight:800; font-size:18px; color:#4285F4;">G</span>
-          <span style="font-weight:700; font-size:16px; color:#2C2C2C;">4.9</span>
+          <span class="google-score" style="font-weight:700; font-size:16px; color:#2C2C2C;">4.9</span>
           <span style="color:#F59E0B; letter-spacing:2px;">★★★★★</span>
-          <span style="color:#666; font-size:13px;">(Google Reviews)</span>
+          <span class="google-count" style="color:#666; font-size:13px;">(Google Reviews)</span>
         </div>
       </div>
 
-      <!-- YAHAN MAIN.JS LIVE REVIEWS LOAD KAREGA -->
-      <div class="testimonials-grid">
-        <div class="testimonial-card">
-          <div class="testimonial-rating" style="color:#F59E0B;">★★★★★</div>
-          <p>"The Señorita Bread is incredible — warm, soft, and perfectly sweet! Liza and Nick are amazing."</p>
-          <span class="testimonial-author" style="font-weight:bold; color:#2C2C2C;">Maria G.</span>
+      <!-- REVIEWS CAROUSEL WRAPPER -->
+      <div class="reviews-carousel-wrapper fade-in">
+        <button class="reviews-arrow prev-arrow" id="reviews-prev" aria-label="Previous review">❮</button>
+        
+        <div class="reviews-track-container">
+          <div class="reviews-track" id="reviews-track">
+            <!-- Dynamic Google Reviews Will Render Here via JS -->
+            <p style="text-align:center; width:100%; color:#888;">Loading latest Google reviews...</p>
+          </div>
         </div>
-        <div class="testimonial-card">
-          <div class="testimonial-rating" style="color:#F59E0B;">★★★★★</div>
-          <p>"Always fresh out of the oven! Best bakery in Stockton. Fast pickup and super friendly staff."</p>
-          <span class="testimonial-author" style="font-weight:bold; color:#2C2C2C;">Jamal R.</span>
-        </div>
-        <div class="testimonial-card">
-          <div class="testimonial-rating" style="color:#F59E0B;">★★★★★</div>
-          <p>"Amazing authentic Señorita bread and fresh brewed coffee! Perfect combination."</p>
-          <span class="testimonial-author" style="font-weight:bold; color:#2C2C2C;">Priya K.</span>
-        </div>
+
+        <button class="reviews-arrow next-arrow" id="reviews-next" aria-label="Next review">❯</button>
       </div>
 
-      <!-- Direct Google Maps Review Link -->
-      <div style="text-align:center; margin-top:35px;">
+      <!-- Direct Google Maps Link -->
+      <div style="text-align:center; margin-top:25px;">
         <a href="https://www.google.com/maps/place/Fresh+Hot+Bread+All+Day/@37.98456,-121.3346066,17z/data=!4m8!3m7!1s0x80900d0009850a5b:0x97b6c03eb644a54!8m2!3d37.98456!4d-121.3346066!9m1!1b1!16s%2Fg%2F11vhg53d8_?entry=ttu" 
            target="_blank" 
            rel="noopener noreferrer" 
