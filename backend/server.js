@@ -108,30 +108,17 @@ app.get('/', (req, res) => {
 
 
 // -----------------------
-// 404 Handler (WooRank Approved Custom 404 Page)
+// Custom 404 Handler (Forces HTTP 404 Status Code for WooRank)
 // -----------------------
+app.get(['/404', '/404.html'], (req, res) => {
+  res.status(404).sendFile(path.join(__dirname, 'site', '404.html'));
+});
+
 app.use((req, res) => {
-  // Return JSON only for API routes
   if (req.path.startsWith('/api/')) {
     return res.status(404).json({ error: 'Route not found' });
   }
-
-  // Send physical 404.html page for all web pages
-  res.status(404).sendFile(path.join(__dirname, 'site', '404.html'), (err) => {
-    if (err) {
-      res.status(404).send(`
-        <!DOCTYPE html>
-        <html lang="en">
-        <head><title>404 - Page Not Found</title></head>
-        <body style="text-align:center;padding:50px;font-family:sans-serif;">
-          <h1 style="color:#960909;font-size:72px;">404</h1>
-          <h2>Page Not Found</h2>
-          <a href="/" style="background:#960909;color:#fff;padding:10px 20px;text-decoration:none;border-radius:5px;">Go Home</a>
-        </body>
-        </html>
-      `);
-    }
-  });
+  res.status(404).sendFile(path.join(__dirname, 'site', '404.html'));
 });
 
 // -----------------------
