@@ -677,55 +677,44 @@ document.addEventListener("DOMContentLoaded", function() {
 
 });
 
-async function loadGoogleReviews() {
-  const container = document.getElementById('google-reviews-container');
-  if (!container) return;
+  // ========== FETCH DYNAMIC GOOGLE REVIEWS VIA NODE.JS ==========
+  async function loadDynamicGoogleReviews() {
+    try {
+      const response = await fetch(API_URL + '/api/reviews');
+      if (!response.ok) return;
 
-  try {
-    // We use a free open-source worker to get reviews without API key
-    // Place ID: ChIJW0oFCgANkIARVKVkujvnbpc (Fresh Hot Bread All Day)
-    const response = await fetch('https://wd-847249219324.fresh-bread-api.workers.dev/reviews'); 
-    const data = await response.json();
+      const data = await response.json();
+      if (!data.reviews || data.reviews.length === 0) return;
 
-    if (data && data.length > 0) {
-      container.innerHTML = data.slice(0, 3).map(review => `
-        <div class="testimonial-card fade-in visible">
-          <div class="testimonial-card-header">
-            <div class="reviewer-info">
-              <span class="reviewer-avatar">${review.name.charAt(0)}</span>
-              <div>
-                <strong class="reviewer-name">${review.name}</strong>
-                <span class="review-date">${review.time}</span>
+      const container = document.querySelector('.testimonials-grid');
+      if (container) {
+        container.innerHTML = data.reviews.slice(0, 3).map(function(review) {
+          const firstLetter = review.author ? review.author.charAt(0).toUpperCase() : 'G';
+          const stars = '★'.repeat(review.rating || 5);
+
+          return `
+            <div class="testimonial-card fade-in visible">
+              <div class="testimonial-card-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <div class="reviewer-info" style="display:flex; align-items:center; gap:10px;">
+                  ${review.avatar ? 
+                    `<img src="${review.avatar}" style="width:38px; height:38px; border-radius:50%; object-fit:cover;" alt="${review.author}">` : 
+                    `<span style="width:38px; height:38px; border-radius:50%; background:#960909; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:bold;">${firstLetter}</span>`}
+                  <div>
+                    <strong style="display:block; color:#2C2C2C; font-size:14px;">${review.author}</strong>
+                    <span style="font-size:12px; color:#888;">${review.time || 'Google Review'}</span>
+                  </div>
+                </div>
+                <span style="font-weight:800; color:#4285F4; font-size:16px;">G</span>
               </div>
+              <div class="testimonial-rating" style="color:#F59E0B; margin-bottom:8px;">${stars}</div>
+              <p style="font-size:14px; color:#555; line-height:1.5;">"${review.text}"</p>
             </div>
-            <span style="color:#4285F4; font-weight:bold;">G</span>
-          </div>
-          <div class="testimonial-rating">${'★'.repeat(review.rating)}</div>
-          <p>"${review.text.substring(0, 150)}${review.text.length > 150 ? '...' : ''}"</p>
-        </div>
-      `).join('');
+          `;
+        }).join('');
+      }
+    } catch (error) {
+      console.log('Using default reviews display');
     }
-  } catch (error) {
-    console.log("Fallback to static reviews");
-    // Agar fetch fail ho jaye, toh purane 3 reviews dikha do taaki khali na dikhe
-    container.innerHTML = `
-      <div class="testimonial-card">
-        <div class="testimonial-rating">★★★★★</div>
-        <p>"The Señorita Bread is incredible — warm and perfectly sweet. Best in Stockton!"</p>
-        <span class="testimonial-author">Maria G.</span>
-      </div>
-      <div class="testimonial-card">
-        <div class="testimonial-rating">★★★★★</div>
-        <p>"Always fresh out of the oven. Fast pickup and super friendly staff."</p>
-        <span class="testimonial-author">Jamal R.</span>
-      </div>
-      <div class="testimonial-card">
-        <div class="testimonial-rating">★★★★★</div>
-        <p>"Amazing authentic flavor. Perfectly pairs with their fresh coffee."</p>
-        <span class="testimonial-author">Priya K.</span>
-      </div>
-    `;
   }
-}
 
-loadGoogleReviews();
+  loadDynamicGoogleReviews();

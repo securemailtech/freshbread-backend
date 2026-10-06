@@ -3,6 +3,7 @@ const cors = require('cors');
 const path = require('path');
 const dotenv = require('dotenv');
 const { initializeDatabase } = require('./models/initDb');
+const reviewRoutes = require('./routes/reviews');
 
 // Load environment variables
 dotenv.config();
@@ -69,6 +70,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/content', contentRoutes);
 app.use('/api/images', imageRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/reviews', reviewRoutes);
 
 if (paymentRoutes) {
   app.use('/api/payments', paymentRoutes);
