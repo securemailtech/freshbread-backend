@@ -458,14 +458,25 @@ document.addEventListener("DOMContentLoaded", function() {
   
   loadSpecialOfferVisibility();
 
+  
   // ========== LOAD DYNAMIC IMAGES FROM DATABASE ==========
-    // ========== LOAD DYNAMIC IMAGES FROM DATABASE ==========
+    // Helper: Cloudinary Auto-Optimizer (Resizes & Compresses images on-the-fly)
+  function optimizeImageUrl(url) {
+    if (!url) return url;
+    if (url.includes('res.cloudinary.com') && !url.includes('f_auto')) {
+      return url.replace('/upload/', '/upload/f_auto,q_auto,w_800,c_limit/');
+    }
+    return url;
+  }
+
+  // ========== LOAD DYNAMIC IMAGES FROM DATABASE ==========
   async function loadDynamicImages() {
     const imageMap = {
       'hero': '.hero-image-wrapper img',
       'logo': '.logo img, .footer-logo',
       'product': '.product-image img',
-      'coffee': '.coffee-image-wrapper img',
+      'coffee-machine': '.coffee-image-wrapper img',
+      'coffee-menu': '.coffee-menu-card img',
       'feature1': '.feature-card:nth-child(1) .feature-image img',
       'feature2': '.feature-card:nth-child(2) .feature-image img',
       'feature3': '.feature-card:nth-child(3) .feature-image img',
@@ -487,12 +498,12 @@ document.addEventListener("DOMContentLoaded", function() {
           if (data.url) {
             const elements = document.querySelectorAll(imageMap[key]);
             elements.forEach(function(el) {
-              el.src = data.url;
+              el.src = optimizeImageUrl(data.url); // Auto-optimized URL
             });
           }
         }
       } catch (error) {
-        // Continue silently if image not found
+        // Continue silently
       }
     }
   }
