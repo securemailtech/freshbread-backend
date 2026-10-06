@@ -441,7 +441,7 @@ async function sendOrderEmail(order) {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          from: 'Fresh Hot Bread <onboarding@resend.dev>',
+          from: 'Fresh Hot Bread <orders@freshhotbreadallday.com>',
           to: [ownerEmail],
           subject: `🍞 New Order #${order.id} - $${parseFloat(order.total).toFixed(2)} - ${order.customerName}`,
           html: htmlContent
