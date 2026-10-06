@@ -5,57 +5,101 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex, follow">
   <title>404 - Page Not Found | Fresh Hot Bread All Day</title>
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/jpeg" href="/images/logo.jpg">
   <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    .error-page-wrapper {
+      min-height: 80vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
       text-align: center;
-      padding: 80px 20px;
+      padding: 60px 20px;
       background-color: #FFFEF9;
-      color: #2C2C2C;
-      margin: 0;
     }
-    .error-container {
-      max-width: 500px;
-      margin: 0 auto;
-      padding: 40px 20px;
-    }
-    h1 {
-      font-size: 96px;
+    .error-code {
+      font-size: 110px;
+      font-family: 'Playfair Display', Georgia, serif;
+      font-weight: 800;
       color: #960909;
-      margin: 0;
       line-height: 1;
+      margin: 0;
     }
-    h2 {
-      font-size: 26px;
-      margin: 20px 0 10px;
+    .error-title {
+      font-size: 28px;
+      font-family: 'Playfair Display', Georgia, serif;
       color: #2C2C2C;
+      margin: 20px 0 10px;
     }
-    p {
+    .error-desc {
       color: #666;
       font-size: 16px;
-      margin-bottom: 30px;
-      line-height: 1.5;
+      max-width: 480px;
+      margin: 0 auto 30px;
+      line-height: 1.6;
     }
-    a {
-      display: inline-block;
+    .error-actions {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .btn-404-primary {
       background-color: #960909;
-      color: #ffffff;
-      padding: 14px 32px;
+      color: #ffffff !important;
+      padding: 14px 28px;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 700;
+      transition: background 0.2s;
+    }
+    .btn-404-primary:hover {
+      background-color: #6B0707;
+    }
+    .btn-404-secondary {
+      background-color: transparent;
+      color: #960909 !important;
+      border: 2px solid #960909;
+      padding: 12px 26px;
       text-decoration: none;
       border-radius: 8px;
       font-weight: 700;
     }
-    a:hover {
-      background-color: #6B0707;
-    }
   </style>
 </head>
 <body>
-  <div class="error-container">
-    <h1>404</h1>
-    <h2>Oops! Page Not Found</h2>
-    <p>The page you are looking for might have been moved, renamed, or is temporarily unavailable.</p>
-    <a href="/">Back to Homepage</a>
+
+  <!-- Minimal Brand Header -->
+  <nav class="navbar" style="position: relative; background: #960909;">
+    <a href="/" class="logo">
+      <img src="/images/logo.jpg" alt="Fresh Hot Bread Logo">
+      <div class="logo-text">
+        <span style="color:#FFF;">Fresh Hot</span>
+        <strong style="color:#FFF;">Bread</strong>
+      </div>
+    </a>
+  </nav>
+
+  <!-- Main 404 Content -->
+  <div class="error-page-wrapper">
+    <h1 class="error-code">404</h1>
+    <h2 class="error-title">Page Not Found</h2>
+    <p class="error-desc">Sorry, the page you are looking for doesn't exist, has been removed, or is temporarily unavailable.</p>
+    
+    <div class="error-actions">
+      <a href="/" class="btn-404-primary">Back to Homepage</a>
+      <a href="/#menu" class="btn-404-secondary">View Menu</a>
+    </div>
   </div>
+
+  <!-- Footer -->
+  <footer class="footer" style="padding: 20px 0; background: #2C2C2C; color: #fff; text-align: center;">
+    <p style="margin: 0; font-size: 14px;">© Fresh Hot Bread All Day — All Rights Reserved</p>
+  </footer>
+
 </body>
 </html>

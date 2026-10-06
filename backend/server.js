@@ -108,12 +108,23 @@ app.get('/', (req, res) => {
 
 
 // -----------------------
-// Custom 404 Handler (Forces HTTP 404 Status Code for WooRank)
+// Force 404 Status Code for 404 Page (WooRank Rule)
 // -----------------------
 app.get(['/404', '/404.html'], (req, res) => {
   res.status(404).sendFile(path.join(__dirname, 'site', '404.html'));
 });
 
+// -----------------------
+// Serve Main Site
+// -----------------------
+app.use(express.static(path.join(__dirname, 'site')));
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'site', 'index.html'));
+});
+
+// -----------------------
+// Catch-All 404 Handler
+// -----------------------
 app.use((req, res) => {
   if (req.path.startsWith('/api/')) {
     return res.status(404).json({ error: 'Route not found' });
