@@ -677,25 +677,30 @@ document.addEventListener("DOMContentLoaded", function() {
 
 });
 
-    // ========== FETCH LIVE GOOGLE REVIEWS (UP TO 12) ==========
+   // ========== FETCH GOOGLE REVIEWS FROM DATABASE (INSTANT & DYNAMIC) ==========
   async function loadDynamicGoogleReviews() {
     const track = document.getElementById('reviews-track');
     if (!track) return;
 
+    // Safe URL check inside function scope
+    const baseUrl = (typeof API_URL !== 'undefined') 
+      ? API_URL 
+      : (window.location.hostname === 'localhost' ? 'http://localhost:5000' : '');
+
     try {
-      const response = await fetch(API_URL + '/api/reviews');
+      const response = await fetch(baseUrl + '/api/reviews');
       if (!response.ok) return;
 
       const data = await response.json();
       const reviewsList = data.reviews || [];
 
       if (reviewsList.length === 0) {
-        track.innerHTML = '<p style="text-align:center; width:100%; color:#888;">No recent Google reviews found.</p>';
+        track.innerHTML = '<p style="text-align:center; width:100%; color:#888;">No reviews available.</p>';
         return;
       }
 
-      // Render up to 12 live Google reviews
-      track.innerHTML = reviewsList.slice(0, 12).map(function(review) {
+      // Render 12 Google reviews into the slider track
+      track.innerHTML = reviewsList.map(function(review) {
         const firstLetter = review.author ? review.author.charAt(0).toUpperCase() : 'G';
         const stars = '★'.repeat(review.rating || 5);
 
@@ -719,69 +724,10 @@ document.addEventListener("DOMContentLoaded", function() {
         `;
       }).join('');
 
-      // Initialize Slider
+      // Initialize Carousel Navigation
       initReviewsCarousel();
 
     } catch (error) {
-      console.log('Error loading live Google reviews:', error);
+      console.log('Error loading reviews from database:', error);
     }
   }
-
-  // Reviews Slider Logic
-  function initReviewsCarousel() {
-    const track = document.getElementById('reviews-track');
-    const prevBtn = document.getElementById('reviews-prev');
-    const nextBtn = document.getElementById('reviews-next');
-
-    if (!track || !prevBtn || !nextBtn) return;
-
-    let currentIndex = 0;
-
-    function updateReviewsSlider() {
-      let itemsVisible = 3;
-      if (window.innerWidth <= 992) itemsVisible = 2;
-      if (window.innerWidth <= 600) itemsVisible = 1;
-
-      const totalItems = track.children.length;
-      const maxIndex = Math.max(0, totalItems - itemsVisible);
-
-      if (currentIndex > maxIndex) currentIndex = maxIndex;
-
-      if (track.children[0]) {
-        const itemWidth = track.children[0].getBoundingClientRect().width;
-        const gap = parseInt(window.getComputedStyle(track).gap) || 20;
-        const moveAmount = itemWidth + gap;
-        track.style.transform = 'translateX(-' + (currentIndex * moveAmount) + 'px)';
-      }
-
-      prevBtn.disabled = currentIndex === 0;
-      nextBtn.disabled = currentIndex >= maxIndex;
-      prevBtn.style.opacity = currentIndex === 0 ? "0.4" : "1";
-      nextBtn.style.opacity = currentIndex >= maxIndex ? "0.4" : "1";
-    }
-
-    nextBtn.onclick = function() {
-      let itemsVisible = 3;
-      if (window.innerWidth <= 992) itemsVisible = 2;
-      if (window.innerWidth <= 600) itemsVisible = 1;
-
-      const maxIndex = Math.max(0, track.children.length - itemsVisible);
-      if (currentIndex < maxIndex) {
-        currentIndex++;
-        updateReviewsSlider();
-      }
-    };
-
-    prevBtn.onclick = function() {
-      if (currentIndex > 0) {
-        currentIndex--;
-        updateReviewsSlider();
-      }
-    };
-
-    window.addEventListener('resize', updateReviewsSlider);
-    setTimeout(updateReviewsSlider, 300);
-  }
-
-  // Load live reviews on page load
-  loadDynamicGoogleReviews();
