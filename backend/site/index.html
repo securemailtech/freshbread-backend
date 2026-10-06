@@ -54,9 +54,9 @@
 
 <body>
 
-  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-53GFG98F"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<!-- End Google Tag Manager (noscript) -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-53GFG98F" height="0" width="0"
+      style="display:none;visibility:hidden"></iframe></noscript>
+  <!-- End Google Tag Manager (noscript) -->
 
 
   <!-- Page Loader -->
@@ -173,8 +173,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="container">
       <div class="features-grid">
         <div class="feature-card fade-in">
-          <div class="feature-image">
+          <!-- <div class="feature-image">
             <img src="images/shop.webp" alt="Baked Fresh Daily">
+          </div> -->
+          <div class="feature-image">
+            <img src="images/feature1-630.webp" srcset="
+            images/feature1-315.webp 315w,
+            images/feature1-630.webp 630w,
+            images/feature1-1247.webp 1247w
+        " sizes="315px" width="630" height="473" alt="Baked Fresh Daily">
           </div>
           <h3>Baked Fresh Daily</h3>
           <p>Every morning our bakers start early to bring you the freshest bread possible.</p>
@@ -324,9 +331,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             </svg>
             <span>Large orders (50+ pieces) require 24-hour notice.</span>
           </div>
-           <div class="order-notice phone-confirm-notice">
+          <div class="order-notice phone-confirm-notice">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+              <path
+                d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
             </svg>
             <span><strong>Please note:</strong> All orders will be confirmed by phone call.</span>
           </div>
@@ -462,7 +470,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
   </section>
 
-     <!-- Gallery Section -->
+  <!-- Gallery Section -->
   <section id="gallery" class="gallery-section">
     <div class="container">
       <div class="section-header fade-in">
@@ -473,18 +481,36 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <!-- CAROUSEL WRAPPER -->
       <div class="gallery-carousel-wrapper fade-in">
         <button class="gallery-arrow prev-arrow" id="gallery-prev" aria-label="Previous image">❮</button>
-        
+
         <div class="gallery-track-container">
           <div class="gallery-track" id="gallery-track">
             <!-- 8 Items -->
-            <div class="gallery-item"><img src="images/hq720.jpg" alt="Fresh Bread 1" loading="lazy"><div class="gallery-overlay"><span>Fresh Daily</span></div></div>
-            <div class="gallery-item"><img src="images/bread 2.jpg" alt="Fresh Bread 2" loading="lazy"><div class="gallery-overlay"><span>Golden Perfection</span></div></div>
-            <div class="gallery-item"><img src="images/Screenshot 2025-12-04 123539.png" alt="Fresh Bread 3" loading="lazy"><div class="gallery-overlay"><span>Homemade Love</span></div></div>
-            <div class="gallery-item"><img src="images/frontview.webp" alt="Fresh Bread 4" loading="lazy"><div class="gallery-overlay"><span>Buttery Delight</span></div></div>
-            <div class="gallery-item"><img src="images/hq720.jpg" alt="Fresh Bread 5" loading="lazy"><div class="gallery-overlay"><span>Pandesal</span></div></div>
-            <div class="gallery-item"><img src="images/bread 2.jpg" alt="Fresh Bread 6" loading="lazy"><div class="gallery-overlay"><span>Pandesal Everything</span></div></div>
-            <div class="gallery-item"><img src="images/Screenshot 2025-12-04 123539.png" alt="Fresh Bread 7" loading="lazy"><div class="gallery-overlay"><span>Señorita Bread</span></div></div>
-            <div class="gallery-item"><img src="images/frontview.webp" alt="Fresh Bread 8" loading="lazy"><div class="gallery-overlay"><span>Coffee Machine</span></div></div>
+            <div class="gallery-item"><img src="images/hq720.jpg" alt="Fresh Bread 1" loading="lazy">
+              <div class="gallery-overlay"><span>Fresh Daily</span></div>
+            </div>
+            <div class="gallery-item"><img src="images/bread 2.jpg" alt="Fresh Bread 2" loading="lazy">
+              <div class="gallery-overlay"><span>Golden Perfection</span></div>
+            </div>
+            <div class="gallery-item"><img src="images/Screenshot 2025-12-04 123539.png" alt="Fresh Bread 3"
+                loading="lazy">
+              <div class="gallery-overlay"><span>Homemade Love</span></div>
+            </div>
+            <div class="gallery-item"><img src="images/frontview.webp" alt="Fresh Bread 4" loading="lazy">
+              <div class="gallery-overlay"><span>Buttery Delight</span></div>
+            </div>
+            <div class="gallery-item"><img src="images/hq720.jpg" alt="Fresh Bread 5" loading="lazy">
+              <div class="gallery-overlay"><span>Pandesal</span></div>
+            </div>
+            <div class="gallery-item"><img src="images/bread 2.jpg" alt="Fresh Bread 6" loading="lazy">
+              <div class="gallery-overlay"><span>Pandesal Everything</span></div>
+            </div>
+            <div class="gallery-item"><img src="images/Screenshot 2025-12-04 123539.png" alt="Fresh Bread 7"
+                loading="lazy">
+              <div class="gallery-overlay"><span>Señorita Bread</span></div>
+            </div>
+            <div class="gallery-item"><img src="images/frontview.webp" alt="Fresh Bread 8" loading="lazy">
+              <div class="gallery-overlay"><span>Coffee Machine</span></div>
+            </div>
           </div>
         </div>
 
