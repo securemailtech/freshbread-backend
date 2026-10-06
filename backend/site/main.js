@@ -677,63 +677,54 @@ document.addEventListener("DOMContentLoaded", function() {
 
 });
 
-   // ========== FETCH DYNAMIC GOOGLE REVIEWS & SLIDER ==========
+    // ========== FETCH LIVE GOOGLE REVIEWS (UP TO 12) ==========
   async function loadDynamicGoogleReviews() {
     const track = document.getElementById('reviews-track');
     if (!track) return;
 
-    let reviewsList = [];
-
     try {
       const response = await fetch(API_URL + '/api/reviews');
-      if (response.ok) {
-        const data = await response.json();
-        if (data.reviews && data.reviews.length > 0) {
-          reviewsList = data.reviews;
-        }
+      if (!response.ok) return;
+
+      const data = await response.json();
+      const reviewsList = data.reviews || [];
+
+      if (reviewsList.length === 0) {
+        track.innerHTML = '<p style="text-align:center; width:100%; color:#888;">No recent Google reviews found.</p>';
+        return;
       }
-    } catch (error) {
-      console.log('Using fallback reviews for carousel');
-    }
 
-    // Fallback reviews array if API returns empty
-    if (reviewsList.length === 0) {
-      reviewsList = [
-        { author: 'Maria G.', rating: 5, time: 'Local Guide', text: 'The Señorita Bread is incredible — warm, soft, and perfectly sweet! Liza and Nick are amazing.' },
-        { author: 'Jamal R.', rating: 5, time: 'Stockton, CA', text: 'Always fresh out of the oven! Best bakery in Stockton. Fast pickup and super friendly staff.' },
-        { author: 'Priya K.', rating: 5, time: 'Verified Customer', text: 'Amazing authentic Señorita bread and fresh brewed coffee! Perfect combination to start the morning.' },
-        { author: 'Chris M.', rating: 5, time: 'Regular Customer', text: 'Delicious bread, wonderful owners, and great service every single time. 10/10 recommend!' },
-        { author: 'Rene N.', rating: 5, time: 'Local Guide', text: 'Best bakery in town! Fresh hot bread made with love. Can\'t recommend enough!' }
-      ];
-    }
+      // Render up to 12 live Google reviews
+      track.innerHTML = reviewsList.slice(0, 12).map(function(review) {
+        const firstLetter = review.author ? review.author.charAt(0).toUpperCase() : 'G';
+        const stars = '★'.repeat(review.rating || 5);
 
-    // Render cards into slider track
-    track.innerHTML = reviewsList.map(function(review) {
-      const firstLetter = review.author ? review.author.charAt(0).toUpperCase() : 'G';
-      const stars = '★'.repeat(review.rating || 5);
-
-      return `
-        <div class="testimonial-card">
-          <div class="testimonial-card-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-            <div class="reviewer-info" style="display:flex; align-items:center; gap:10px;">
-              ${review.avatar ? 
-                `<img src="${review.avatar}" style="width:38px; height:38px; border-radius:50%; object-fit:cover;" alt="${review.author}">` : 
-                `<span style="width:38px; height:38px; border-radius:50%; background:#960909; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:bold;">${firstLetter}</span>`}
-              <div>
-                <strong style="display:block; color:#2C2C2C; font-size:14px;">${review.author}</strong>
-                <span style="font-size:12px; color:#888;">${review.time || 'Google Review'}</span>
+        return `
+          <div class="testimonial-card">
+            <div class="testimonial-card-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+              <div class="reviewer-info" style="display:flex; align-items:center; gap:10px;">
+                ${review.avatar ? 
+                  `<img src="${review.avatar}" style="width:38px; height:38px; border-radius:50%; object-fit:cover;" alt="${review.author}">` : 
+                  `<span style="width:38px; height:38px; border-radius:50%; background:#960909; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:bold;">${firstLetter}</span>`}
+                <div>
+                  <strong style="display:block; color:#2C2C2C; font-size:14px;">${review.author}</strong>
+                  <span style="font-size:12px; color:#888;">${review.time || 'Google Review'}</span>
+                </div>
               </div>
+              <span style="font-weight:800; color:#4285F4; font-size:16px;">G</span>
             </div>
-            <span style="font-weight:800; color:#4285F4; font-size:16px;">G</span>
+            <div class="testimonial-rating" style="color:#F59E0B; margin-bottom:8px;">${stars}</div>
+            <p style="font-size:14px; color:#555; line-height:1.5;">"${review.text}"</p>
           </div>
-          <div class="testimonial-rating" style="color:#F59E0B; margin-bottom:8px;">${stars}</div>
-          <p style="font-size:14px; color:#555; line-height:1.5;">"${review.text}"</p>
-        </div>
-      `;
-    }).join('');
+        `;
+      }).join('');
 
-    // Initialize Reviews Slider Logic
-    initReviewsCarousel();
+      // Initialize Slider
+      initReviewsCarousel();
+
+    } catch (error) {
+      console.log('Error loading live Google reviews:', error);
+    }
   }
 
   // Reviews Slider Logic
@@ -792,5 +783,5 @@ document.addEventListener("DOMContentLoaded", function() {
     setTimeout(updateReviewsSlider, 300);
   }
 
-  // Run function
+  // Load live reviews on page load
   loadDynamicGoogleReviews();
