@@ -12,6 +12,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800;900&family=DM+Sans:wght@400;500;600;700&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="icon" type="image/jpeg" href="images/logo.jpg">
+  <link rel="stylesheet" href="/styles.css">
   <style>
     .blog-hero {
       background: linear-gradient(135deg, #960909 0%, #6B0707 100%);
@@ -126,30 +127,96 @@
 
 <body>
 
-  <!-- Navigation -->
+    <!-- Navigation -->
+    <!-- Navigation -->
   <nav class="navbar" id="navbar">
     <a href="/" class="logo">
-      <img src="images/logo.jpg" alt="Fresh Hot Bread Logo">
+      <img src="/images/logo.jpg" alt="Fresh Hot Bread Logo" width="120" height="120">
       <div class="logo-text">
         <span>Fresh Hot</span>
         <strong>Bread</strong>
+      </div>
+
+      <div class="logo-mobile-text">
+        <span class="line1"><span class="fresh">Fresh</span> <span class="hot">Hot</span></span>
+        <span class="line2"><span class="bread">Bread</span> <span class="all-day">All Day</span></span>
       </div>
     </a>
 
     <ul class="nav-links" id="nav-links">
       <li><a href="/#about">About</a></li>
       <li><a href="/#menu">Menu</a></li>
-      <li><a href="/blog" class="active">Blog</a></li>
+      <li><a href="/#testimonials">Reviews</a></li>
       <li><a href="/#gallery">Gallery</a></li>
+      <li><a href="/#faq">FAQ</a></li>
       <li><a href="/#contact">Contact</a></li>
     </ul>
 
     <div class="nav-right">
       <button class="hamburger" id="hamburger" aria-label="Menu">
-        <span></span><span></span><span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <button class="cart-toggle" id="cart-toggle" aria-label="Shopping Cart">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="9" cy="21" r="1" />
+          <circle cx="20" cy="21" r="1" />
+          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+        </svg>
+        <span class="cart-dot" id="cart-dot"></span>
       </button>
     </div>
   </nav>
+
+  <!-- Mini Cart -->
+  <div class="cart-overlay" id="cart-overlay"></div>
+  <div id="mini-cart">
+    <div class="cart-header">
+      <h4>Your Order</h4>
+      <button class="cart-close" id="cart-close" aria-label="Close cart">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 6L6 18M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <ul id="cart-items"></ul>
+    <p class="cart-empty">Your cart is empty.</p>
+
+    <!-- Cart Footer -->
+    <div class="cart-footer">
+      <p class="cart-total-row">
+        Total: <span>$<span id="cart-total">0.00</span></span>
+      </p>
+      <button class="checkout-btn" id="checkout-btn" disabled>Place Order</button>
+    </div>
+  </div>
+
+  <!-- Mini Cart -->
+  <div class="cart-overlay" id="cart-overlay"></div>
+  <div id="mini-cart">
+    <div class="cart-header">
+      <h4>Your Order</h4>
+      <button class="cart-close" id="cart-close" aria-label="Close cart">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 6L6 18M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <ul id="cart-items"></ul>
+    <p class="cart-empty">Your cart is empty.</p>
+
+    <!-- Cart Footer -->
+    <div class="cart-footer">
+      <p class="cart-total-row">
+        Total: <span>$<span id="cart-total">0.00</span></span>
+      </p>
+      <button class="checkout-btn" id="checkout-btn" disabled>Place Order</button>
+    </div>
+  </div>
 
   <!-- Hero -->
   <section class="blog-hero">
@@ -181,7 +248,7 @@
       </div>
     </div>
   </footer>
-
+<script src="/main.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
       const container = document.getElementById('blog-list');
