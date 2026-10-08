@@ -873,7 +873,6 @@ function escapeHtml(text) {
 // BLOG MANAGEMENT SYSTEM & UPLOADS
 // ========================================
 
-// --- AUTO SLUG & FEATURED IMAGE LOGIC ---
 document.addEventListener('DOMContentLoaded', () => {
   const titleInput = document.getElementById('blog_title');
   const slugInput = document.getElementById('blog_slug');
@@ -918,7 +917,7 @@ document.addEventListener('DOMContentLoaded', () => {
   async function uploadFeaturedImage(file) {
     if (!file.type.startsWith('image/')) return showToast('Only images are allowed', true);
     
-    if (dropzone) dropzone.innerHTML = '<span style="color:#888;">⏳ Uploading...</span>';
+    if (dropzone) dropzone.innerHTML = '<span style="color:#64748b; font-size:13px;">Uploading image...</span>';
     
     const formData = new FormData();
     formData.append('image', file);
@@ -936,14 +935,14 @@ document.addEventListener('DOMContentLoaded', () => {
       const finalUrl = result.url || `/${formData.get('targetPath')}`;
       if (imageUrlInput) imageUrlInput.value = finalUrl;
       if (dropzone) dropzone.innerHTML = `<img src="${finalUrl}" style="max-width:100%; max-height:140px; border-radius:6px; object-fit:cover;">`;
-      showToast('Image Uploaded!');
+      showToast('Featured Image Uploaded!');
     } catch (err) {
-      if (dropzone) dropzone.innerHTML = '<span style="color:red;">Upload failed! Try again.</span>';
+      if (dropzone) dropzone.innerHTML = '<span style="color:#ef4444; font-size:13px;">Upload failed! Try again.</span>';
     }
   }
 });
 
-// --- CORE BLOG CRUD ---
+// CORE BLOG CRUD FUNCTIONS
 async function loadAdminBlogs() {
   const container = document.getElementById('admin-blog-list');
   if (!container) return;
@@ -952,20 +951,20 @@ async function loadAdminBlogs() {
     const response = await fetch(`${API_URL}/api/blogs?status=all`);
     const blogs = await response.json();
 
-    if (blogs.length === 0) {
+    if (!Array.isArray(blogs) || blogs.length === 0) {
       container.innerHTML = '<p class="empty-state">No blogs written yet. Click "+ New Blog Post" to start!</p>';
       return;
     }
 
     container.innerHTML = blogs.map(blog => `
-      <div class="order-row" style="cursor:default; display:flex; align-items:center; justify-content:space-between; gap:15px; padding:15px; border-bottom:1px solid #eee;">
+      <div class="order-row" style="cursor:default; display:flex; align-items:center; justify-content:space-between; gap:15px; padding:15px; border-bottom:1px solid #e2e8f0;">
         <div style="flex:1; min-width:0;">
-          <h4 style="margin:0 0 5px 0; font-size:16px; color:#111; word-break:break-word;">${escapeHtml(blog.title)}</h4>
-          <span style="color:#888; font-size:13px; display:block;">/${escapeHtml(blog.slug)}</span>
+          <h4 style="margin:0 0 4px 0; font-size:16px; color:#0f172a; word-break:break-word;">${escapeHtml(blog.title)}</h4>
+          <span style="color:#64748b; font-size:13px; display:block;">/${escapeHtml(blog.slug)}</span>
         </div>
         <div style="display:flex; align-items:center; gap:12px; flex-shrink:0;">
-          <span style="color:#666; font-size:13px; white-space:nowrap;">${new Date(blog.created_at).toLocaleDateString()}</span>
-          <span class="order-status ${blog.status === 'published' ? 'status-completed' : 'status-pending'}" style="margin:0;">${blog.status.toUpperCase()}</span>
+          <span style="color:#64748b; font-size:13px; white-space:nowrap;">${blog.created_at ? new Date(blog.created_at).toLocaleDateString() : ''}</span>
+          <span class="order-status ${blog.status === 'published' ? 'status-completed' : 'status-pending'}" style="margin:0;">${(blog.status || 'draft').toUpperCase()}</span>
           <button onclick="editBlog(${blog.id})" style="background:var(--blue); color:#fff; border:none; padding:8px 14px; border-radius:6px; font-weight:600; cursor:pointer;">Edit</button>
           <button onclick="deleteBlog(${blog.id})" style="background:var(--red); color:#fff; border:none; padding:8px 14px; border-radius:6px; font-weight:600; cursor:pointer;">Delete</button>
         </div>
@@ -991,7 +990,7 @@ function showBlogEditor(isNew = true, blog = null) {
     if (slugInput) slugInput.dataset.manuallyEdited = '';
     
     if(dropzone) {
-        dropzone.innerHTML = `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" style="margin-bottom: 12px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg><span style="color:#64748b; font-size:13px; line-height:1.5; pointer-events:none;">Click to Upload Image<br><strong style="color:#0f172a; font-weight:600;">or Ctrl+V to Paste</strong></span>`;
+        dropzone.innerHTML = `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" style="margin-bottom: 8px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg><span style="color:#64748b; font-size:13px; line-height:1.4; pointer-events:none;">Click to Upload Image<br><strong style="color:#0f172a; font-weight:600;">or Ctrl+V to Paste</strong></span>`;
     }
     
     if(typeof tinymce !== 'undefined' && tinymce.get('blog_content')) {
@@ -1007,14 +1006,14 @@ function showBlogEditor(isNew = true, blog = null) {
     document.getElementById('blog_quick_answer').value = blog.quick_answer || '';
     document.getElementById('blog_sources').value = blog.sources || '';
     document.getElementById('blog_cta').value = blog.cta || '';
-    document.getElementById('blog_status').value = blog.status || 'draft';
+    document.getElementById('blog_status').value = blog.status || 'published';
     
     if (slugInput) slugInput.dataset.manuallyEdited = 'true';
     
     if (blog.image_url && dropzone) {
       dropzone.innerHTML = `<img src="${blog.image_url}" style="max-width:100%; max-height:140px; border-radius:6px; object-fit:cover;">`;
     } else if (dropzone) {
-      dropzone.innerHTML = `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" style="margin-bottom: 12px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg><span style="color:#64748b; font-size:13px; line-height:1.5; pointer-events:none;">Click to Upload Image<br><strong style="color:#0f172a; font-weight:600;">or Ctrl+V to Paste</strong></span>`;
+      dropzone.innerHTML = `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" style="margin-bottom: 8px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg><span style="color:#64748b; font-size:13px; line-height:1.4; pointer-events:none;">Click to Upload Image<br><strong style="color:#0f172a; font-weight:600;">or Ctrl+V to Paste</strong></span>`;
     }
     
     if(typeof tinymce !== 'undefined' && tinymce.get('blog_content')) {
@@ -1058,7 +1057,7 @@ async function deleteBlog(id) {
   }
 }
 
-// Initialize Powerful TinyMCE Editor
+// Initialize TinyMCE
 function initBlogEditor() {
   if (typeof tinymce === 'undefined') return;
   
@@ -1067,9 +1066,9 @@ function initBlogEditor() {
     plugins: 'advlist autolink lists link image charmap preview anchor pagebreak searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime media nonbreaking table emoticons accordion',
     toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline | alignleft aligncenter alignright alignjustify | table accordion | link image | bullist numlist | code fullscreen',
     paste_data_images: true, 
-    height: 700,
+    height: 650,
     menubar: 'file edit view insert format tools table',
-    content_style: 'body { font-family: "DM Sans", sans-serif; font-size:16px; line-height: 1.6; } table { border-collapse: collapse; width: 100%; } td, th { border: 1px solid #ddd; padding: 8px; }',
+    content_style: 'body { font-family: "DM Sans", sans-serif; font-size:16px; line-height: 1.6; color: #1e293b; } table { border-collapse: collapse; width: 100%; } td, th { border: 1px solid #cbd5e1; padding: 8px; }',
     setup: function (editor) {
       editor.on('change', function () {
         tinymce.triggerSave();
@@ -1078,7 +1077,7 @@ function initBlogEditor() {
   });
 }
 
-// Bind Blog Events on Load
+// Bind Events on Load
 document.addEventListener('DOMContentLoaded', () => {
   const btnCreate = document.getElementById('btn-create-new-blog');
   const btnBack = document.getElementById('btn-back-to-blogs');
@@ -1095,9 +1094,9 @@ document.addEventListener('DOMContentLoaded', () => {
         tinymce.triggerSave(); 
       }
       
-      const editorContent = document.getElementById('blog_content').value;
+      const editorContent = document.getElementById('blog_content')?.value || '';
       
-      if(!editorContent || !editorContent.trim()) {
+      if(!editorContent.trim()) {
         return showToast('Content cannot be empty!', true);
       }
 
@@ -1107,15 +1106,18 @@ document.addEventListener('DOMContentLoaded', () => {
       submitBtn.disabled = true;
 
       const id = document.getElementById('blog_id').value;
+      const quickAnswer = document.getElementById('blog_quick_answer')?.value || '';
       
+      // EXCERPT PASSED TO PREVENT 500 SERVER ERROR
       const payload = {
         title: document.getElementById('blog_title')?.value || '',
         slug: document.getElementById('blog_slug')?.value || '',
-        image_url: document.getElementById('blog_image_url')?.value || '',
-        quick_answer: document.getElementById('blog_quick_answer')?.value || '',
+        excerpt: quickAnswer, // DB required field
+        quick_answer: quickAnswer,
         sources: document.getElementById('blog_sources')?.value || '',
         cta: document.getElementById('blog_cta')?.value || '',
         content: editorContent,
+        image_url: document.getElementById('blog_image_url')?.value || '',
         status: document.getElementById('blog_status')?.value || 'published'
       };
 
@@ -1133,10 +1135,11 @@ document.addEventListener('DOMContentLoaded', () => {
           showToast(id ? 'Blog updated successfully!' : 'Blog created successfully!');
           hideBlogEditor();
         } else {
-          showToast('Failed to save blog', true);
+          const errData = await response.json();
+          showToast(errData.error || 'Failed to save blog', true);
         }
       } catch (error) {
-        showToast('Failed to save blog', true);
+        showToast('Server error while saving blog', true);
       } finally {
         submitBtn.innerHTML = originalHtml;
         submitBtn.disabled = false;
@@ -1148,5 +1151,5 @@ document.addEventListener('DOMContentLoaded', () => {
     loadAdminBlogs();
   }
   
-  setTimeout(initBlogEditor, 500); 
+  setTimeout(initBlogEditor, 400); 
 });
