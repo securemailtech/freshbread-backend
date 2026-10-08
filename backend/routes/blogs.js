@@ -1,94 +1,182 @@
 const express = require('express');
 const router = express.Router();
-const { getDb, backupDatabaseToCloudinary } = require('../models/initDb');
-const authMiddleware = require('../middleware/auth');
+const jwt = require('jsonwebtoken');
+const { getDb } = require('../models/initDb');
 
-// Helper function to create URL-friendly slug
-function generateSlug(title) {
-  return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
-}
+// ==========================================
+// AUTHENTICATION MIDDLEWARE (FIX FOR RENDER)
+// ==========================================
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
 
-// Helper: Safe Cloudinary Backup Trigger
-async function safeBackup() {
-  if (typeof backupDatabaseToCloudinary === 'function') {
-    try {
-      await backupDatabaseToCloudinary();
-    } catch (err) {
-      console.error('⚠️ Backup trigger error:', err.message);
-    }
+  if (!token) {
+    return res.status(401).json({ error: 'Access denied. No token provided.' });
   }
+
+  const jwtSecret = process.env.JWT_SECRET || 'freshbread_secret_key_2025';
+
+  jwt.verify(token, jwtSecret, (err, user) => {
+    if (err) {
+      return res.status(403).json({ error: 'Invalid or expired token.' });
+    }
+    req.user = user;
+    next();
+  });
 }
 
-// ========================================
-// PUBLIC ROUTES
-// ========================================
-
-// GET /api/blogs - Get all published blogs
+// ==========================================
+// 1. GET ALL BLOGS
+// ==========================================
 router.get('/', (req, res) => {
   const db = getDb();
-  // If admin passes status=all, show everything, else only published
-  const { status } = req.query;
-  const query = status === 'all' ? 'SELECT * FROM blogs ORDER BY created_at DESC' : 'SELECT * FROM blogs WHERE status = "published" ORDER BY created_at DESC';
+  const status = req.query.status;
 
-  db.all(query, [], (err, blogs) => {
-    if (err) return res.status(500).json({ error: 'Database error' });
-    res.json(blogs || []);
+  let query = "SELECT * FROM blogs ORDER BY created_at DESC";
+  let params = [];
+
+  if (status && status !== 'all') {
+    query = "SELECT * FROM blogs WHERE status = ? ORDER BY created_at DESC";
+    params = [status];
+  } else if (!status) {
+    // Default public view: only published blogs
+    query = "SELECT * FROM blogs WHERE status = 'published' ORDER BY created_at DESC";
+  }
+
+  db.all(query, params, (err, rows) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+    res.json(rows || []);
   });
 });
 
-// GET /api/blogs/:slug - Get single blog by slug
-router.get('/:slug', (req, res) => {
+// ==========================================
+// 2. GET SINGLE BLOG BY SLUG OR ID
+// ==========================================
+router.get('/:slugOrId', (req, res) => {
   const db = getDb();
-  db.get('SELECT * FROM blogs WHERE slug = ?', [req.params.slug], (err, blog) => {
-    if (err) return res.status(500).json({ error: 'Database error' });
-    if (!blog) return res.status(404).json({ error: 'Blog not found' });
-    res.json(blog);
+  const param = req.params.slugOrId;
+
+  const query = "SELECT * FROM blogs WHERE slug = ? OR id = ?";
+  db.get(query, [param, param], (err, row) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+    if (!row) {
+      return res.status(404).json({ error: 'Blog post not found' });
+    }
+    res.json(row);
   });
 });
 
-// ========================================
-// PROTECTED ROUTES (Admin Only)
-// ========================================
-
+// ==========================================
+// 3. CREATE NEW BLOG POST
+// ==========================================
 router.post('/', authenticateToken, (req, res) => {
   const { title, slug, excerpt, content, image_url, quick_answer, sources, status } = req.body;
   const db = getDb();
-  
-  db.run(
-    `INSERT INTO blogs (title, slug, excerpt, content, image_url, quick_answer, sources, status) 
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-    [title, slug, excerpt, content, image_url, quick_answer, sources, status],
-    function (err) {
-      if (err) return res.status(500).json({ error: err.message });
-      res.json({ id: this.lastID, message: 'Blog created successfully' });
+
+  if (!title || !content) {
+    return res.status(400).json({ error: 'Title and Content are required.' });
+  }
+
+  // Generate slug if not provided
+  const finalSlug = (slug || title)
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/[\s_-]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+
+  const query = `
+    INSERT INTO blogs (title, slug, excerpt, content, image_url, quick_answer, sources, status)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+  `;
+
+  const params = [
+    title,
+    finalSlug,
+    excerpt || '',
+    content,
+    image_url || '',
+    quick_answer || '',
+    sources || '',
+    status || 'published'
+  ];
+
+  db.run(query, params, function (err) {
+    if (err) {
+      if (err.message.includes('UNIQUE constraint failed')) {
+        return res.status(400).json({ error: 'A blog with this title or slug already exists.' });
+      }
+      return res.status(500).json({ error: err.message });
     }
-  );
+
+    res.json({
+      id: this.lastID,
+      slug: finalSlug,
+      message: 'Blog created successfully!'
+    });
+  });
 });
 
-// PUT /api/blogs/:id - Update a blog
+// ==========================================
+// 4. UPDATE EXISTING BLOG POST
+// ==========================================
 router.put('/:id', authenticateToken, (req, res) => {
   const { title, slug, excerpt, content, image_url, quick_answer, sources, status } = req.body;
   const db = getDb();
-  
-  db.run(
-    `UPDATE blogs SET title = ?, slug = ?, excerpt = ?, content = ?, image_url = ?, quick_answer = ?, sources = ?, status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
-    [title, slug, excerpt, content, image_url, quick_answer, sources, status, req.params.id],
-    function (err) {
-      if (err) return res.status(500).json({ error: err.message });
-      res.json({ message: 'Blog updated successfully' });
+  const id = req.params.id;
+
+  const finalSlug = slug
+    ? slug.toLowerCase().trim().replace(/[^\w\s-]/g, '').replace(/[\s_-]+/g, '-')
+    : title.toLowerCase().trim().replace(/[^\w\s-]/g, '').replace(/[\s_-]+/g, '-');
+
+  const query = `
+    UPDATE blogs 
+    SET title = ?, slug = ?, excerpt = ?, content = ?, image_url = ?, quick_answer = ?, sources = ?, status = ?, updated_at = CURRENT_TIMESTAMP
+    WHERE id = ?
+  `;
+
+  const params = [
+    title,
+    finalSlug,
+    excerpt || '',
+    content,
+    image_url || '',
+    quick_answer || '',
+    sources || '',
+    status || 'published',
+    id
+  ];
+
+  db.run(query, params, function (err) {
+    if (err) {
+      return res.status(500).json({ error: err.message });
     }
-  );
+    if (this.changes === 0) {
+      return res.status(404).json({ error: 'Blog not found' });
+    }
+    res.json({ message: 'Blog updated successfully!' });
+  });
 });
 
-// DELETE /api/blogs/:id - Delete a blog
-router.delete('/:id', authMiddleware, (req, res) => {
+// ==========================================
+// 5. DELETE BLOG POST
+// ==========================================
+router.delete('/:id', authenticateToken, (req, res) => {
   const db = getDb();
-  db.run('DELETE FROM blogs WHERE id = ?', [req.params.id], async function(err) {
-    if (err) return res.status(500).json({ error: 'Failed to delete blog' });
-    if (this.changes === 0) return res.status(404).json({ error: 'Blog not found' });
-    
-    res.json({ success: true });
-    await safeBackup();
+  const id = req.params.id;
+
+  db.run("DELETE FROM blogs WHERE id = ?", [id], function (err) {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+    if (this.changes === 0) {
+      return res.status(404).json({ error: 'Blog not found' });
+    }
+    res.json({ message: 'Blog deleted successfully!' });
   });
 });
 
