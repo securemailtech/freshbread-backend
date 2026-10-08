@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
-const { getDb } = require('../models/initDb');
+const { getDb, backupDatabaseToCloudinary } = require('../models/initDb');
 
 // ==========================================
-// AUTHENTICATION MIDDLEWARE (FIX FOR RENDER)
+// AUTHENTICATION MIDDLEWARE
 // ==========================================
 function authenticateToken(req, res, next) {
   const authHeader = req.headers['authorization'];
@@ -74,7 +74,7 @@ router.get('/:slugOrId', (req, res) => {
 // 3. CREATE NEW BLOG POST
 // ==========================================
 router.post('/', authenticateToken, (req, res) => {
-  const { title, slug, excerpt, content, image_url, quick_answer, sources,cta, status } = req.body;
+  const { title, slug, excerpt, content, image_url, quick_answer, sources, cta, status } = req.body;
   const db = getDb();
 
   if (!title || !content) {
@@ -89,9 +89,10 @@ router.post('/', authenticateToken, (req, res) => {
     .replace(/[\s_-]+/g, '-')
     .replace(/^-+|-+$/g, '');
 
+  // EXACTLY 9 COLUMNS & EXACTLY 9 PLACEHOLDERS (?)
   const query = `
     INSERT INTO blogs (title, slug, excerpt, content, image_url, quick_answer, sources, cta, status)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
   const params = [
@@ -112,6 +113,11 @@ router.post('/', authenticateToken, (req, res) => {
         return res.status(400).json({ error: 'A blog with this title or slug already exists.' });
       }
       return res.status(500).json({ error: err.message });
+    }
+
+    // Backup to Cloudinary if available
+    if (typeof backupDatabaseToCloudinary === 'function') {
+      backupDatabaseToCloudinary();
     }
 
     res.json({
@@ -160,6 +166,11 @@ router.put('/:id', authenticateToken, (req, res) => {
     if (this.changes === 0) {
       return res.status(404).json({ error: 'Blog not found' });
     }
+
+    if (typeof backupDatabaseToCloudinary === 'function') {
+      backupDatabaseToCloudinary();
+    }
+
     res.json({ message: 'Blog updated successfully!' });
   });
 });
@@ -178,6 +189,11 @@ router.delete('/:id', authenticateToken, (req, res) => {
     if (this.changes === 0) {
       return res.status(404).json({ error: 'Blog not found' });
     }
+
+    if (typeof backupDatabaseToCloudinary === 'function') {
+      backupDatabaseToCloudinary();
+    }
+
     res.json({ message: 'Blog deleted successfully!' });
   });
 });
