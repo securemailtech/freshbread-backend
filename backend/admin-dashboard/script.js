@@ -1019,3 +1019,100 @@ document.addEventListener('DOMContentLoaded', () => {
     loadAdminBlogs();
   }
 });
+
+// Initialize Powerful TinyMCE Editor
+function initBlogEditor() {
+  tinymce.init({
+    selector: '#blog_content',
+    plugins: 'advlist autolink lists link image charmap preview anchor pagebreak searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime media nonbreaking table emoticons accordion paste',
+    toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline | alignleft aligncenter alignright alignjustify | table accordion | link image | bullist numlist | code fullscreen',
+    paste_data_images: true, // Yahi feature Google Docs ki images direct paste hone dega
+    height: 700,
+    menubar: 'file edit view insert format tools table',
+    content_style: 'body { font-family: "DM Sans", sans-serif; font-size:16px; line-height: 1.6; } table { border-collapse: collapse; width: 100%; } td, th { border: 1px solid #ddd; padding: 8px; }',
+    setup: function (editor) {
+      editor.on('change', function () {
+        tinymce.triggerSave(); // Ensure textarea is updated
+      });
+    }
+  });
+}
+
+// Update showBlogEditor function to handle TinyMCE data
+const originalShowBlogEditor = showBlogEditor;
+showBlogEditor = function(isNew = true, blog = null) {
+  originalShowBlogEditor(isNew, blog);
+  
+  // Naye fields ko clear ya populate karna
+  if (isNew) {
+    document.getElementById('blog_quick_answer').value = '';
+    document.getElementById('blog_sources').value = '';
+    if(tinymce.get('blog_content')) tinymce.get('blog_content').setContent('');
+  } else if (blog) {
+    document.getElementById('blog_quick_answer').value = blog.quick_answer || '';
+    document.getElementById('blog_sources').value = blog.sources || '';
+    if(tinymce.get('blog_content')) tinymce.get('blog_content').setContent(blog.content || '');
+  }
+};
+
+// Form submission me Editor ka data catch karna
+const blogForm = document.getElementById('blog-form');
+if (blogForm) {
+  // Purana event listener hatane ke liye isko modify kar rahe hain hum
+  blogForm.onsubmit = async (e) => {
+    e.preventDefault();
+    
+    // Get content directly from Powerful Editor
+    const editorContent = tinymce.get('blog_content').getContent();
+    
+    if(!editorContent.trim()) {
+      showToast('Content cannot be empty!', true);
+      return;
+    }
+
+    const submitBtn = document.getElementById('btn-save-blog');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = 'Saving...';
+    submitBtn.disabled = true;
+
+    const id = document.getElementById('blog_id').value;
+    const payload = {
+      title: document.getElementById('blog_title').value,
+      slug: document.getElementById('blog_slug').value,
+      image_url: document.getElementById('blog_image_url').value,
+      quick_answer: document.getElementById('blog_quick_answer').value, // New field
+      sources: document.getElementById('blog_sources').value, // New field
+      content: editorContent, // Content from TinyMCE
+      status: document.getElementById('blog_status').value
+    };
+
+    const method = id ? 'PUT' : 'POST';
+    const url = id ? `${API_URL}/api/blogs/${id}` : `${API_URL}/api/blogs`;
+
+    try {
+      const response = await fetch(url, {
+        method: method,
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
+        body: JSON.stringify(payload)
+      });
+
+      if (response.ok) {
+        showToast(id ? 'Blog updated successfully!' : 'Blog created successfully!');
+        hideBlogEditor();
+      } else {
+        const error = await response.json();
+        showToast(error.error || 'Failed to save blog', true);
+      }
+    } catch (error) {
+      showToast('Failed to save blog', true);
+    } finally {
+      submitBtn.innerHTML = originalText;
+      submitBtn.disabled = false;
+    }
+  };
+}
+
+// Call init on load
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(initBlogEditor, 1000); 
+});

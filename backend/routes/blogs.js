@@ -50,48 +50,32 @@ router.get('/:slug', (req, res) => {
 // PROTECTED ROUTES (Admin Only)
 // ========================================
 
-// POST /api/blogs - Create a new blog
-router.post('/', authMiddleware, (req, res) => {
-  let { title, slug, excerpt, content, image_url, status } = req.body;
-  
-  if (!title || !content) {
-    return res.status(400).json({ error: 'Title and content are required' });
-  }
-
-  // Auto-generate slug if not provided
-  if (!slug) slug = generateSlug(title);
-
+router.post('/', authenticateToken, (req, res) => {
+  const { title, slug, excerpt, content, image_url, quick_answer, sources, status } = req.body;
   const db = getDb();
+  
   db.run(
-    `INSERT INTO blogs (title, slug, excerpt, content, image_url, status) VALUES (?, ?, ?, ?, ?, ?)`,
-    [title, slug, excerpt || '', content, image_url || '', status || 'published'],
-    async function(err) {
-      if (err) {
-        if (err.message.includes('UNIQUE constraint failed')) {
-          return res.status(400).json({ error: 'A blog with this title/slug already exists' });
-        }
-        return res.status(500).json({ error: 'Failed to create blog' });
-      }
-      res.json({ success: true, id: this.lastID, slug });
-      await safeBackup();
+    `INSERT INTO blogs (title, slug, excerpt, content, image_url, quick_answer, sources, status) 
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+    [title, slug, excerpt, content, image_url, quick_answer, sources, status],
+    function (err) {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ id: this.lastID, message: 'Blog created successfully' });
     }
   );
 });
 
 // PUT /api/blogs/:id - Update a blog
-router.put('/:id', authMiddleware, (req, res) => {
-  const { title, slug, excerpt, content, image_url, status } = req.body;
+router.put('/:id', authenticateToken, (req, res) => {
+  const { title, slug, excerpt, content, image_url, quick_answer, sources, status } = req.body;
   const db = getDb();
-
+  
   db.run(
-    `UPDATE blogs SET title = ?, slug = ?, excerpt = ?, content = ?, image_url = ?, status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
-    [title, slug, excerpt, content, image_url, status, req.params.id],
-    async function(err) {
-      if (err) return res.status(500).json({ error: 'Failed to update blog' });
-      if (this.changes === 0) return res.status(404).json({ error: 'Blog not found' });
-      
-      res.json({ success: true });
-      await safeBackup();
+    `UPDATE blogs SET title = ?, slug = ?, excerpt = ?, content = ?, image_url = ?, quick_answer = ?, sources = ?, status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
+    [title, slug, excerpt, content, image_url, quick_answer, sources, status, req.params.id],
+    function (err) {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ message: 'Blog updated successfully' });
     }
   );
 });
