@@ -869,78 +869,81 @@ function escapeHtml(text) {
   return div.innerHTML;
 }
 
-// --- AUTO SLUG GENERATOR ---
-const titleInput = document.getElementById('blog_title');
-const slugInput = document.getElementById('blog_slug');
+// ========================================
+// BLOG MANAGEMENT SYSTEM & UPLOADS
+// ========================================
 
-titleInput?.addEventListener('input', function() {
-  if (!slugInput.dataset.manuallyEdited) {
-    slugInput.value = this.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-  }
-});
+// --- AUTO SLUG & FEATURED IMAGE LOGIC ---
+document.addEventListener('DOMContentLoaded', () => {
+  const titleInput = document.getElementById('blog_title');
+  const slugInput = document.getElementById('blog_slug');
 
-slugInput?.addEventListener('input', function() {
-  this.dataset.manuallyEdited = 'true';
-  if(this.value === '') delete this.dataset.manuallyEdited;
-});
+  // Auto-generate slug
+  titleInput?.addEventListener('input', function() {
+    if (!slugInput.dataset.manuallyEdited) {
+      slugInput.value = this.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    }
+  });
 
-// --- FEATURED IMAGE UPLOAD & PASTE LOGIC ---
-const dropzone = document.getElementById('featured-image-dropzone');
-const fileInput = document.getElementById('featured_image_file');
-const imageUrlInput = document.getElementById('blog_image_url');
+  slugInput?.addEventListener('input', function() {
+    this.dataset.manuallyEdited = 'true';
+    if(this.value === '') delete this.dataset.manuallyEdited;
+  });
 
-dropzone?.addEventListener('click', () => fileInput.click());
+  // Featured Image Upload & Paste
+  const dropzone = document.getElementById('featured-image-dropzone');
+  const fileInput = document.getElementById('featured_image_file');
+  const imageUrlInput = document.getElementById('blog_image_url');
 
-fileInput?.addEventListener('change', (e) => {
-  if(e.target.files[0]) uploadFeaturedImage(e.target.files[0]);
-});
+  dropzone?.addEventListener('click', () => fileInput?.click());
 
-// PASTE EVENT LISTENER
-document.addEventListener('paste', (e) => {
-  // Only trigger if blog editor is visible
-  if(document.getElementById('blog-editor-view').style.display !== 'none') {
-    const items = (e.clipboardData || e.originalEvent.clipboardData).items;
-    for (let index in items) {
-      const item = items[index];
-      if (item.kind === 'file') {
-        const blob = item.getAsFile();
-        uploadFeaturedImage(blob);
+  fileInput?.addEventListener('change', (e) => {
+    if(e.target.files[0]) uploadFeaturedImage(e.target.files[0]);
+  });
+
+  // Paste image directly into dropzone
+  document.addEventListener('paste', (e) => {
+    if(document.getElementById('blog-editor-view')?.style.display !== 'none') {
+      const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+      for (let index in items) {
+        const item = items[index];
+        if (item.kind === 'file') {
+          const blob = item.getAsFile();
+          uploadFeaturedImage(blob);
+        }
       }
+    }
+  });
+
+  async function uploadFeaturedImage(file) {
+    if (!file.type.startsWith('image/')) return showToast('Only images are allowed', true);
+    
+    if (dropzone) dropzone.innerHTML = '<span style="color:#888;">⏳ Uploading...</span>';
+    
+    const formData = new FormData();
+    formData.append('image', file);
+    formData.append('key', 'blog_feat_' + Date.now());
+    formData.append('targetPath', 'images/blog_' + Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9.]/g, ''));
+    
+    try {
+      const response = await fetch(`${API_URL}/api/images/upload`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${authToken}` },
+        body: formData
+      });
+      const result = await response.json();
+      
+      const finalUrl = result.url || `/${formData.get('targetPath')}`;
+      if (imageUrlInput) imageUrlInput.value = finalUrl;
+      if (dropzone) dropzone.innerHTML = `<img src="${finalUrl}" style="max-width:100%; max-height:140px; border-radius:6px; object-fit:cover;">`;
+      showToast('Image Uploaded!');
+    } catch (err) {
+      if (dropzone) dropzone.innerHTML = '<span style="color:red;">Upload failed! Try again.</span>';
     }
   }
 });
 
-async function uploadFeaturedImage(file) {
-  if (!file.type.startsWith('image/')) return showToast('Only images are allowed', true);
-  
-  dropzone.innerHTML = '<span style="color:#888;">⏳ Uploading...</span>';
-  
-  const formData = new FormData();
-  formData.append('image', file);
-  formData.append('key', 'blog_feat_' + Date.now());
-  formData.append('targetPath', 'images/blog_' + Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9.]/g, ''));
-  
-  try {
-    const response = await fetch(`${API_URL}/api/images/upload`, {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${authToken}` },
-      body: formData
-    });
-    const result = await response.json();
-    
-    const finalUrl = result.url || `/${formData.get('targetPath')}`;
-    imageUrlInput.value = finalUrl;
-    dropzone.innerHTML = `<img src="${finalUrl}" style="max-width:100%; max-height:180px; border-radius:6px; object-fit:cover;">`;
-    showToast('Image Uploaded!');
-  } catch (err) {
-    dropzone.innerHTML = '<span style="color:red;">Upload failed! Try again.</span>';
-  }
-}
-
-// ========================================
-// BLOG MANAGEMENT SYSTEM
-// ========================================
-
+// --- CORE BLOG CRUD ---
 async function loadAdminBlogs() {
   const container = document.getElementById('admin-blog-list');
   if (!container) return;
@@ -977,19 +980,46 @@ function showBlogEditor(isNew = true, blog = null) {
   document.getElementById('blog-list-view').style.display = 'none';
   document.getElementById('blog-editor-view').style.display = 'block';
   
+  const dropzone = document.getElementById('featured-image-dropzone');
+  const slugInput = document.getElementById('blog_slug');
+  
   if (isNew) {
     document.getElementById('blog-form').reset();
     document.getElementById('blog_id').value = '';
-    document.getElementById('btn-save-blog').innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px; vertical-align:middle;"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/></svg> Create Blog Post';
+    document.getElementById('blog_image_url').value = '';
+    
+    if (slugInput) slugInput.dataset.manuallyEdited = '';
+    
+    if(dropzone) {
+        dropzone.innerHTML = `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" style="margin-bottom: 12px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg><span style="color:#64748b; font-size:13px; line-height:1.5; pointer-events:none;">Click to Upload Image<br><strong style="color:#0f172a; font-weight:600;">or Ctrl+V to Paste</strong></span>`;
+    }
+    
+    if(typeof tinymce !== 'undefined' && tinymce.get('blog_content')) {
+        tinymce.get('blog_content').setContent('');
+    }
+    
   } else if (blog) {
     document.getElementById('blog_id').value = blog.id;
-    document.getElementById('blog_title').value = blog.title;
-    document.getElementById('blog_slug').value = blog.slug;
+    document.getElementById('blog_title').value = blog.title || '';
+    document.getElementById('blog_slug').value = blog.slug || '';
     document.getElementById('blog_image_url').value = blog.image_url || '';
-    document.getElementById('blog_excerpt').value = blog.excerpt || '';
-    document.getElementById('blog_content').value = blog.content;
-    document.getElementById('blog_status').value = blog.status;
-    document.getElementById('btn-save-blog').innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px; vertical-align:middle;"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/></svg> Update Blog Post';
+    
+    document.getElementById('blog_quick_answer').value = blog.quick_answer || '';
+    document.getElementById('blog_sources').value = blog.sources || '';
+    document.getElementById('blog_cta').value = blog.cta || '';
+    document.getElementById('blog_status').value = blog.status || 'draft';
+    
+    if (slugInput) slugInput.dataset.manuallyEdited = 'true';
+    
+    if (blog.image_url && dropzone) {
+      dropzone.innerHTML = `<img src="${blog.image_url}" style="max-width:100%; max-height:140px; border-radius:6px; object-fit:cover;">`;
+    } else if (dropzone) {
+      dropzone.innerHTML = `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" style="margin-bottom: 12px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg><span style="color:#64748b; font-size:13px; line-height:1.5; pointer-events:none;">Click to Upload Image<br><strong style="color:#0f172a; font-weight:600;">or Ctrl+V to Paste</strong></span>`;
+    }
+    
+    if(typeof tinymce !== 'undefined' && tinymce.get('blog_content')) {
+        tinymce.get('blog_content').setContent(blog.content || '');
+    }
   }
 }
 
@@ -1028,6 +1058,26 @@ async function deleteBlog(id) {
   }
 }
 
+// Initialize Powerful TinyMCE Editor
+function initBlogEditor() {
+  if (typeof tinymce === 'undefined') return;
+  
+  tinymce.init({
+    selector: '#blog_content',
+    plugins: 'advlist autolink lists link image charmap preview anchor pagebreak searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime media nonbreaking table emoticons accordion',
+    toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline | alignleft aligncenter alignright alignjustify | table accordion | link image | bullist numlist | code fullscreen',
+    paste_data_images: true, 
+    height: 700,
+    menubar: 'file edit view insert format tools table',
+    content_style: 'body { font-family: "DM Sans", sans-serif; font-size:16px; line-height: 1.6; } table { border-collapse: collapse; width: 100%; } td, th { border: 1px solid #ddd; padding: 8px; }',
+    setup: function (editor) {
+      editor.on('change', function () {
+        tinymce.triggerSave();
+      });
+    }
+  });
+}
+
 // Bind Blog Events on Load
 document.addEventListener('DOMContentLoaded', () => {
   const btnCreate = document.getElementById('btn-create-new-blog');
@@ -1038,22 +1088,35 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btnBack) btnBack.addEventListener('click', hideBlogEditor);
   
   if (blogForm) {
-    blogForm.addEventListener('submit', async (e) => {
+    blogForm.onsubmit = async (e) => {
       e.preventDefault();
       
+      if(typeof tinymce !== 'undefined' && tinymce.get('blog_content')) {
+        tinymce.triggerSave(); 
+      }
+      
+      const editorContent = document.getElementById('blog_content').value;
+      
+      if(!editorContent || !editorContent.trim()) {
+        return showToast('Content cannot be empty!', true);
+      }
+
       const submitBtn = document.getElementById('btn-save-blog');
-      const originalText = submitBtn.innerHTML;
+      const originalHtml = submitBtn.innerHTML;
       submitBtn.innerHTML = 'Saving...';
       submitBtn.disabled = true;
 
       const id = document.getElementById('blog_id').value;
+      
       const payload = {
-        title: document.getElementById('blog_title').value,
-        slug: document.getElementById('blog_slug').value,
-        image_url: document.getElementById('blog_image_url').value,
-        excerpt: document.getElementById('blog_excerpt').value,
-        content: document.getElementById('blog_content').value,
-        status: document.getElementById('blog_status').value
+        title: document.getElementById('blog_title')?.value || '',
+        slug: document.getElementById('blog_slug')?.value || '',
+        image_url: document.getElementById('blog_image_url')?.value || '',
+        quick_answer: document.getElementById('blog_quick_answer')?.value || '',
+        sources: document.getElementById('blog_sources')?.value || '',
+        cta: document.getElementById('blog_cta')?.value || '',
+        content: editorContent,
+        status: document.getElementById('blog_status')?.value || 'published'
       };
 
       const method = id ? 'PUT' : 'POST';
@@ -1070,121 +1133,20 @@ document.addEventListener('DOMContentLoaded', () => {
           showToast(id ? 'Blog updated successfully!' : 'Blog created successfully!');
           hideBlogEditor();
         } else {
-          const error = await response.json();
-          showToast(error.error || 'Failed to save blog', true);
+          showToast('Failed to save blog', true);
         }
       } catch (error) {
         showToast('Failed to save blog', true);
       } finally {
-        submitBtn.innerHTML = originalText;
+        submitBtn.innerHTML = originalHtml;
         submitBtn.disabled = false;
       }
-    });
+    };
   }
 
-  // Initial Load of Blogs
   if (document.getElementById('section-blogs')) {
     loadAdminBlogs();
   }
-});
-
-// Initialize Powerful TinyMCE Editor
-function initBlogEditor() {
-  tinymce.init({
-    selector: '#blog_content',
-    plugins: 'advlist autolink lists link image charmap preview anchor pagebreak searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime media nonbreaking table emoticons accordion paste',
-    toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline | alignleft aligncenter alignright alignjustify | table accordion | link image | bullist numlist | code fullscreen',
-    paste_data_images: true, // Yahi feature Google Docs ki images direct paste hone dega
-    height: 700,
-    menubar: 'file edit view insert format tools table',
-    content_style: 'body { font-family: "DM Sans", sans-serif; font-size:16px; line-height: 1.6; } table { border-collapse: collapse; width: 100%; } td, th { border: 1px solid #ddd; padding: 8px; }',
-    setup: function (editor) {
-      editor.on('change', function () {
-        tinymce.triggerSave(); // Ensure textarea is updated
-      });
-    }
-  });
-}
-
-// Update showBlogEditor function to handle TinyMCE data
-const originalShowBlogEditor = showBlogEditor;
-showBlogEditor = function(isNew = true, blog = null) {
-  originalShowBlogEditor(isNew, blog);
   
-  if (isNew) {
-    document.getElementById('blog_quick_answer').value = '';
-    document.getElementById('blog_sources').value = '';
-    document.getElementById('blog_cta').value = '';
-    slugInput.dataset.manuallyEdited = '';
-    dropzone.innerHTML = '<span style="color:#888; font-size:14px; pointer-events:none;">📸 Click to Upload or<br><b>Ctrl+V to Paste Image</b></span>';
-    if(tinymce.get('blog_content')) tinymce.get('blog_content').setContent('');
-  } else if (blog) {
-    document.getElementById('blog_quick_answer').value = blog.quick_answer || '';
-    document.getElementById('blog_sources').value = blog.sources || '';
-    document.getElementById('blog_cta').value = blog.cta || '';
-    slugInput.dataset.manuallyEdited = 'true';
-    
-    if (blog.image_url) {
-      dropzone.innerHTML = `<img src="${blog.image_url}" style="max-width:100%; max-height:180px; border-radius:6px; object-fit:cover;">`;
-    } else {
-      dropzone.innerHTML = '<span style="color:#888; font-size:14px; pointer-events:none;">📸 Click to Upload or<br><b>Ctrl+V to Paste Image</b></span>';
-    }
-    
-    if(tinymce.get('blog_content')) tinymce.get('blog_content').setContent(blog.content || '');
-  }
-};
-
-// Form submission me Editor ka data catch karna
-const blogForm = document.getElementById('blog-form');
-if (blogForm) {
-  blogForm.onsubmit = async (e) => {
-    e.preventDefault();
-    const editorContent = tinymce.get('blog_content').getContent();
-    
-    if(!editorContent.trim()) return showToast('Content cannot be empty!', true);
-
-    const submitBtn = document.getElementById('btn-save-blog');
-    const originalText = submitBtn.innerHTML;
-    submitBtn.innerHTML = 'Saving...';
-    submitBtn.disabled = true;
-
-    const id = document.getElementById('blog_id').value;
-    const payload = {
-      title: document.getElementById('blog_title').value,
-      slug: document.getElementById('blog_slug').value,
-      image_url: document.getElementById('blog_image_url').value,
-      quick_answer: document.getElementById('blog_quick_answer').value,
-      sources: document.getElementById('blog_sources').value,
-      cta: document.getElementById('blog_cta').value, // CTA ADDED HERE
-      content: editorContent,
-      status: document.getElementById('blog_status').value
-    };
-
-    const method = id ? 'PUT' : 'POST';
-    const url = id ? `${API_URL}/api/blogs/${id}` : `${API_URL}/api/blogs`;
-
-    try {
-      const response = await fetch(url, {
-        method: method,
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
-        body: JSON.stringify(payload)
-      });
-      if (response.ok) {
-        showToast(id ? 'Blog updated successfully!' : 'Blog created successfully!');
-        hideBlogEditor();
-      } else {
-        showToast('Failed to save blog', true);
-      }
-    } catch (error) {
-      showToast('Error saving blog', true);
-    } finally {
-      submitBtn.innerHTML = originalText;
-      submitBtn.disabled = false;
-    }
-  };
-}
-
-// Call init on load
-document.addEventListener('DOMContentLoaded', () => {
-  setTimeout(initBlogEditor, 1000); 
+  setTimeout(initBlogEditor, 500); 
 });
