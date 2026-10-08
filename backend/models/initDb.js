@@ -175,6 +175,7 @@ async function initializeDatabase() {
       `);
 
       // NEW UPDATED BLOGS TABLE
+            // NEW UPDATED BLOGS TABLE (Added CTA)
       database.run(`
         CREATE TABLE IF NOT EXISTS blogs (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -185,16 +186,18 @@ async function initializeDatabase() {
           image_url TEXT,
           quick_answer TEXT,
           sources TEXT,
+          cta TEXT,
           status TEXT DEFAULT 'published',
           created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
           updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )
       `, (err) => {
         if (!err) {
-          // AUTO MIGRATION: Add columns if they don't exist in older DB
+          // AUTO MIGRATION
           database.run(`ALTER TABLE blogs ADD COLUMN quick_answer TEXT`, () => {});
           database.run(`ALTER TABLE blogs ADD COLUMN sources TEXT`, () => {});
-          console.log('Blogs table ready and updated');
+          database.run(`ALTER TABLE blogs ADD COLUMN cta TEXT`, () => {});
+          console.log('Blogs table ready and updated with CTA');
         }
       });
 

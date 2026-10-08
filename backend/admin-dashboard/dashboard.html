@@ -11,7 +11,9 @@
     rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <!-- TinyMCE Editor API -->
-  <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+  <!-- FREE TinyMCE Editor (No API Key Required) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.3/tinymce.min.js" referrerpolicy="origin"></script>
+
 </head>
 
 <body class="dashboard-page">
@@ -695,67 +697,83 @@
         </div>
       </div>
 
-      <!-- Blog Editor View (Hidden by default) -->
-      <div id="blog-editor-view" style="display: none;">
-        <button class="back-btn" id="btn-back-to-blogs"
-          style="background:none; border:none; color:var(--gray-600); cursor:pointer; font-size:14px; margin-bottom:20px;">←
-          Back to Blogs</button>
-
-        <form id="blog-form" class="edit-form">
-          <input type="hidden" id="blog_id" name="blog_id">
-
-          <!-- Dashboard.html ke #blog-form ke andar Form-card me ye update karo -->
-          <div class="form-card">
-            <div class="form-group">
-              <label for="blog_title">Blog Title *</label>
-              <input type="text" id="blog_title" required placeholder="e.g., The 2025 Guide to FHA Loans">
-            </div>
-
-            <div class="form-group">
-              <label for="blog_slug">Custom URL Slug (Optional)</label>
-              <input type="text" id="blog_slug" placeholder="e.g., 2025-guide-fha-loans">
-            </div>
-
-            <div class="form-group">
-              <label for="blog_image_url">Featured Image URL</label>
-              <input type="text" id="blog_image_url" placeholder="https://...">
-            </div>
-
-            <!-- NEW: Quick Answer Field -->
-            <div class="form-group">
-              <label for="blog_quick_answer">Quick Answer (Top Highlighted Box)</label>
-              <textarea id="blog_quick_answer" rows="3"
-                placeholder="Write a short summary that directly answers the user's query..."></textarea>
-            </div>
-
-            <!-- NEW: Powerful Editor Field -->
-            <div class="form-group">
-              <label for="blog_content">Full Content (Paste from Google Docs!) *</label>
-              <!-- Isko textarea hi rehne do, JS isko super editor bana dega -->
-              <textarea id="blog_content" rows="15"></textarea>
-            </div>
-
-            <!-- NEW: Sources Field -->
-            <div class="form-group">
-              <label for="blog_sources">Sources / References</label>
-              <textarea id="blog_sources" rows="4"
-                placeholder="[1] Internal Revenue Service, Instructions for Form W-7..."></textarea>
-            </div>
-
-            <div class="form-group">
-              <label for="blog_status">Status</label>
-              <select id="blog_status" style="width:100%; padding:12px; border-radius:8px; border:1px solid #ddd;">
-                <option value="published">Published</option>
-                <option value="draft">Draft</option>
-              </select>
-            </div>
+     <!-- Blog Editor View (Premium UI) -->
+<div id="blog-editor-view" style="display: none; max-width: 100%;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <button class="back-btn" id="btn-back-to-blogs" style="background:none; border:none; color:var(--gray-600); cursor:pointer; font-size:15px; font-weight:600;">
+      ← Back to Blogs
+    </button>
+    <button type="submit" form="blog-form" class="save-btn" id="btn-save-blog" style="background:#111; padding: 10px 24px; font-size: 16px;">
+      Save Blog Post
+    </button>
+  </div>
+  
+  <form id="blog-form" class="edit-form">
+    <input type="hidden" id="blog_id" name="blog_id">
+    
+    <!-- Modern 2-Column Grid -->
+    <div style="display: grid; grid-template-columns: 2.5fr 1fr; gap: 24px; align-items: start;">
+      
+      <!-- LEFT COLUMN (Main Content) -->
+      <div style="display: flex; flex-direction: column; gap: 24px;">
+        
+        <div class="form-card" style="margin:0; padding:30px;">
+          <input type="text" id="blog_title" required placeholder="Enter Blog Title Here..." style="font-size: 28px; font-weight: 700; border: none; border-bottom: 2px solid #eee; border-radius: 0; padding: 10px 0; margin-bottom: 15px; background: transparent; box-shadow:none;">
+          
+          <div style="display:flex; align-items:center; gap:10px; color:#666; font-size:14px; margin-bottom: 30px;">
+            <span>Slug: /</span>
+            <input type="text" id="blog_slug" placeholder="auto-generated-slug" style="flex:1; border:none; background:#f9f9f9; padding:6px 12px; border-radius:4px; font-size:14px;">
           </div>
+          
+          <label style="font-weight:600; color:#333; margin-bottom:8px; display:block;">Quick Answer (Top Highlighted Box)</label>
+          <textarea id="blog_quick_answer" rows="3" placeholder="Write a short summary that directly answers the user's query..." style="border: 1px solid #ddd; background:#fafafa; border-radius:8px; padding:15px; font-size:15px;"></textarea>
+        </div>
 
-          <div class="form-actions">
-            <button type="submit" class="save-btn" id="btn-save-blog">Save Blog Post</button>
-          </div>
-        </form>
+        <div class="form-card" style="margin:0; padding:0; overflow:hidden; border:none; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+          <!-- TinyMCE will render here -->
+          <textarea id="blog_content" rows="20"></textarea>
+        </div>
       </div>
+
+      <!-- RIGHT COLUMN (Settings & Media) -->
+      <div style="display: flex; flex-direction: column; gap: 20px;">
+        
+        <div class="form-card" style="margin:0;">
+          <h3 style="font-size:16px; margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">Publish Settings</h3>
+          <select id="blog_status" style="width:100%; padding:12px; border-radius:8px; border:1px solid #ddd; background:#f5f5f5; font-weight:600;">
+            <option value="published">🟢 Published</option>
+            <option value="draft">🟡 Draft</option>
+          </select>
+        </div>
+
+        <div class="form-card" style="margin:0;">
+          <h3 style="font-size:16px; margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">Featured Image</h3>
+          
+          <!-- Image Paste/Drop Zone -->
+          <div id="featured-image-dropzone" style="border:2px dashed #ccc; border-radius:8px; padding:20px; text-align:center; cursor:pointer; background:#fafafa; transition:0.3s; position:relative; min-height:120px; display:flex; align-items:center; justify-content:center; flex-direction:column;">
+            <span style="color:#888; font-size:14px; pointer-events:none;">
+              📸 Click to Upload or<br><b>Ctrl+V to Paste Image</b>
+            </span>
+          </div>
+          <input type="file" id="featured_image_file" accept="image/*" style="display:none;">
+          <input type="hidden" id="blog_image_url">
+        </div>
+
+        <div class="form-card" style="margin:0;">
+          <h3 style="font-size:16px; margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">Call to Action (CTA)</h3>
+          <textarea id="blog_cta" rows="3" placeholder="e.g. Ready to buy a home? Contact us today for a free consultation!" style="border: 1px solid #ddd; border-radius:8px; padding:12px; font-size:14px;"></textarea>
+        </div>
+
+        <div class="form-card" style="margin:0;">
+          <h3 style="font-size:16px; margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">Sources & References</h3>
+          <textarea id="blog_sources" rows="3" placeholder="[1] Internal Revenue Service...&#10;[2] HUD Guidelines..." style="border: 1px solid #ddd; border-radius:8px; padding:12px; font-size:14px;"></textarea>
+        </div>
+
+      </div>
+    </div>
+  </form>
+</div>
+
     </section>
 
     <!-- Special Offer Section -->

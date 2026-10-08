@@ -74,7 +74,7 @@ router.get('/:slugOrId', (req, res) => {
 // 3. CREATE NEW BLOG POST
 // ==========================================
 router.post('/', authenticateToken, (req, res) => {
-  const { title, slug, excerpt, content, image_url, quick_answer, sources, status } = req.body;
+  const { title, slug, excerpt, content, image_url, quick_answer, sources,cta, status } = req.body;
   const db = getDb();
 
   if (!title || !content) {
@@ -90,7 +90,7 @@ router.post('/', authenticateToken, (req, res) => {
     .replace(/^-+|-+$/g, '');
 
   const query = `
-    INSERT INTO blogs (title, slug, excerpt, content, image_url, quick_answer, sources, status)
+    INSERT INTO blogs (title, slug, excerpt, content, image_url, quick_answer, sources, cta, status)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
@@ -102,6 +102,7 @@ router.post('/', authenticateToken, (req, res) => {
     image_url || '',
     quick_answer || '',
     sources || '',
+    cta || '',
     status || 'published'
   ];
 
@@ -125,7 +126,7 @@ router.post('/', authenticateToken, (req, res) => {
 // 4. UPDATE EXISTING BLOG POST
 // ==========================================
 router.put('/:id', authenticateToken, (req, res) => {
-  const { title, slug, excerpt, content, image_url, quick_answer, sources, status } = req.body;
+  const { title, slug, excerpt, content, image_url, quick_answer, sources, cta, status } = req.body;
   const db = getDb();
   const id = req.params.id;
 
@@ -135,7 +136,7 @@ router.put('/:id', authenticateToken, (req, res) => {
 
   const query = `
     UPDATE blogs 
-    SET title = ?, slug = ?, excerpt = ?, content = ?, image_url = ?, quick_answer = ?, sources = ?, status = ?, updated_at = CURRENT_TIMESTAMP
+    SET title = ?, slug = ?, excerpt = ?, content = ?, image_url = ?, quick_answer = ?, sources = ?, cta = ?, status = ?, updated_at = CURRENT_TIMESTAMP
     WHERE id = ?
   `;
 
@@ -147,6 +148,7 @@ router.put('/:id', authenticateToken, (req, res) => {
     image_url || '',
     quick_answer || '',
     sources || '',
+    cta || '',
     status || 'published',
     id
   ];

@@ -303,6 +303,15 @@
               ${blog.content}
             </div>
 
+             <!-- CTA SECTION -->
+            ${blog.cta ? `
+              <div style="background: #111827; color: white; padding: 30px; border-radius: 12px; margin: 50px 0; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
+                <h3 style="font-family: 'Playfair Display', serif; font-size: 26px; color:white; margin-top:0;">Special Offer</h3>
+                <p style="font-size: 18px; margin-bottom: 20px;">${blog.cta.replace(/\n/g, '<br>')}</p>
+                <a href="/#contact" style="display:inline-block; background:#960909; color:white; padding:12px 30px; border-radius:50px; text-decoration:none; font-weight:700;">Get in Touch</a>
+              </div>
+            ` : ''}
+
             ${blog.sources ? `
               <div class="sources-section">
                 <h4>Sources & References</h4>
