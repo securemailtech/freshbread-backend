@@ -937,7 +937,176 @@ async function uploadFeaturedImage(file) {
   }
 }
 
-// --- UPDATE showBlogEditor function ---
+// ========================================
+// BLOG MANAGEMENT SYSTEM
+// ========================================
+
+async function loadAdminBlogs() {
+  const container = document.getElementById('admin-blog-list');
+  if (!container) return;
+
+  try {
+    const response = await fetch(`${API_URL}/api/blogs?status=all`);
+    const blogs = await response.json();
+
+    if (blogs.length === 0) {
+      container.innerHTML = '<p class="empty-state">No blogs written yet. Click "+ New Blog Post" to start!</p>';
+      return;
+    }
+
+    container.innerHTML = blogs.map(blog => `
+      <div class="order-row" style="cursor:default; display:flex; align-items:center; justify-content:space-between; gap:15px; padding:15px; border-bottom:1px solid #eee;">
+        <div style="flex:1; min-width:0;">
+          <h4 style="margin:0 0 5px 0; font-size:16px; color:#111; word-break:break-word;">${escapeHtml(blog.title)}</h4>
+          <span style="color:#888; font-size:13px; display:block;">/${escapeHtml(blog.slug)}</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:12px; flex-shrink:0;">
+          <span style="color:#666; font-size:13px; white-space:nowrap;">${new Date(blog.created_at).toLocaleDateString()}</span>
+          <span class="order-status ${blog.status === 'published' ? 'status-completed' : 'status-pending'}" style="margin:0;">${blog.status.toUpperCase()}</span>
+          <button onclick="editBlog(${blog.id})" style="background:var(--blue); color:#fff; border:none; padding:8px 14px; border-radius:6px; font-weight:600; cursor:pointer;">Edit</button>
+          <button onclick="deleteBlog(${blog.id})" style="background:var(--red); color:#fff; border:none; padding:8px 14px; border-radius:6px; font-weight:600; cursor:pointer;">Delete</button>
+        </div>
+      </div>
+    `).join('');
+  } catch (error) {
+    container.innerHTML = '<p class="empty-state">Failed to load blogs.</p>';
+  }
+}
+
+function showBlogEditor(isNew = true, blog = null) {
+  document.getElementById('blog-list-view').style.display = 'none';
+  document.getElementById('blog-editor-view').style.display = 'block';
+  
+  if (isNew) {
+    document.getElementById('blog-form').reset();
+    document.getElementById('blog_id').value = '';
+    document.getElementById('btn-save-blog').innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px; vertical-align:middle;"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/></svg> Create Blog Post';
+  } else if (blog) {
+    document.getElementById('blog_id').value = blog.id;
+    document.getElementById('blog_title').value = blog.title;
+    document.getElementById('blog_slug').value = blog.slug;
+    document.getElementById('blog_image_url').value = blog.image_url || '';
+    document.getElementById('blog_excerpt').value = blog.excerpt || '';
+    document.getElementById('blog_content').value = blog.content;
+    document.getElementById('blog_status').value = blog.status;
+    document.getElementById('btn-save-blog').innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px; vertical-align:middle;"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/></svg> Update Blog Post';
+  }
+}
+
+function hideBlogEditor() {
+  document.getElementById('blog-list-view').style.display = 'block';
+  document.getElementById('blog-editor-view').style.display = 'none';
+  loadAdminBlogs();
+}
+
+async function editBlog(id) {
+  try {
+    const response = await fetch(`${API_URL}/api/blogs?status=all`);
+    const blogs = await response.json();
+    const blog = blogs.find(b => b.id === id);
+    if (blog) showBlogEditor(false, blog);
+  } catch (error) {
+    showToast('Failed to fetch blog details', true);
+  }
+}
+
+async function deleteBlog(id) {
+  if (!confirm('Are you sure you want to delete this blog post?')) return;
+  try {
+    const response = await fetch(`${API_URL}/api/blogs/${id}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${authToken}` }
+    });
+    if (response.ok) {
+      showToast('Blog deleted successfully');
+      loadAdminBlogs();
+    } else {
+      showToast('Failed to delete blog', true);
+    }
+  } catch (error) {
+    showToast('Failed to delete blog', true);
+  }
+}
+
+// Bind Blog Events on Load
+document.addEventListener('DOMContentLoaded', () => {
+  const btnCreate = document.getElementById('btn-create-new-blog');
+  const btnBack = document.getElementById('btn-back-to-blogs');
+  const blogForm = document.getElementById('blog-form');
+
+  if (btnCreate) btnCreate.addEventListener('click', () => showBlogEditor(true));
+  if (btnBack) btnBack.addEventListener('click', hideBlogEditor);
+  
+  if (blogForm) {
+    blogForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const submitBtn = document.getElementById('btn-save-blog');
+      const originalText = submitBtn.innerHTML;
+      submitBtn.innerHTML = 'Saving...';
+      submitBtn.disabled = true;
+
+      const id = document.getElementById('blog_id').value;
+      const payload = {
+        title: document.getElementById('blog_title').value,
+        slug: document.getElementById('blog_slug').value,
+        image_url: document.getElementById('blog_image_url').value,
+        excerpt: document.getElementById('blog_excerpt').value,
+        content: document.getElementById('blog_content').value,
+        status: document.getElementById('blog_status').value
+      };
+
+      const method = id ? 'PUT' : 'POST';
+      const url = id ? `${API_URL}/api/blogs/${id}` : `${API_URL}/api/blogs`;
+
+      try {
+        const response = await fetch(url, {
+          method: method,
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
+          body: JSON.stringify(payload)
+        });
+
+        if (response.ok) {
+          showToast(id ? 'Blog updated successfully!' : 'Blog created successfully!');
+          hideBlogEditor();
+        } else {
+          const error = await response.json();
+          showToast(error.error || 'Failed to save blog', true);
+        }
+      } catch (error) {
+        showToast('Failed to save blog', true);
+      } finally {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+      }
+    });
+  }
+
+  // Initial Load of Blogs
+  if (document.getElementById('section-blogs')) {
+    loadAdminBlogs();
+  }
+});
+
+// Initialize Powerful TinyMCE Editor
+function initBlogEditor() {
+  tinymce.init({
+    selector: '#blog_content',
+    plugins: 'advlist autolink lists link image charmap preview anchor pagebreak searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime media nonbreaking table emoticons accordion paste',
+    toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline | alignleft aligncenter alignright alignjustify | table accordion | link image | bullist numlist | code fullscreen',
+    paste_data_images: true, // Yahi feature Google Docs ki images direct paste hone dega
+    height: 700,
+    menubar: 'file edit view insert format tools table',
+    content_style: 'body { font-family: "DM Sans", sans-serif; font-size:16px; line-height: 1.6; } table { border-collapse: collapse; width: 100%; } td, th { border: 1px solid #ddd; padding: 8px; }',
+    setup: function (editor) {
+      editor.on('change', function () {
+        tinymce.triggerSave(); // Ensure textarea is updated
+      });
+    }
+  });
+}
+
+// Update showBlogEditor function to handle TinyMCE data
 const originalShowBlogEditor = showBlogEditor;
 showBlogEditor = function(isNew = true, blog = null) {
   originalShowBlogEditor(isNew, blog);
@@ -965,7 +1134,7 @@ showBlogEditor = function(isNew = true, blog = null) {
   }
 };
 
-// --- BLOG FORM SUBMIT UPDATE ---
+// Form submission me Editor ka data catch karna
 const blogForm = document.getElementById('blog-form');
 if (blogForm) {
   blogForm.onsubmit = async (e) => {
@@ -1014,3 +1183,8 @@ if (blogForm) {
     }
   };
 }
+
+// Call init on load
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(initBlogEditor, 1000); 
+});
