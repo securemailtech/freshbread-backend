@@ -1012,3 +1012,25 @@ body {
     min-width: auto;
   }
 }
+
+ #section-blogs {
+        max-width: 100% !important;
+        width: 100% !important;
+      }
+      #blog-editor-view .edit-form {
+        max-width: 100% !important;
+        width: 100% !important;
+      }
+      /* Professional 2-Column Grid: Editor takes full space, Sidebar is fixed at 320px */
+      .blog-grid-layout {
+        display: grid;
+        grid-template-columns: 1fr 320px;
+        gap: 32px;
+        width: 100%;
+        align-items: start;
+      }
+      @media (max-width: 1024px) {
+        .blog-grid-layout {
+          grid-template-columns: 1fr;
+        }
+      }
