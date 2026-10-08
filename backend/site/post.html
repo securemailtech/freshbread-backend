@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id="post-title">Loading... | Fresh Hot Bread</title>
+  <meta name="description" id="post-meta-desc" content="Fresh Hot Bread All Day blog post">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/jpeg" href="images/logo.jpg">
+  <style>
+    .post-hero {
+      position: relative;
+      background: #2C2C2C;
+      padding: 150px 20px 80px;
+      text-align: center;
+      color: #fff;
+      overflow: hidden;
+      margin-top: 70px;
+    }
+    .post-hero::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: var(--bg-image, linear-gradient(135deg, #960909 0%, #6B0707 100%));
+      background-size: cover;
+      background-position: center;
+      opacity: 0.3;
+      filter: blur(2px);
+      z-index: 0;
+    }
+    .post-hero .container {
+      position: relative;
+      z-index: 2;
+      max-width: 800px;
+    }
+    .post-date-tag {
+      display: inline-block;
+      background: rgba(255,255,255,0.15);
+      color: #fff;
+      padding: 6px 18px;
+      border-radius: 30px;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      margin-bottom: 20px;
+    }
+    .post-hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 48px;
+      line-height: 1.2;
+      margin: 0;
+      font-weight: 800;
+    }
+    .post-container {
+      max-width: 820px;
+      margin: 60px auto;
+      padding: 0 20px;
+    }
+    .post-featured-image {
+      width: 100%;
+      max-height: 500px;
+      object-fit: cover;
+      border-radius: 15px;
+      margin-bottom: 40px;
+      box-shadow: 0 10px 35px rgba(0,0,0,0.1);
+    }
+    .post-content {
+      font-size: 18px;
+      line-height: 1.9;
+      color: #333;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .post-content p { margin: 0 0 20px; }
+    .post-content h2 {
+      font-family: 'Playfair Display', serif;
+      color: #960909;
+      font-size: 28px;
+      margin: 40px 0 15px;
+    }
+    .post-content h3 {
+      color: #2C2C2C;
+      font-size: 22px;
+      margin: 30px 0 12px;
+    }
+    .post-content a {
+      color: #960909;
+      font-weight: 600;
+    }
+    .post-content img {
+      max-width: 100%;
+      border-radius: 10px;
+      margin: 20px 0;
+    }
+    .post-content ul, .post-content ol {
+      padding-left: 30px;
+      margin-bottom: 20px;
+    }
+    .post-content blockquote {
+      border-left: 4px solid #960909;
+      background: #FFFEF9;
+      padding: 20px 24px;
+      margin: 25px 0;
+      font-style: italic;
+      color: #555;
+      border-radius: 0 10px 10px 0;
+    }
+    .post-footer {
+      border-top: 1px solid #eee;
+      margin-top: 50px;
+      padding-top: 30px;
+      text-align: center;
+    }
+    .btn-back-blog {
+      display: inline-block;
+      background: #960909;
+      color: #fff !important;
+      padding: 14px 32px;
+      border-radius: 50px;
+      text-decoration: none;
+      font-weight: 700;
+      transition: all 0.3s;
+    }
+    .btn-back-blog:hover {
+      background: #6B0707;
+      transform: translateY(-2px);
+    }
+    .loading-msg {
+      text-align: center;
+      padding: 100px 20px;
+      color: #888;
+      font-size: 18px;
+    }
+    @media (max-width: 600px) {
+      .post-hero h1 { font-size: 32px; }
+      .post-content { font-size: 16px; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Navigation -->
+  <nav class="navbar" id="navbar">
+    <a href="/" class="logo">
+      <img src="images/logo.jpg" alt="Fresh Hot Bread Logo">
+      <div class="logo-text">
+        <span>Fresh Hot</span>
+        <strong>Bread</strong>
+      </div>
+    </a>
+
+    <ul class="nav-links" id="nav-links">
+      <li><a href="/#about">About</a></li>
+      <li><a href="/#menu">Menu</a></li>
+      <li><a href="/blog">Blog</a></li>
+      <li><a href="/#gallery">Gallery</a></li>
+      <li><a href="/#contact">Contact</a></li>
+    </ul>
+
+    <div class="nav-right">
+      <button class="hamburger" id="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Post Content -->
+  <div id="post-wrapper">
+    <p class="loading-msg">Loading post...</p>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <img src="images/logo.jpg" alt="Fresh Hot Bread Logo" class="footer-logo">
+          <div class="footer-brand-text">
+            <h3>Fresh Hot Bread All Day</h3>
+            <p>Warm • Sweet • Made Fresh Daily</p>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2025 Fresh Hot Bread All Day — All Rights Reserved</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const wrapper = document.getElementById('post-wrapper');
+      const urlParams = new URLSearchParams(window.location.search);
+      const slug = urlParams.get('slug');
+
+      if (!slug) {
+        wrapper.innerHTML = '<p class="loading-msg">Blog not found. <a href="/blog" style="color:#960909;">Back to Blog</a></p>';
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/blogs/' + encodeURIComponent(slug));
+        if (!response.ok) throw new Error('Not found');
+        const blog = await response.json();
+
+        // Update SEO
+        document.getElementById('post-title').textContent = blog.title + ' | Fresh Hot Bread';
+        document.getElementById('post-meta-desc').setAttribute('content', blog.excerpt || blog.title);
+
+        const date = new Date(blog.created_at).toLocaleDateString('en-US', {
+          month: 'long', day: 'numeric', year: 'numeric'
+        });
+
+        const bgStyle = blog.image_url ? `--bg-image: url('${blog.image_url}');` : '';
+
+        wrapper.innerHTML = `
+          <section class="post-hero" style="${bgStyle}">
+            <div class="container">
+              <span class="post-date-tag">${date}</span>
+              <h1>${blog.title}</h1>
+            </div>
+          </section>
+
+          <article class="post-container">
+            ${blog.image_url ? `<img src="${blog.image_url}" alt="${blog.title}" class="post-featured-image">` : ''}
+            
+            <div class="post-content">
+              ${blog.content}
+            </div>
+
+            <div class="post-footer">
+              <a href="/blog" class="btn-back-blog">← Back to All Blogs</a>
+            </div>
+          </article>
+        `;
+      } catch (error) {
+        wrapper.innerHTML = '<p class="loading-msg">Blog not found. <a href="/blog" style="color:#960909;">Back to Blog</a></p>';
+      }
+    });
+
+    document.getElementById('hamburger')?.addEventListener('click', function() {
+      this.classList.toggle('active');
+      document.getElementById('nav-links').classList.toggle('active');
+    });
+  </script>
+
+</body>
+</html>

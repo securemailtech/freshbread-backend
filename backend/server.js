@@ -3,6 +3,7 @@ const cors = require('cors');
 const path = require('path');
 const dotenv = require('dotenv');
 const { initializeDatabase } = require('./models/initDb');
+const blogRoutes = require('./routes/blogs');
 
 // Load environment variables
 dotenv.config();
@@ -69,6 +70,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/content', contentRoutes);
 app.use('/api/images', imageRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/blogs', blogRoutes); 
 
 if (paymentRoutes) {
   app.use('/api/payments', paymentRoutes);
@@ -120,6 +122,15 @@ app.get(['/404', '/404.html'], (req, res) => {
 app.use(express.static(path.join(__dirname, 'site')));
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'site', 'index.html'));
+});
+
+// Blog Routes (clean URLs)
+app.get('/blog', (req, res) => {
+  res.sendFile(path.join(__dirname, 'site', 'blog.html'));
+});
+
+app.get('/post', (req, res) => {
+  res.sendFile(path.join(__dirname, 'site', 'post.html'));
 });
 
 // -----------------------

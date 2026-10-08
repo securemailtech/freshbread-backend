@@ -39,7 +39,7 @@ function getDb() {
 // ==========================================
 async function backupDatabaseToCloudinary() {
   if (!process.env.CLOUDINARY_CLOUD_NAME) {
-    console.log('⚠️ Cloudinary keys not found, skipping backup.');
+    console.log('Cloudinary keys not found, skipping backup.');
     return;
   }
   const database = getDb();
@@ -48,8 +48,9 @@ async function backupDatabaseToCloudinary() {
     const content = await new Promise((res, rej) => database.all("SELECT * FROM site_content", (e, r) => e ? rej(e) : res(r || [])));
     const orders = await new Promise((res, rej) => database.all("SELECT * FROM orders", (e, r) => e ? rej(e) : res(r || [])));
     const images = await new Promise((res, rej) => database.all("SELECT * FROM site_images", (e, r) => e ? rej(e) : res(r || [])));
+    const blogs = await new Promise((res, rej) => database.all("SELECT * FROM blogs", (e, r) => e ? rej(e) : res(r || [])));
 
-    const backupObj = { content, orders, images, timestamp: new Date().toISOString() };
+    const backupObj = { content, orders, images, blogs, timestamp: new Date().toISOString() };
     const base64Data = `data:text/plain;base64,${Buffer.from(JSON.stringify(backupObj)).toString('base64')}`;
 
     await cloudinary.uploader.upload(base64Data, {
@@ -58,9 +59,9 @@ async function backupDatabaseToCloudinary() {
       overwrite: true,
       invalidate: true
     });
-    console.log(`☁️ Cloudinary Auto-Backup SUCCESS! (${orders.length} orders, ${content.length} content keys backed up)`);
+    console.log(`Cloudinary Auto-Backup SUCCESS! (${orders.length} orders, ${content.length} content, ${(blogs || []).length} blogs backed up)`);
   } catch (err) {
-    console.error('⚠️ DB Backup warning:', err.message);
+    console.error('DB Backup warning:', err.message);
   }
 }
 
@@ -70,11 +71,10 @@ async function backupDatabaseToCloudinary() {
 async function restoreDatabaseFromCloudinary() {
   if (!process.env.CLOUDINARY_CLOUD_NAME) return false;
   
-  // Appending timestamp to bypass CDN cache and get FRESH backup
   const backupUrl = `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/raw/upload/freshbread_data_backup.json?t=${Date.now()}`;
   
   return new Promise((resolve) => {
-    console.log('🔄 Checking for Database JSON backup on Cloudinary...');
+    console.log('Checking for Database JSON backup on Cloudinary...');
     https.get(backupUrl, (res) => {
       let data = '';
       if (res.statusCode === 200) {
@@ -103,20 +103,26 @@ async function restoreDatabaseFromCloudinary() {
                 parsed.images.forEach(img => stmt.run(img.id, img.key, img.filename, img.url, img.updated_at || new Date().toISOString()));
                 stmt.finalize();
               }
+              // Restore Blogs
+              if (parsed.blogs && parsed.blogs.length > 0) {
+                const stmt = database.prepare("INSERT OR REPLACE INTO blogs (id, title, slug, excerpt, content, image_url, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                parsed.blogs.forEach(b => stmt.run(b.id, b.title, b.slug, b.excerpt || '', b.content, b.image_url || '', b.status || 'published', b.created_at || new Date().toISOString(), b.updated_at || new Date().toISOString()));
+                stmt.finalize();
+              }
             });
-            console.log(`✅ SQLite Database successfully restored from Cloudinary! (${parsed.orders ? parsed.orders.length : 0} orders loaded)`);
+            console.log(`SQLite Database restored from Cloudinary! (${parsed.orders ? parsed.orders.length : 0} orders, ${parsed.blogs ? parsed.blogs.length : 0} blogs loaded)`);
             resolve(true);
           } catch (e) {
-            console.log('⚠️ Failed to parse backup JSON:', e.message);
+            console.log('Failed to parse backup JSON:', e.message);
             resolve(false);
           }
         });
       } else {
-        console.log('ℹ️ No existing Cloudinary JSON backup found, starting with default DB.');
+        console.log('No existing Cloudinary JSON backup found, starting with default DB.');
         resolve(false);
       }
     }).on('error', (err) => {
-      console.log('⚠️ Could not fetch backup from Cloudinary:', err.message);
+      console.log('Could not fetch backup from Cloudinary:', err.message);
       resolve(false);
     });
   });
@@ -173,11 +179,24 @@ async function initializeDatabase() {
           updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )
       `, (err) => {
-        if (err) {
-          console.log('Orders table check complete');
-        } else {
-          console.log('✅ Orders table ready');
-        }
+        if (!err) console.log('Orders table ready');
+      });
+
+      // BLOGS TABLE
+      database.run(`
+        CREATE TABLE IF NOT EXISTS blogs (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          title TEXT NOT NULL,
+          slug TEXT UNIQUE NOT NULL,
+          excerpt TEXT,
+          content TEXT NOT NULL,
+          image_url TEXT,
+          status TEXT DEFAULT 'published',
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+      `, (err) => {
+        if (!err) console.log('Blogs table ready');
       });
 
       // Default Content Insertion
@@ -222,7 +241,7 @@ async function initializeDatabase() {
           `UPDATE admin_users SET password = ? WHERE username = ?`,
           [hashedPassword, adminUsername],
           (err) => {
-            if (!err) console.log('🔁 Admin password updated from ENV');
+            if (!err) console.log('Admin password updated from ENV');
             resolve(database);
           }
         );
@@ -231,7 +250,7 @@ async function initializeDatabase() {
           `INSERT INTO admin_users (username, password) VALUES (?, ?)`,
           [adminUsername, hashedPassword],
           (err) => {
-            if (!err) console.log('✅ Default admin user created');
+            if (!err) console.log('Default admin user created');
             resolve(database);
           }
         );

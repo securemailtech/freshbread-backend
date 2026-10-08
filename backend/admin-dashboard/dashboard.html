@@ -58,6 +58,17 @@
         </svg>
         <span>Edit Content</span>
       </a>
+            <!-- NEW BLOG BUTTON -->
+      <a href="#" class="nav-item" data-section="blogs">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/>
+          <polyline points="10 9 9 9 8 9"/>
+        </svg>
+        <span>Blog Manager</span>
+      </a>
       <a href="#" class="nav-item" data-section="special">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
@@ -605,6 +616,76 @@
           </button>
         </div>
       </form>
+    </section>
+
+        <!-- Blogs Section -->
+    <section class="content-section" id="section-blogs">
+      <div class="section-header">
+        <div class="section-header-top" style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+          <div>
+            <h1>Blog Manager</h1>
+            <p>Write and manage your bakery's blog posts</p>
+          </div>
+          <button class="save-btn" id="btn-create-new-blog" style="background:var(--blue);">+ New Blog Post</button>
+        </div>
+      </div>
+      
+      <!-- Blog List View -->
+      <div id="blog-list-view">
+        <div id="admin-blog-list" class="orders-list full-list">
+          <p class="empty-state">Loading blogs...</p>
+        </div>
+      </div>
+
+      <!-- Blog Editor View (Hidden by default) -->
+      <div id="blog-editor-view" style="display: none;">
+        <button class="back-btn" id="btn-back-to-blogs" style="background:none; border:none; color:var(--gray-600); cursor:pointer; font-size:14px; margin-bottom:20px;">← Back to Blogs</button>
+        
+        <form id="blog-form" class="edit-form">
+          <input type="hidden" id="blog_id" name="blog_id">
+          
+          <div class="form-card">
+            <div class="form-group">
+              <label for="blog_title">Blog Title *</label>
+              <input type="text" id="blog_title" required placeholder="e.g., Why Señorita Bread is the Best">
+            </div>
+            
+            <div class="form-group">
+              <label for="blog_slug">Custom URL Slug (Optional)</label>
+              <input type="text" id="blog_slug" placeholder="e.g., why-senorita-bread-is-best">
+              <span class="form-hint">Leave blank to auto-generate from title.</span>
+            </div>
+            
+            <div class="form-group">
+              <label for="blog_image_url">Featured Image URL</label>
+              <input type="text" id="blog_image_url" placeholder="https://res.cloudinary.com/...">
+              <span class="form-hint">Upload an image in the <strong>Images</strong> tab, then paste its URL here.</span>
+            </div>
+            
+            <div class="form-group">
+              <label for="blog_excerpt">Short Excerpt (Summary)</label>
+              <textarea id="blog_excerpt" rows="2" placeholder="A short summary of this post..."></textarea>
+            </div>
+            
+            <div class="form-group">
+              <label for="blog_content">Full Content *</label>
+              <textarea id="blog_content" required rows="10" placeholder="Write your full blog post here... (HTML tags like <b>, <i>, <br> are supported)"></textarea>
+            </div>
+            
+            <div class="form-group">
+              <label for="blog_status">Status</label>
+              <select id="blog_status" style="width:100%; padding:12px; border-radius:8px; border:1px solid #ddd;">
+                <option value="published">Published (Visible to public)</option>
+                <option value="draft">Draft (Hidden)</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="form-actions">
+            <button type="submit" class="save-btn" id="btn-save-blog">Save Blog Post</button>
+          </div>
+        </form>
+      </div>
     </section>
     
     <!-- Special Offer Section -->

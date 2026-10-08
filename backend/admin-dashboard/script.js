@@ -868,3 +868,154 @@ function escapeHtml(text) {
   div.textContent = text;
   return div.innerHTML;
 }
+
+// ========================================
+// BLOG MANAGEMENT SYSTEM
+// ========================================
+
+async function loadAdminBlogs() {
+  const container = document.getElementById('admin-blog-list');
+  if (!container) return;
+
+  try {
+    const response = await fetch(`${API_URL}/api/blogs?status=all`);
+    const blogs = await response.json();
+
+    if (blogs.length === 0) {
+      container.innerHTML = '<p class="empty-state">No blogs written yet. Click "+ New Blog Post" to start!</p>';
+      return;
+    }
+
+    container.innerHTML = blogs.map(blog => `
+      <div class="order-row" style="cursor:default; align-items:center;">
+        <div class="order-customer" style="flex:2;">
+          <span class="name" style="font-size:15px;">${escapeHtml(blog.title)}</span>
+          <span class="phone" style="color:#888; font-size:12px;">/${escapeHtml(blog.slug)}</span>
+        </div>
+        <span class="order-time" style="flex:1; color:#555;">${new Date(blog.created_at).toLocaleDateString()}</span>
+        <span class="order-status ${blog.status === 'published' ? 'status-completed' : 'status-pending'}">${blog.status.toUpperCase()}</span>
+        <div style="display:flex; gap:8px;">
+          <button onclick="editBlog(${blog.id})" style="background:var(--blue); color:#fff; border:none; padding:6px 12px; border-radius:6px; font-weight:600; cursor:pointer;">Edit</button>
+          <button onclick="deleteBlog(${blog.id})" style="background:var(--red); color:#fff; border:none; padding:6px 12px; border-radius:6px; font-weight:600; cursor:pointer;">Delete</button>
+        </div>
+      </div>
+    `).join('');
+  } catch (error) {
+    container.innerHTML = '<p class="empty-state">Failed to load blogs.</p>';
+  }
+}
+
+function showBlogEditor(isNew = true, blog = null) {
+  document.getElementById('blog-list-view').style.display = 'none';
+  document.getElementById('blog-editor-view').style.display = 'block';
+  
+  if (isNew) {
+    document.getElementById('blog-form').reset();
+    document.getElementById('blog_id').value = '';
+    document.getElementById('btn-save-blog').innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px; vertical-align:middle;"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/></svg> Create Blog Post';
+  } else if (blog) {
+    document.getElementById('blog_id').value = blog.id;
+    document.getElementById('blog_title').value = blog.title;
+    document.getElementById('blog_slug').value = blog.slug;
+    document.getElementById('blog_image_url').value = blog.image_url || '';
+    document.getElementById('blog_excerpt').value = blog.excerpt || '';
+    document.getElementById('blog_content').value = blog.content;
+    document.getElementById('blog_status').value = blog.status;
+    document.getElementById('btn-save-blog').innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px; vertical-align:middle;"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/></svg> Update Blog Post';
+  }
+}
+
+function hideBlogEditor() {
+  document.getElementById('blog-list-view').style.display = 'block';
+  document.getElementById('blog-editor-view').style.display = 'none';
+  loadAdminBlogs();
+}
+
+async function editBlog(id) {
+  try {
+    const response = await fetch(`${API_URL}/api/blogs?status=all`);
+    const blogs = await response.json();
+    const blog = blogs.find(b => b.id === id);
+    if (blog) showBlogEditor(false, blog);
+  } catch (error) {
+    showToast('Failed to fetch blog details', true);
+  }
+}
+
+async function deleteBlog(id) {
+  if (!confirm('Are you sure you want to delete this blog post?')) return;
+  try {
+    const response = await fetch(`${API_URL}/api/blogs/${id}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${authToken}` }
+    });
+    if (response.ok) {
+      showToast('Blog deleted successfully');
+      loadAdminBlogs();
+    } else {
+      showToast('Failed to delete blog', true);
+    }
+  } catch (error) {
+    showToast('Failed to delete blog', true);
+  }
+}
+
+// Bind Blog Events on Load
+document.addEventListener('DOMContentLoaded', () => {
+  const btnCreate = document.getElementById('btn-create-new-blog');
+  const btnBack = document.getElementById('btn-back-to-blogs');
+  const blogForm = document.getElementById('blog-form');
+
+  if (btnCreate) btnCreate.addEventListener('click', () => showBlogEditor(true));
+  if (btnBack) btnBack.addEventListener('click', hideBlogEditor);
+  
+  if (blogForm) {
+    blogForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const submitBtn = document.getElementById('btn-save-blog');
+      const originalText = submitBtn.innerHTML;
+      submitBtn.innerHTML = 'Saving...';
+      submitBtn.disabled = true;
+
+      const id = document.getElementById('blog_id').value;
+      const payload = {
+        title: document.getElementById('blog_title').value,
+        slug: document.getElementById('blog_slug').value,
+        image_url: document.getElementById('blog_image_url').value,
+        excerpt: document.getElementById('blog_excerpt').value,
+        content: document.getElementById('blog_content').value,
+        status: document.getElementById('blog_status').value
+      };
+
+      const method = id ? 'PUT' : 'POST';
+      const url = id ? `${API_URL}/api/blogs/${id}` : `${API_URL}/api/blogs`;
+
+      try {
+        const response = await fetch(url, {
+          method: method,
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
+          body: JSON.stringify(payload)
+        });
+
+        if (response.ok) {
+          showToast(id ? 'Blog updated successfully!' : 'Blog created successfully!');
+          hideBlogEditor();
+        } else {
+          const error = await response.json();
+          showToast(error.error || 'Failed to save blog', true);
+        }
+      } catch (error) {
+        showToast('Failed to save blog', true);
+      } finally {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+      }
+    });
+  }
+
+  // Initial Load of Blogs
+  if (document.getElementById('section-blogs')) {
+    loadAdminBlogs();
+  }
+});
