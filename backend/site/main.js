@@ -542,6 +542,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // ========== LOAD DYNAMIC IMAGES FROM DATABASE ==========
+   // ========== LOAD DYNAMIC IMAGES FROM DATABASE ==========
   async function loadDynamicImages() {
     const imageMap = {
       'hero': '.hero-image-wrapper img',
@@ -563,28 +564,45 @@ document.addEventListener("DOMContentLoaded", function () {
     };
 
     for (const key in imageMap) {
-      // ========== PANDESAL DYNAMIC IMAGE ==========
       try {
-        const response = await fetch(API_URL + '/api/images/product-pandesal');
+        // Added ?t= timestamp to bypass browser cache
+        const response = await fetch(API_URL + '/api/images/' + key + '?t=' + Date.now());
         if (response.ok) {
           const data = await response.json();
-          if (data.url && typeof productData !== 'undefined') {
-            // Admin se uploaded Cloudinary URL set karo
-            const finalUrl = optimizeImageUrl(data.url);
-            productData.pandesal.image = finalUrl;
-
-            // Agar abhi Pandesal Tab active hai to live src badal do
-            const activeTab = document.querySelector('.product-tab.active');
-            if (activeTab && activeTab.getAttribute('data-target') === 'pandesal') {
-              const imgEl = document.getElementById('dynamic-product-image');
-              if (imgEl) imgEl.src = finalUrl;
-            }
+          if (data.url) {
+            const elements = document.querySelectorAll(imageMap[key]);
+            const freshUrl = optimizeImageUrl(data.url);
+            elements.forEach(function(el) {
+              el.src = freshUrl;
+            });
+            console.log(`📸 Dynamic Image loaded for [${key}]:`, freshUrl);
           }
         }
       } catch (error) {
-        // Continue silently
+        console.log('Image load error for key:', key);
       }
     }
+
+    // ========== PANDESAL DYNAMIC IMAGE ==========
+    try {
+      const response = await fetch(API_URL + '/api/images/product-pandesal?t=' + Date.now());
+      if (response.ok) {
+        const data = await response.json();
+        if (data.url && typeof productData !== 'undefined') {
+          const finalUrl = optimizeImageUrl(data.url);
+          productData.pandesal.image = finalUrl;
+
+          const activeTab = document.querySelector('.product-tab.active');
+          if (activeTab && activeTab.getAttribute('data-target') === 'pandesal') {
+            const imgEl = document.getElementById('dynamic-product-image');
+            if (imgEl) imgEl.src = finalUrl;
+          }
+        }
+      }
+    } catch (error) {
+      // Continue silently
+    }
+  }
 
     // ========== PANDESAL DYNAMIC IMAGE (NEW) ==========
     try {
