@@ -457,7 +457,7 @@ body {
   align-items: center;
   gap: 8px;
   padding: 14px 28px;
-  background: var(--burgundy);
+  background: var(--burgundy) !important;
   color: var(--white);
   border: none;
   border-radius: var(--radius);

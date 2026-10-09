@@ -460,8 +460,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
   
   // ========== LOAD DYNAMIC IMAGES FROM DATABASE ==========
-    // Helper: Cloudinary Auto-Optimizer (Resizes & Compresses images on-the-fly)
-    // Helper: Cloudinary Auto-Optimizer (Resizes to exact display size & compresses)
   function optimizeImageUrl(url) {
     if (!url) return url;
     if (url.includes('res.cloudinary.com') && !url.includes('f_auto')) {
