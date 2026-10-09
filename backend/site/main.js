@@ -64,6 +64,102 @@ document.addEventListener("DOMContentLoaded", function() {
   let cart = [];
   let total = 0;
 
+    // ========== DYNAMIC PRODUCT TABS LOGIC ==========
+  const productData = {
+    senorita: {
+      title: "Señorita Bread",
+      desc: "Our signature soft, sweet bread that's become a Stockton favorite. Perfect for any occasion.",
+      image: "images/download (1).jpg",
+      notice: "Large Orders (50+ pieces) require 30 minutes' prior notice.",
+      options: `
+        <option value="45">50 pieces - $45.00</option>
+        <option value="36">40 pieces - $36.00</option>
+        <option value="27">30 pieces - $27.00</option>
+        <option value="22.5">25 pieces - $22.50</option>
+        <option value="18">20 pieces - $18.00</option>
+        <option value="13.5">15 pieces - $13.50</option>
+        <option value="9">10 pieces - $9.00</option>
+        <option value="4.5">5 pieces - $4.50</option>
+      `
+    },
+    pandesal: {
+      title: "Pandesal Bread",
+      desc: "Classic Filipino soft, airy, and slightly sweet golden rolls. Baked fresh daily, they are the perfect start to your morning.",
+      image: "images/hq720.jpg", // Change this to actual Pandesal image path
+      notice: "Min. order 1 Dozen. For pickup/delivery before 10 AM, order 1 day in advance.",
+      options: `
+        <option value="9">1 Dozen - $9.00</option>
+        <option value="18">2 Dozen - $18.00</option>
+        <option value="27">3 Dozen - $27.00</option>
+        <option value="36">4 Dozen - $36.00</option>
+        <option value="45">5 Dozen - $45.00</option>
+      `
+    }
+  };
+
+  let currentProductTitle = "Señorita Bread"; // Default
+
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  const dynamicImg = document.getElementById('dynamic-product-img');
+  const dynamicTitle = document.getElementById('dynamic-product-title');
+  const dynamicDesc = document.getElementById('dynamic-product-desc');
+  const dynamicNotice = document.getElementById('dynamic-product-notice');
+  const dynamicSelect = document.getElementById('quantity');
+  const selectedPriceElement = document.getElementById('selected-price');
+
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', function() {
+      // Remove active from all, add to clicked
+      tabBtns.forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+
+      const pType = this.getAttribute('data-product');
+      const data = productData[pType];
+
+      // Update DOM
+      currentProductTitle = data.title;
+      dynamicImg.src = data.image;
+      dynamicTitle.textContent = data.title;
+      dynamicDesc.textContent = data.desc;
+      dynamicNotice.textContent = data.notice;
+      dynamicSelect.innerHTML = data.options;
+      
+      // Update Price display based on first option of selected product
+      selectedPriceElement.textContent = parseFloat(dynamicSelect.value).toFixed(2);
+    });
+  });
+
+
+  // ========== YAHAN ADD TO CART FUNCTION REPLACE KAREIN ==========
+  // Apne JS me purane 'addToCartBtn' wale block ki jagah isko paste karein
+  if (addToCartBtn && quantitySelect) {
+    addToCartBtn.addEventListener('click', function() {
+      const quantityText = quantitySelect.options[quantitySelect.selectedIndex].text;
+      const price = parseFloat(quantitySelect.value);
+
+      // YAHAN PRODUCT KA NAAM BHI JUDEGA (e.g. "Pandesal Bread (1 Dozen - $9.00)")
+      const itemName = currentProductTitle + ' : ' + quantityText;
+
+      cart.push({ id: Date.now(), quantityText: itemName, price: price });
+      total += price;
+      updateCartDisplay();
+
+      addToCartBtn.classList.add('added');
+      const btnText = addToCartBtn.querySelector('.btn-text');
+      const originalText = btnText ? btnText.textContent : 'Add to Order';
+      if (btnText) btnText.textContent = 'Added!';
+      
+      showToast('Added to cart!');
+      
+      setTimeout(function() {
+        addToCartBtn.classList.remove('added');
+        if (btnText) btnText.textContent = originalText;
+      }, 1500);
+
+      setTimeout(openCart, 300);
+    });
+  }
+
   // ========== DOM ELEMENTS ==========
   const addToCartBtn = document.getElementById('add-to-cart-btn');
   const quantitySelect = document.getElementById('quantity');
