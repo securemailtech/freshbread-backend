@@ -1,16 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title id="post-title">Loading... | Fresh Hot Bread</title>
   <meta name="description" id="post-meta-desc" content="Fresh Hot Bread All Day blog post">
-  
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800;900&family=DM+Sans:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
   <link rel="icon" type="image/jpeg" href="images/logo.jpg">
   <link rel="stylesheet" href="/styles.css">
-  
+
   <style>
     /* Modern Blog Typography & Variables */
     :root {
@@ -34,9 +37,9 @@
       background-color: var(--brand-red);
       color: #ffffff;
       padding: 140px 20px 80px;
-      
+
     }
-    
+
     .post-hero-inner {
       max-width: 1245px;
       margin: 0 auto;
@@ -45,7 +48,7 @@
 
     .hero-badge {
       display: inline-block;
-      border: 1px solid rgba(255,255,255,0.4);
+      border: 1px solid rgba(255, 255, 255, 0.4);
       color: #ffffff;
       padding: 6px 16px;
       border-radius: 50px;
@@ -72,11 +75,11 @@
       gap: 20px;
       align-items: center;
       font-size: 14px;
-      color: rgba(255,255,255,0.8);
+      color: rgba(255, 255, 255, 0.8);
       font-family: 'DM Sans', sans-serif;
       margin-bottom: 24px;
     }
-    
+
     .post-meta-row span {
       display: flex;
       align-items: center;
@@ -86,7 +89,7 @@
     .hero-excerpt {
       font-size: 18px;
       line-height: 1.6;
-      color: rgba(255,255,255,0.9);
+      color: rgba(255, 255, 255, 0.9);
       max-width: 800px;
       margin: 0;
     }
@@ -116,7 +119,7 @@
       object-fit: cover;
       border-radius: 12px;
       margin-bottom: 40px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
     }
 
     /* Quick Answer Box */
@@ -129,6 +132,7 @@
       font-size: 16px;
       line-height: 1.7;
     }
+
     .quick-answer-box strong {
       color: var(--heading-color);
       font-family: 'Playfair Display', serif;
@@ -142,23 +146,71 @@
       font-size: 17px;
       line-height: 1.8;
     }
-    .post-content p { margin: 0 0 24px; }
-    .post-content h2, .post-content h3 {
+
+    .post-content p {
+      margin: 0 0 24px;
+    }
+
+    .post-content h2,
+    .post-content h3 {
       font-family: 'Playfair Display', serif;
       color: var(--heading-color);
       margin: 45px 0 20px;
     }
-    .post-content h2 { font-size: 30px; font-weight: 700; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
-    .post-content h3 { font-size: 24px; font-weight: 600; }
-    .post-content img { max-width: 100%; height: auto !important; border-radius: 8px; margin: 30px 0; }
+
+    .post-content h2 {
+      font-size: 30px;
+      font-weight: 700;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 10px;
+    }
+
+    .post-content h3 {
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    .post-content img {
+      max-width: 100%;
+      height: auto !important;
+      border-radius: 8px;
+      margin: 30px 0;
+    }
 
     /* Tables & Accordions */
-    .post-content table { width: 100%; border-collapse: collapse; margin: 30px 0; font-size: 16px; background: #fff; border-radius: 8px; overflow: hidden; }
-    .post-content th { background-color: var(--heading-color); color: #fff; padding: 16px; text-align: left; }
-    .post-content td { padding: 16px; border-bottom: 1px solid var(--border-color); }
-    .post-content tr:nth-child(even) { background-color: var(--light-bg); }
+    .post-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 30px 0;
+      font-size: 16px;
+      background: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+    }
 
-    .sources-section { margin-top: 50px; padding-top: 20px; border-top: 1px solid var(--border-color); font-size: 14px; color: #64748b; }
+    .post-content th {
+      background-color: var(--heading-color);
+      color: #fff;
+      padding: 16px;
+      text-align: left;
+    }
+
+    .post-content td {
+      padding: 16px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .post-content tr:nth-child(even) {
+      background-color: var(--light-bg);
+    }
+
+    .sources-section {
+      margin-top: 50px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border-color);
+      font-size: 14px;
+      color: #64748b;
+    }
 
     /* 🌟 RIGHT: STICKY SIDEBAR */
     .blog-sidebar {
@@ -177,7 +229,7 @@
       border-radius: 12px;
       padding: 24px;
     }
-    
+
     .sidebar-card h4 {
       font-family: 'DM Sans', sans-serif;
       font-size: 14px;
@@ -197,12 +249,14 @@
       margin-bottom: 20px;
       line-height: 1.6;
     }
+
     .btn-sidebar-contact {
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 10px;
-      background: #0f172a; /* Dark Navy/Black button */
+      background: #0f172a;
+      /* Dark Navy/Black button */
       color: #ffffff !important;
       text-decoration: none;
       padding: 14px;
@@ -212,7 +266,11 @@
       transition: 0.3s;
       margin-bottom: 16px;
     }
-    .btn-sidebar-contact:hover { background: var(--brand-red); }
+
+    .btn-sidebar-contact:hover {
+      background: var(--brand-red);
+    }
+
     .sidebar-email {
       font-size: 14px;
       color: #3b82f6;
@@ -226,9 +284,11 @@
       padding: 0;
       margin: 0;
     }
+
     .related-links li {
       margin-bottom: 12px;
     }
+
     .related-links a {
       display: flex;
       align-items: center;
@@ -238,7 +298,11 @@
       font-size: 15px;
       transition: 0.2s;
     }
-    .related-links a:hover { color: var(--brand-red); }
+
+    .related-links a:hover {
+      color: var(--brand-red);
+    }
+
     .related-links a::before {
       content: '→';
       color: #94a3b8;
@@ -250,98 +314,109 @@
         grid-template-columns: 1fr;
         margin-top: 0;
       }
-      .post-hero-burgundy h1 { font-size: 36px; }
-      .blog-sidebar { position: relative; top: 0; margin-top: 20px; }
+
+      .post-hero-burgundy h1 {
+        font-size: 36px;
+      }
+
+      .blog-sidebar {
+        position: relative;
+        top: 0;
+        margin-top: 20px;
+      }
     }
+
     /* ============================================
    FAQ ACCORDION - FORCE CLEAN FULL WIDTH
    ============================================ */
-.post-content details,
-.post-content .mce-accordion,
-.post-content [data-mce-name="accordion"],
-.post-content .tox-accordion {
-  background: #ffffff !important;
-  border: 1px solid #E2E8F0 !important;
-  border-radius: 10px !important;
-  margin: 0 0 12px 0 !important;
-  width: 100% !important;
-  max-width: 100% !important;
-  display: block !important;
-  overflow: hidden !important;
-  box-shadow: none !important;
-  padding: 0 !important;
-}
+    .post-content details,
+    .post-content .mce-accordion,
+    .post-content [data-mce-name="accordion"],
+    .post-content .tox-accordion {
+      background: #ffffff !important;
+      border: 1px solid #E2E8F0 !important;
+      border-radius: 10px !important;
+      margin: 0 0 12px 0 !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      display: block !important;
+      overflow: hidden !important;
+      box-shadow: none !important;
+      padding: 0 !important;
+    }
 
-.post-content summary,
-.post-content .mce-accordion-summary,
-.post-content details > summary {
-  padding: 18px 50px 18px 20px !important;
-  font-weight: 600 !important;
-  font-size: 17px !important;
-  color: #0f172a !important;
-  cursor: pointer !important;
-  list-style: none !important;
-  background: #F8FAFC !important;
-  border: none !important;
-  margin: 0 !important;
-  display: block !important;
-  position: relative !important;
-  line-height: 1.4 !important;
-  font-family: 'DM Sans', sans-serif !important;
-}
+    .post-content summary,
+    .post-content .mce-accordion-summary,
+    .post-content details>summary {
+      padding: 18px 50px 18px 20px !important;
+      font-weight: 600 !important;
+      font-size: 17px !important;
+      color: #0f172a !important;
+      cursor: pointer !important;
+      list-style: none !important;
+      background: #F8FAFC !important;
+      border: none !important;
+      margin: 0 !important;
+      display: block !important;
+      position: relative !important;
+      line-height: 1.4 !important;
+      font-family: 'DM Sans', sans-serif !important;
+    }
 
-/* Hide default arrow */
-.post-content summary::-webkit-details-marker,
-.post-content summary::marker {
-  display: none !important;
-  content: '' !important;
-}
+    /* Hide default arrow */
+    .post-content summary::-webkit-details-marker,
+    .post-content summary::marker {
+      display: none !important;
+      content: '' !important;
+    }
 
-/* Custom + / − icon */
-.post-content summary::after {
-  content: '+' !important;
-  position: absolute !important;
-  right: 20px !important;
-  top: 50% !important;
-  transform: translateY(-50%) !important;
-  color: #960909 !important;
-  font-size: 24px !important;
-  font-weight: 400 !important;
-  line-height: 1 !important;
-}
+    /* Custom + / − icon */
+    .post-content summary::after {
+      content: '+' !important;
+      position: absolute !important;
+      right: 20px !important;
+      top: 50% !important;
+      transform: translateY(-50%) !important;
+      color: #960909 !important;
+      font-size: 24px !important;
+      font-weight: 400 !important;
+      line-height: 1 !important;
+    }
 
-.post-content details[open] > summary::after {
-  content: '−' !important;
-}
+    .post-content details[open]>summary::after {
+      content: '−' !important;
+    }
 
-/* Answer body */
-.post-content details[open] > summary {
-  border-bottom: 1px solid #E2E8F0 !important;
-  margin-bottom: 0 !important;
-  background: #F1F5F9 !important;
-}
+    /* Answer body */
+    .post-content details[open]>summary {
+      border-bottom: 1px solid #E2E8F0 !important;
+      margin-bottom: 0 !important;
+      background: #F1F5F9 !important;
+    }
 
-.post-content details > *:not(summary) {
-  padding: 20px !important;
-  margin: 0 !important;
-  font-size: 16px !important;
-  line-height: 1.7 !important;
-  color: #334155 !important;
-  background: #fff !important;
-  display: block !important;
-}
+    .post-content details>*:not(summary) {
+      padding: 20px !important;
+      margin: 0 !important;
+      font-size: 16px !important;
+      line-height: 1.7 !important;
+      color: #334155 !important;
+      background: #fff !important;
+      display: block !important;
+    }
 
-/* TinyMCE sometimes wraps answer in extra divs */
-.post-content details div,
-.post-content details p {
-  padding: 20px !important;
-  margin: 0 0 12px 0 !important;
-}
-.post-content details > div {
-  padding: 20px !important;
-}
+    /* TinyMCE sometimes wraps answer in extra divs */
+    .post-content details div,
+    .post-content details p {
+      padding: 20px !important;
+      margin: 0 0 12px 0 !important;
+    }
+
+    .post-content details>div {
+      padding: 20px !important;
+    }
   </style>
 </head>
+
 <body>
 
   <!-- Navigation -->
@@ -388,7 +463,9 @@
     <div class="cart-header">
       <h4>Your Order</h4>
       <button class="cart-close" id="cart-close" aria-label="Close cart">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12" /></svg>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 6L6 18M6 6l12 12" />
+        </svg>
       </button>
     </div>
     <ul id="cart-items"></ul>
@@ -432,38 +509,50 @@
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
       const wrapper = document.getElementById('post-wrapper');
-      const urlParams = new URLSearchParams(window.location.search);
-      const slug = urlParams.get('slug');
+      
+      // 1. Clean URL support + purana fallback
+      let slug = window.__BLOG_SLUG__ || null;
+
+      if (!slug) {
+        // URL Path (/blog/my-slug) se slug nikaalo
+        const pathParts = window.location.pathname.split('/').filter(Boolean);
+        if (pathParts[0] === 'blog' && pathParts[1]) {
+          slug = pathParts[1];
+        }
+      }
+
+      // Purana query parameter fallback (?slug=my-slug)
+      if (!slug) {
+        const urlParams = new URLSearchParams(window.location.search);
+        slug = urlParams.get('slug');
+      }
 
       if (!slug) {
         wrapper.innerHTML = '<p style="text-align:center; padding:150px;">Blog not found. <a href="/blog">Back to Blog</a></p>';
         return;
       }
 
-            try {
-        // Fetch current blog
+      try {
+        // Fetch current blog data
         const response = await fetch('/api/blogs/' + encodeURIComponent(slug));
         if (!response.ok) throw new Error('Not found');
         const blog = await response.json();
 
-        
-
-        // Fetch Related Articles
+        // 2. Fetch Related Articles (with Clean URLs /blog/slug)
         let relatedHtml = '';
         try {
           const allBlogsRes = await fetch('/api/blogs');
-          if(allBlogsRes.ok) {
+          if (allBlogsRes.ok) {
             const allBlogs = await allBlogsRes.json();
-            // Filter out current blog and get top 3
             const related = allBlogs.filter(b => b.id !== blog.id).slice(0, 3);
             
-            if(related.length > 0) {
+            if (related.length > 0) {
               relatedHtml = `
                 <div class="related-articles-section" style="margin-top: 60px; border-top: 2px solid var(--border-color); padding-top: 40px;">
                   <h3 style="font-family: 'Playfair Display', serif; font-size: 28px; color: var(--heading-color); margin-bottom: 30px;">Related Articles</h3>
                   <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 24px;">
                     ${related.map(r => `
-                      <a href="?slug=${r.slug}" style="text-decoration:none; color:inherit; background:var(--light-bg); border-radius:12px; overflow:hidden; border:1px solid var(--border-color); display:block; transition:0.3s;" onmouseover="this.style.borderColor='var(--brand-red)'" onmouseout="this.style.borderColor='var(--border-color)'">
+                      <a href="/blog/${r.slug}" style="text-decoration:none; color:inherit; background:var(--light-bg); border-radius:12px; overflow:hidden; border:1px solid var(--border-color); display:block; transition:0.3s;" onmouseover="this.style.borderColor='var(--brand-red)'" onmouseout="this.style.borderColor='var(--border-color)'">
                         ${r.image_url ? `<img src="${r.image_url}" style="width:100%; height:160px; object-fit:cover;" alt="${r.title}">` : `<div style="width:100%; height:160px; background:#e2e8f0; display:flex; align-items:center; justify-content:center; color:#94a3b8;">No Image</div>`}
                         <div style="padding: 20px;">
                           <h4 style="font-family: 'DM Sans', sans-serif; margin:0 0 10px; font-size:16px; color:var(--heading-color); line-height:1.4; font-weight:700;">${r.title}</h4>
@@ -478,10 +567,10 @@
           }
         } catch(e) { console.log('Could not load related articles'); }
 
-               // ==========================================
+        // ==========================================
         // LIVE SEO + SCHEMA INJECTOR (FIXED)
         // ==========================================
-        
+
         // Debug - console me dekhna data aa raha hai ya nahi
         console.log('SEO Data from API:', {
           meta_title: blog.meta_title,
@@ -564,15 +653,15 @@
         const date = new Date(blog.created_at).toLocaleDateString('en-US', {
           month: 'long', day: 'numeric', year: 'numeric'
         });
-        
+
         const wordCount = blog.content ? blog.content.replace(/<[^>]*>?/gm, '').split(' ').length : 0;
         const readTime = Math.max(1, Math.ceil(wordCount / 200));
 
-         // ========== YAHAN SE PASTE KARO (DYNAMIC CTA) ==========
+        // ========== YAHAN SE PASTE KARO (DYNAMIC CTA) ==========
         let ctaHtml = '';
         if (blog.cta) {
           const ctaLines = blog.cta.split('\n').map(line => line.trim()).filter(line => line.length > 0);
-          
+
           let ctaHeading = 'Special Offer';
           let ctaText = blog.cta.replace(/\n/g, '<br>');
           let ctaBtnText = 'Get in Touch';
@@ -595,7 +684,7 @@
             </div>
           `;
         }
-     
+
 
         let htmlContent = `
           <section class="post-hero-burgundy">
@@ -671,7 +760,7 @@
 
         wrapper.innerHTML = htmlContent;
 
-       // ===== FIX BROKEN TINYMCE ACCORDIONS =====
+        // ===== FIX BROKEN TINYMCE ACCORDIONS =====
         setTimeout(() => {
           const contentArea = wrapper.querySelector('.post-content');
           if (!contentArea) return;
@@ -692,17 +781,18 @@
             details.innerHTML = `<summary>${summaryText}</summary><div>${answerHTML}</div>`;
             acc.replaceWith(details);
           });
-        }, 100);  
+        }, 100);
 
       } catch (error) {
         wrapper.innerHTML = '<p style="text-align:center; padding:150px;">Blog not found. <a href="/blog">Back to Blog</a></p>';
       }
     });
 
-    document.getElementById('hamburger')?.addEventListener('click', function() {
+    document.getElementById('hamburger')?.addEventListener('click', function () {
       this.classList.toggle('active');
       document.getElementById('nav-links').classList.toggle('active');
     });
   </script>
 </body>
+
 </html>

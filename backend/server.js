@@ -1,8 +1,9 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs'); // FIXED: Added fs module
 const dotenv = require('dotenv');
-const { initializeDatabase } = require('./models/initDb');
+const { initializeDatabase, getDb } = require('./models/initDb'); // FIXED: Added getDb import
 const blogRoutes = require('./routes/blogs');
 
 // Load environment variables
@@ -101,15 +102,6 @@ app.get('/admin/dashboard', (req, res) => {
 });
 
 // -----------------------
-// Serve Main Site
-// -----------------------
-app.use(express.static(path.join(__dirname, 'site')));
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'site', 'index.html'));
-});
-
-
-// -----------------------
 // Force 404 Status Code for 404 Page (WooRank Rule)
 // -----------------------
 app.get(['/404', '/404.html'], (req, res) => {
@@ -117,20 +109,102 @@ app.get(['/404', '/404.html'], (req, res) => {
 });
 
 // -----------------------
-// Serve Main Site
+// Serve Main Site Static Files
 // -----------------------
 app.use(express.static(path.join(__dirname, 'site')));
+
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'site', 'index.html'));
 });
 
-// Blog Routes (clean URLs)
-app.get('/blog', (req, res) => {
-  res.sendFile(path.join(__dirname, 'site', 'blog.html'));
+// ========== CLEAN BLOG URL + SERVER SIDE META INJECTION ==========
+app.get('/blog/:slug', async (req, res) => {
+  try {
+    const db = getDb();
+    const slug = req.params.slug;
+
+    db.get("SELECT * FROM blogs WHERE slug = ? AND status = 'published'", [slug], (err, blog) => {
+      if (err || !blog) {
+        return res.status(404).sendFile(path.join(__dirname, 'site', '404.html'));
+      }
+
+      const filePath = path.join(__dirname, 'site', 'post.html');
+      
+      if (!fs.existsSync(filePath)) {
+        return res.status(500).send('post.html file not found');
+      }
+
+      let html = fs.readFileSync(filePath, 'utf8');
+
+      // Meta values
+      const metaTitle = (blog.meta_title && blog.meta_title.trim()) 
+        ? blog.meta_title.trim() 
+        : `${blog.title} | Fresh Hot Bread`;
+      
+      const metaDesc = (blog.meta_description && blog.meta_description.trim()) 
+        ? blog.meta_description.trim() 
+        : (blog.excerpt || blog.title || 'Fresh Hot Bread All Day');
+
+      // Replace title tag
+      html = html.replace(
+        /<title[^>]*>.*?<\/title>/i,
+        `<title>${metaTitle}</title>`
+      );
+
+      // Replace meta description tag
+      html = html.replace(
+        /<meta\s+name="description"[^>]*>/i,
+        `<meta name="description" id="post-meta-desc" content="${metaDesc.replace(/"/g, '&quot;')}">`
+      );
+
+      // Open Graph tags add/inject
+      const ogTags = `
+  <meta property="og:title" content="${metaTitle.replace(/"/g, '&quot;')}">
+  <meta property="og:description" content="${metaDesc.replace(/"/g, '&quot;')}">
+  <meta property="og:type" content="article">
+  ${blog.image_url ? `<meta property="og:image" content="${blog.image_url}">` : ''}
+  <meta property="og:url" content="https://freshhotbreadallday.com/blog/${blog.slug}">
+`;
+
+      html = html.replace('</head>', `${ogTags}\n</head>`);
+
+      // Schema inject (agar available hai)
+      if (blog.schema_code && blog.schema_code.trim()) {
+        let cleanSchema = blog.schema_code
+          .replace(/<script[^>]*>/gi, '')
+          .replace(/<\/script>/gi, '')
+          .trim();
+        
+        try {
+          JSON.parse(cleanSchema); // Validate JSON
+          const schemaTag = `<script type="application/ld+json">${cleanSchema}</script>`;
+          html = html.replace('</head>', `${schemaTag}\n</head>`);
+        } catch (e) {
+          console.log('Invalid schema format, skipping schema injection');
+        }
+      }
+
+      // Inject blog slug variable for frontend fallback script
+      html = html.replace(
+        '<body>',
+        `<body>\n<script>window.__BLOG_SLUG__ = "${blog.slug}";</script>`
+      );
+
+      res.send(html);
+    });
+  } catch (error) {
+    console.error('Blog Route Error:', error);
+    res.status(500).send('Server error');
+  }
 });
 
-app.get('/post', (req, res) => {
-  res.sendFile(path.join(__dirname, 'site', 'post.html'));
+// Purane query URL (/post.html?slug=xyz) ko new clean URL (/blog/xyz) par 301 Redirect karo
+app.get('/post.html', (req, res) => {
+  const slug = req.query.slug;
+  if (slug) {
+    return res.redirect(301, `/blog/${slug}`);
+  }
+  res.redirect('/blog');
 });
 
 // -----------------------
