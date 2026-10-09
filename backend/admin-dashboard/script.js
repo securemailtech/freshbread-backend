@@ -1027,6 +1027,7 @@ function showBlogEditor(isNew = true, blog = null) {
     setVal('blog_id', blog.id);
     setVal('blog_title', blog.title);
     setVal('blog_slug', blog.slug);
+     setVal('blog_excerpt', blog.excerpt || '');
     setVal('blog_image_url', blog.image_url || '');
     setVal('blog_quick_answer', blog.quick_answer || blog.excerpt || '');
     setVal('blog_sources', blog.sources || '');
@@ -1144,13 +1145,14 @@ document.addEventListener('DOMContentLoaded', () => {
       btn.disabled = true;
 
       const id = document.getElementById('blog_id')?.value;
-      const quickAnswer = document.getElementById('blog_quick_answer')?.value || '';
+     const excerpt = document.getElementById('blog_excerpt')?.value || ''; // <-- Ye add karo
+     const quickAnswer = document.getElementById('blog_quick_answer')?.value || '';
 
       // ALL FIELDS - nothing left behind
       const payload = {
         title: document.getElementById('blog_title')?.value || '',
         slug: document.getElementById('blog_slug')?.value || '',
-        excerpt: quickAnswer,
+        excerpt: excerpt, // <-- Ise update karo
         quick_answer: quickAnswer,
         sources: document.getElementById('blog_sources')?.value || '',
         cta: document.getElementById('blog_cta')?.value || '',
