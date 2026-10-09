@@ -162,17 +162,14 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   };
 
-  document.querySelectorAll('.product-tab').forEach(function (tab) {
-    tab.addEventListener('click', function () {
-      // Tab active class toggle
-      document.querySelectorAll('.product-tab').forEach(function (t) { t.classList.remove('active'); });
+    document.querySelectorAll('.product-tab').forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      document.querySelectorAll('.product-tab').forEach(function(t) { t.classList.remove('active'); });
       this.classList.add('active');
 
-      // Get Data
       const target = this.getAttribute('data-target');
       const data = productData[target];
 
-      // Update HTML Elements
       const titleEl = document.getElementById('dynamic-product-title');
       const descEl = document.getElementById('dynamic-product-desc');
       const imgEl = document.getElementById('dynamic-product-image');
@@ -183,16 +180,16 @@ document.addEventListener("DOMContentLoaded", function () {
       if (titleEl) titleEl.textContent = data.title;
       if (descEl) descEl.textContent = data.desc;
       if (imgEl) imgEl.src = data.image;
-      if (noticeEl) noticeEl.textContent = data.notice;
-
-      // Update Dropdown and Price
+      
+      // FIXED: textContent -> innerHTML so <br> creates new line properly
+      if (noticeEl) noticeEl.innerHTML = data.notice; 
+      
       if (selectEl) {
         selectEl.innerHTML = data.options;
         const selectedPriceDisplay = document.getElementById('selected-price');
         if (selectedPriceDisplay) selectedPriceDisplay.textContent = parseFloat(selectEl.value).toFixed(2);
       }
 
-      // Update button data attribute so Cart knows which product it is
       if (addToCartBtn) addToCartBtn.setAttribute('data-product-name', data.title);
     });
   });
