@@ -870,26 +870,28 @@ function escapeHtml(text) {
 }
 
 // ========================================
-// BLOG MANAGEMENT SYSTEM & UPLOADS
+// BLOG MANAGEMENT SYSTEM (EDIT DATA PRESERVE FIX)
 // ========================================
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Auto slug
   const titleInput = document.getElementById('blog_title');
   const slugInput = document.getElementById('blog_slug');
 
-  // Auto-generate slug
-  titleInput?.addEventListener('input', function() {
-    if (!slugInput.dataset.manuallyEdited) {
-      slugInput.value = this.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+  titleInput?.addEventListener('input', function () {
+    if (!slugInput?.dataset.manuallyEdited) {
+      slugInput.value = this.value.toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)/g, '');
     }
   });
 
-  slugInput?.addEventListener('input', function() {
+  slugInput?.addEventListener('input', function () {
     this.dataset.manuallyEdited = 'true';
-    if(this.value === '') delete this.dataset.manuallyEdited;
+    if (this.value === '') delete this.dataset.manuallyEdited;
   });
 
-  // Featured Image Upload & Paste
+  // Featured Image Upload + Paste
   const dropzone = document.getElementById('featured-image-dropzone');
   const fileInput = document.getElementById('featured_image_file');
   const imageUrlInput = document.getElementById('blog_image_url');
@@ -897,127 +899,165 @@ document.addEventListener('DOMContentLoaded', () => {
   dropzone?.addEventListener('click', () => fileInput?.click());
 
   fileInput?.addEventListener('change', (e) => {
-    if(e.target.files[0]) uploadFeaturedImage(e.target.files[0]);
+    if (e.target.files[0]) uploadFeaturedImage(e.target.files[0]);
   });
 
-  // Paste image directly into dropzone
   document.addEventListener('paste', (e) => {
-    if(document.getElementById('blog-editor-view')?.style.display !== 'none') {
+    if (document.getElementById('blog-editor-view')?.style.display !== 'none') {
       const items = (e.clipboardData || e.originalEvent.clipboardData).items;
-      for (let index in items) {
-        const item = items[index];
-        if (item.kind === 'file') {
-          const blob = item.getAsFile();
-          uploadFeaturedImage(blob);
+      for (let i in items) {
+        if (items[i].kind === 'file') {
+          uploadFeaturedImage(items[i].getAsFile());
         }
       }
     }
   });
 
   async function uploadFeaturedImage(file) {
-    if (!file.type.startsWith('image/')) return showToast('Only images are allowed', true);
-    
-    if (dropzone) dropzone.innerHTML = '<span style="color:#64748b; font-size:13px;">Uploading image...</span>';
-    
+    if (!file || !file.type.startsWith('image/')) {
+      return showToast('Only images allowed', true);
+    }
+
+    if (dropzone) {
+      dropzone.innerHTML = '<span style="color:#64748b;font-size:13px;">Uploading...</span>';
+    }
+
     const formData = new FormData();
     formData.append('image', file);
     formData.append('key', 'blog_feat_' + Date.now());
     formData.append('targetPath', 'images/blog_' + Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9.]/g, ''));
-    
+
     try {
-      const response = await fetch(`${API_URL}/api/images/upload`, {
+      const res = await fetch(`${API_URL}/api/images/upload`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${authToken}` },
         body: formData
       });
-      const result = await response.json();
-      
+      const result = await res.json();
       const finalUrl = result.url || `/${formData.get('targetPath')}`;
+
       if (imageUrlInput) imageUrlInput.value = finalUrl;
-      if (dropzone) dropzone.innerHTML = `<img src="${finalUrl}" style="max-width:100%; max-height:140px; border-radius:6px; object-fit:cover;">`;
-      showToast('Featured Image Uploaded!');
+      if (dropzone) {
+        dropzone.innerHTML = `<img src="${finalUrl}" style="max-width:100%;max-height:140px;border-radius:6px;object-fit:cover;">`;
+      }
+      showToast('Image uploaded!');
     } catch (err) {
-      if (dropzone) dropzone.innerHTML = '<span style="color:#ef4444; font-size:13px;">Upload failed! Try again.</span>';
+      if (dropzone) dropzone.innerHTML = '<span style="color:#ef4444;">Upload failed</span>';
     }
   }
 });
 
-// CORE BLOG CRUD FUNCTIONS
+// ---------- Load blogs list ----------
 async function loadAdminBlogs() {
   const container = document.getElementById('admin-blog-list');
   if (!container) return;
 
   try {
-    const response = await fetch(`${API_URL}/api/blogs?status=all`);
-    const blogs = await response.json();
+    const res = await fetch(`${API_URL}/api/blogs?status=all`);
+    const blogs = await res.json();
 
     if (!Array.isArray(blogs) || blogs.length === 0) {
-      container.innerHTML = '<p class="empty-state">No blogs written yet. Click "+ New Blog Post" to start!</p>';
+      container.innerHTML = '<p class="empty-state">No blogs yet. Click "+ New Blog Post"</p>';
       return;
     }
 
     container.innerHTML = blogs.map(blog => `
-      <div class="order-row" style="cursor:default; display:flex; align-items:center; justify-content:space-between; gap:15px; padding:15px; border-bottom:1px solid #e2e8f0;">
-        <div style="flex:1; min-width:0;">
-          <h4 style="margin:0 0 4px 0; font-size:16px; color:#0f172a; word-break:break-word;">${escapeHtml(blog.title)}</h4>
-          <span style="color:#64748b; font-size:13px; display:block;">/${escapeHtml(blog.slug)}</span>
+      <div class="order-row" style="display:flex;align-items:center;justify-content:space-between;gap:15px;padding:15px;border-bottom:1px solid #e2e8f0;">
+        <div style="flex:1;min-width:0;">
+          <h4 style="margin:0 0 4px;font-size:16px;color:#0f172a;">${escapeHtml(blog.title)}</h4>
+          <span style="color:#64748b;font-size:13px;">/${escapeHtml(blog.slug)}</span>
         </div>
-        <div style="display:flex; align-items:center; gap:12px; flex-shrink:0;">
-          <span style="color:#64748b; font-size:13px; white-space:nowrap;">${blog.created_at ? new Date(blog.created_at).toLocaleDateString() : ''}</span>
-          <span class="order-status ${blog.status === 'published' ? 'status-completed' : 'status-pending'}" style="margin:0;">${(blog.status || 'draft').toUpperCase()}</span>
-          <button onclick="editBlog(${blog.id})" style="background:var(--blue); color:#fff; border:none; padding:8px 14px; border-radius:6px; font-weight:600; cursor:pointer;">Edit</button>
-          <button onclick="deleteBlog(${blog.id})" style="background:var(--red); color:#fff; border:none; padding:8px 14px; border-radius:6px; font-weight:600; cursor:pointer;">Delete</button>
+        <div style="display:flex;align-items:center;gap:12px;flex-shrink:0;">
+          <span style="color:#64748b;font-size:13px;">${blog.created_at ? new Date(blog.created_at).toLocaleDateString() : ''}</span>
+          <span class="order-status ${blog.status === 'published' ? 'status-completed' : 'status-pending'}">${(blog.status || 'draft').toUpperCase()}</span>
+          <button onclick="editBlog(${blog.id})" style="background:var(--blue);color:#fff;border:none;padding:8px 14px;border-radius:6px;font-weight:600;cursor:pointer;">Edit</button>
+          <button onclick="deleteBlog(${blog.id})" style="background:var(--red);color:#fff;border:none;padding:8px 14px;border-radius:6px;font-weight:600;cursor:pointer;">Delete</button>
         </div>
       </div>
     `).join('');
-  } catch (error) {
-    container.innerHTML = '<p class="empty-state">Failed to load blogs.</p>';
+  } catch (e) {
+    container.innerHTML = '<p class="empty-state">Failed to load blogs</p>';
   }
 }
 
+// ---------- Show Editor (DATA PRESERVE) ----------
 function showBlogEditor(isNew = true, blog = null) {
   document.getElementById('blog-list-view').style.display = 'none';
   document.getElementById('blog-editor-view').style.display = 'block';
-  
+
   const dropzone = document.getElementById('featured-image-dropzone');
   const slugInput = document.getElementById('blog_slug');
-  
+  const imageUrlInput = document.getElementById('blog_image_url');
+
+  // Helper to safely set value
+  const setVal = (id, val) => {
+    const el = document.getElementById(id);
+    if (el) el.value = val ?? '';
+  };
+
   if (isNew) {
-    document.getElementById('blog-form').reset();
-    document.getElementById('blog_id').value = '';
-    document.getElementById('blog_image_url').value = '';
-    
-    if (slugInput) slugInput.dataset.manuallyEdited = '';
-    
-    if(dropzone) {
-        dropzone.innerHTML = `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" style="margin-bottom: 8px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg><span style="color:#64748b; font-size:13px; line-height:1.4; pointer-events:none;">Click to Upload Image<br><strong style="color:#0f172a; font-weight:600;">or Ctrl+V to Paste</strong></span>`;
+    document.getElementById('blog-form')?.reset();
+    setVal('blog_id', '');
+    setVal('blog_image_url', '');
+    setVal('blog_quick_answer', '');
+    setVal('blog_sources', '');
+    setVal('blog_cta', '');
+    setVal('blog_status', 'published');
+
+    if (slugInput) delete slugInput.dataset.manuallyEdited;
+
+    if (dropzone) {
+      dropzone.innerHTML = `
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" style="margin-bottom:8px;">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="17 8 12 3 7 8"></polyline>
+          <line x1="12" y1="3" x2="12" y2="15"></line>
+        </svg>
+        <span style="color:#64748b;font-size:13px;line-height:1.4;pointer-events:none;">
+          Click to Upload Image<br>
+          <strong style="color:#0f172a;">or Ctrl+V to Paste</strong>
+        </span>`;
     }
-    
-    if(typeof tinymce !== 'undefined' && tinymce.get('blog_content')) {
-        tinymce.get('blog_content').setContent('');
+
+    if (typeof tinymce !== 'undefined' && tinymce.get('blog_content')) {
+      tinymce.get('blog_content').setContent('');
     }
-    
   } else if (blog) {
-    document.getElementById('blog_id').value = blog.id;
-    document.getElementById('blog_title').value = blog.title || '';
-    document.getElementById('blog_slug').value = blog.slug || '';
-    document.getElementById('blog_image_url').value = blog.image_url || '';
-    
-    document.getElementById('blog_quick_answer').value = blog.quick_answer || '';
-    document.getElementById('blog_sources').value = blog.sources || '';
-    document.getElementById('blog_cta').value = blog.cta || '';
-    document.getElementById('blog_status').value = blog.status || 'published';
-    
+    // ===== EDIT MODE - PRESERVE ALL FIELDS =====
+    setVal('blog_id', blog.id);
+    setVal('blog_title', blog.title);
+    setVal('blog_slug', blog.slug);
+    setVal('blog_image_url', blog.image_url || '');
+    setVal('blog_quick_answer', blog.quick_answer || blog.excerpt || '');
+    setVal('blog_sources', blog.sources || '');
+    setVal('blog_cta', blog.cta || '');
+    setVal('blog_status', blog.status || 'published');
+
     if (slugInput) slugInput.dataset.manuallyEdited = 'true';
-    
+
+    // Restore Featured Image
     if (blog.image_url && dropzone) {
-      dropzone.innerHTML = `<img src="${blog.image_url}" style="max-width:100%; max-height:140px; border-radius:6px; object-fit:cover;">`;
+      dropzone.innerHTML = `<img src="${blog.image_url}" style="max-width:100%;max-height:140px;border-radius:6px;object-fit:cover;" alt="Featured">`;
     } else if (dropzone) {
-      dropzone.innerHTML = `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" style="margin-bottom: 8px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg><span style="color:#64748b; font-size:13px; line-height:1.4; pointer-events:none;">Click to Upload Image<br><strong style="color:#0f172a; font-weight:600;">or Ctrl+V to Paste</strong></span>`;
+      dropzone.innerHTML = `
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" style="margin-bottom:8px;">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="17 8 12 3 7 8"></polyline>
+          <line x1="12" y1="3" x2="12" y2="15"></line>
+        </svg>
+        <span style="color:#64748b;font-size:13px;">Click to Upload or Ctrl+V</span>`;
     }
-    
-    if(typeof tinymce !== 'undefined' && tinymce.get('blog_content')) {
-        tinymce.get('blog_content').setContent(blog.content || '');
+
+    // Restore TinyMCE content
+    if (typeof tinymce !== 'undefined' && tinymce.get('blog_content')) {
+      tinymce.get('blog_content').setContent(blog.content || '');
+    } else {
+      // TinyMCE not ready yet - wait a bit
+      setTimeout(() => {
+        if (tinymce.get('blog_content')) {
+          tinymce.get('blog_content').setContent(blog.content || '');
+        }
+      }, 600);
     }
   }
 }
@@ -1030,93 +1070,91 @@ function hideBlogEditor() {
 
 async function editBlog(id) {
   try {
-    const response = await fetch(`${API_URL}/api/blogs?status=all`);
-    const blogs = await response.json();
-    const blog = blogs.find(b => b.id === id);
-    if (blog) showBlogEditor(false, blog);
-  } catch (error) {
-    showToast('Failed to fetch blog details', true);
+    const res = await fetch(`${API_URL}/api/blogs?status=all`);
+    const blogs = await res.json();
+    const blog = blogs.find(b => b.id == id); // == so string/number both work
+    if (blog) {
+      showBlogEditor(false, blog);
+    } else {
+      showToast('Blog not found', true);
+    }
+  } catch (e) {
+    showToast('Failed to load blog', true);
   }
 }
 
 async function deleteBlog(id) {
-  if (!confirm('Are you sure you want to delete this blog post?')) return;
+  if (!confirm('Delete this blog post?')) return;
   try {
-    const response = await fetch(`${API_URL}/api/blogs/${id}`, {
+    const res = await fetch(`${API_URL}/api/blogs/${id}`, {
       method: 'DELETE',
       headers: { 'Authorization': `Bearer ${authToken}` }
     });
-    if (response.ok) {
-      showToast('Blog deleted successfully');
+    if (res.ok) {
+      showToast('Blog deleted');
       loadAdminBlogs();
     } else {
-      showToast('Failed to delete blog', true);
+      showToast('Delete failed', true);
     }
-  } catch (error) {
-    showToast('Failed to delete blog', true);
+  } catch (e) {
+    showToast('Delete failed', true);
   }
 }
 
-// Initialize TinyMCE
+// TinyMCE init
 function initBlogEditor() {
   if (typeof tinymce === 'undefined') return;
-  
+
   tinymce.init({
     selector: '#blog_content',
     plugins: 'advlist autolink lists link image charmap preview anchor pagebreak searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime media nonbreaking table emoticons accordion',
     toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline | alignleft aligncenter alignright alignjustify | table accordion | link image | bullist numlist | code fullscreen',
-    paste_data_images: true, 
+    paste_data_images: true,
     height: 650,
     menubar: 'file edit view insert format tools table',
-    content_style: 'body { font-family: "DM Sans", sans-serif; font-size:16px; line-height: 1.6; color: #1e293b; } table { border-collapse: collapse; width: 100%; } td, th { border: 1px solid #cbd5e1; padding: 8px; }',
+    content_style: 'body { font-family: "DM Sans", sans-serif; font-size:16px; line-height:1.6; }',
     setup: function (editor) {
-      editor.on('change', function () {
-        tinymce.triggerSave();
-      });
+      editor.on('change', () => tinymce.triggerSave());
     }
   });
 }
 
-// Bind Events on Load
+// Bind buttons + form submit
 document.addEventListener('DOMContentLoaded', () => {
-  const btnCreate = document.getElementById('btn-create-new-blog');
-  const btnBack = document.getElementById('btn-back-to-blogs');
-  const blogForm = document.getElementById('blog-form');
+  document.getElementById('btn-create-new-blog')?.addEventListener('click', () => showBlogEditor(true));
+  document.getElementById('btn-back-to-blogs')?.addEventListener('click', hideBlogEditor);
 
-  if (btnCreate) btnCreate.addEventListener('click', () => showBlogEditor(true));
-  if (btnBack) btnBack.addEventListener('click', hideBlogEditor);
-  
+  const blogForm = document.getElementById('blog-form');
   if (blogForm) {
     blogForm.onsubmit = async (e) => {
       e.preventDefault();
-      
-      if(typeof tinymce !== 'undefined' && tinymce.get('blog_content')) {
-        tinymce.triggerSave(); 
-      }
-      
-      const editorContent = document.getElementById('blog_content')?.value || '';
-      
-      if(!editorContent.trim()) {
-        return showToast('Content cannot be empty!', true);
+
+      if (typeof tinymce !== 'undefined' && tinymce.get('blog_content')) {
+        tinymce.triggerSave();
       }
 
-      const submitBtn = document.getElementById('btn-save-blog');
-      const originalHtml = submitBtn.innerHTML;
-      submitBtn.innerHTML = 'Saving...';
-      submitBtn.disabled = true;
+      const content = document.getElementById('blog_content')?.value || '';
+      if (!content.trim()) {
+        return showToast('Content cannot be empty', true);
+      }
 
-      const id = document.getElementById('blog_id').value;
+      const btn = document.getElementById('btn-save-blog');
+      const oldHtml = btn.innerHTML;
+      btn.innerHTML = 'Saving...';
+      btn.disabled = true;
+
+      const id = document.getElementById('blog_id')?.value;
       const quickAnswer = document.getElementById('blog_quick_answer')?.value || '';
-      
-      // EXCERPT PASSED TO PREVENT 500 SERVER ERROR
+
+      // ALL FIELDS - nothing left behind
       const payload = {
         title: document.getElementById('blog_title')?.value || '',
         slug: document.getElementById('blog_slug')?.value || '',
-        excerpt: quickAnswer, // DB required field
+        excerpt: quickAnswer,
         quick_answer: quickAnswer,
         sources: document.getElementById('blog_sources')?.value || '',
         cta: document.getElementById('blog_cta')?.value || '',
-        content: editorContent,
+        content: content,
         image_url: document.getElementById('blog_image_url')?.value || '',
         status: document.getElementById('blog_status')?.value || 'published'
       };
@@ -1125,24 +1163,27 @@ document.addEventListener('DOMContentLoaded', () => {
       const url = id ? `${API_URL}/api/blogs/${id}` : `${API_URL}/api/blogs`;
 
       try {
-        const response = await fetch(url, {
-          method: method,
-          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
+        const res = await fetch(url, {
+          method,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${authToken}`
+          },
           body: JSON.stringify(payload)
         });
 
-        if (response.ok) {
-          showToast(id ? 'Blog updated successfully!' : 'Blog created successfully!');
+        if (res.ok) {
+          showToast(id ? 'Blog updated!' : 'Blog created!');
           hideBlogEditor();
         } else {
-          const errData = await response.json();
-          showToast(errData.error || 'Failed to save blog', true);
+          const err = await res.json().catch(() => ({}));
+          showToast(err.error || 'Save failed', true);
         }
-      } catch (error) {
-        showToast('Server error while saving blog', true);
+      } catch (err) {
+        showToast('Save failed', true);
       } finally {
-        submitBtn.innerHTML = originalHtml;
-        submitBtn.disabled = false;
+        btn.innerHTML = oldHtml;
+        btn.disabled = false;
       }
     };
   }
@@ -1150,6 +1191,6 @@ document.addEventListener('DOMContentLoaded', () => {
   if (document.getElementById('section-blogs')) {
     loadAdminBlogs();
   }
-  
-  setTimeout(initBlogEditor, 400); 
+
+  setTimeout(initBlogEditor, 400);
 });
