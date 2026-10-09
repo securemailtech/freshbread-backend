@@ -729,6 +729,7 @@ function setupImageUploads() {
     'hero': { path: 'images/gemeni 3.png', previewId: 'preview-hero' },
     'logo': { path: 'images/logo.jpg', previewId: 'preview-logo' },
     'product': { path: 'images/download (1).jpg', previewId: 'preview-product' },
+    'product-pandesal': { path: 'images/pandesal-image.jpg', previewId: 'preview-product-pandesal' },
     'coffee-machine': { path: 'images/coffee-machine.webp', previewId: 'preview-coffee-machine' },
     'coffee-menu': { path: 'images/coffee-menu.webp', previewId: 'preview-coffee-menu' },
     'feature1': { path: 'images/shop.webp', previewId: 'preview-feature1' },
@@ -831,7 +832,7 @@ async function loadImagePreviews() {
     const content = data.content || data;
 
     // Check for custom image paths
-    const imageKeys = ['hero', 'logo', 'product', 'coffee-machine', 'coffee-menu',
+    const imageKeys = ['hero', 'logo', 'product', 'product-pandesal', 'coffee-machine', 'coffee-menu',
       'feature1', 'feature2', 'feature3',
       'gallery1', 'gallery2', 'gallery3', 'gallery4', 'gallery5', 'gallery6', 'gallery7', 'gallery8'];
 

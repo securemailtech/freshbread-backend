@@ -542,7 +542,7 @@ document.addEventListener("DOMContentLoaded", function() {
     return url;
   }
 
-  // ========== LOAD DYNAMIC IMAGES FROM DATABASE ==========
+    // ========== LOAD DYNAMIC IMAGES FROM DATABASE ==========
   async function loadDynamicImages() {
     const imageMap = {
       'hero': '.hero-image-wrapper img',
@@ -579,8 +579,21 @@ document.addEventListener("DOMContentLoaded", function() {
         // Continue silently
       }
     }
-  }
 
+    // ========== PANDESAL DYNAMIC IMAGE (NEW) ==========
+    try {
+      const response = await fetch(API_URL + '/api/images/product-pandesal');
+      if (response.ok) {
+        const data = await response.json();
+        if (data.url && typeof productData !== 'undefined') {
+          // Admin se uploaded Cloudinary URL ko Pandesal Tab data me set kar do
+          productData.pandesal.image = optimizeImageUrl(data.url);
+        }
+      }
+    } catch (error) {
+      // Continue silently
+    }
+  }
     // ========== GALLERY CAROUSEL LOGIC ==========
   const track = document.getElementById('gallery-track');
   const prevBtn = document.getElementById('gallery-prev');
