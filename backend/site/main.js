@@ -1,6 +1,6 @@
-document.addEventListener("DOMContentLoaded", function() {
-  
-  
+document.addEventListener("DOMContentLoaded", function () {
+
+
   // ========== API CONFIGURATION ==========
   // Works both locally AND on Render!
   let API_URL;
@@ -9,11 +9,11 @@ document.addEventListener("DOMContentLoaded", function() {
   } else {
     API_URL = '';
   }
-  
+
   // ========== PAGE LOADER ==========
   const pageLoader = document.getElementById('page-loader');
   if (pageLoader) {
-    setTimeout(function() {
+    setTimeout(function () {
       pageLoader.classList.add('loaded');
     }, 800);
   }
@@ -24,21 +24,21 @@ document.addEventListener("DOMContentLoaded", function() {
   const navbar = document.getElementById("navbar");
 
   if (hamburger && navLinks) {
-    hamburger.addEventListener("click", function(e) {
+    hamburger.addEventListener("click", function (e) {
       e.preventDefault();
       e.stopPropagation();
       hamburger.classList.toggle("active");
       navLinks.classList.toggle("active");
     });
-    
-    navLinks.querySelectorAll("a").forEach(function(link) {
-      link.addEventListener("click", function() {
+
+    navLinks.querySelectorAll("a").forEach(function (link) {
+      link.addEventListener("click", function () {
         hamburger.classList.remove("active");
         navLinks.classList.remove("active");
       });
     });
 
-    document.addEventListener("click", function(e) {
+    document.addEventListener("click", function (e) {
       if (!hamburger.contains(e.target) && !navLinks.contains(e.target)) {
         hamburger.classList.remove("active");
         navLinks.classList.remove("active");
@@ -47,13 +47,13 @@ document.addEventListener("DOMContentLoaded", function() {
   }
 
   // ========== SCROLL EFFECTS ==========
-  window.addEventListener("scroll", function() {
+  window.addEventListener("scroll", function () {
     const currentScroll = window.pageYOffset;
-    
+
     if (navbar) {
       navbar.classList.toggle("scrolled", currentScroll > 50);
     }
-    
+
     const backToTop = document.getElementById("back-to-top");
     if (backToTop) {
       backToTop.classList.toggle("visible", currentScroll > 500);
@@ -88,7 +88,7 @@ document.addEventListener("DOMContentLoaded", function() {
       if (toastMessage) toastMessage.textContent = message;
       toast.style.background = isError ? '#DC2626' : '#2F855A';
       toast.classList.add('show');
-      setTimeout(function() {
+      setTimeout(function () {
         toast.classList.remove('show');
       }, 3000);
     }
@@ -101,7 +101,7 @@ document.addEventListener("DOMContentLoaded", function() {
     if (cartItems) cartItems.innerHTML = "";
     if (cartEmptyMsg) cartEmptyMsg.style.display = cart.length === 0 ? "block" : "none";
 
-    cart.forEach(function(item) {
+    cart.forEach(function (item) {
       const li = document.createElement('li');
       li.classList.add("cart-item");
       li.innerHTML = '<span>' + item.quantityText + '</span><button class="remove-btn" data-id="' + item.id + '">×</button>';
@@ -129,7 +129,7 @@ document.addEventListener("DOMContentLoaded", function() {
     hideOrderForm();
   }
 
-    // ========== PRODUCT TABS LOGIC ==========
+  // ========== PRODUCT TABS LOGIC ==========
   const productData = {
     senorita: {
       title: "Señorita Bread",
@@ -150,7 +150,7 @@ document.addEventListener("DOMContentLoaded", function() {
     pandesal: {
       title: "Pandesal Bread",
       desc: "Classic Filipino bread rolls, baked fresh daily. Soft, fluffy, and perfect for breakfast or snacks.",
-      image: "images/pandesal-image.jpg", /* Apni Pandesal image ka path yahan daal do */
+      image: "images/download (1).jpg",
       notice: "Fresh Pandesal batches are baked every morning.",
       options: `
         <option value="15">20 pieces - $15.00</option>
@@ -160,10 +160,10 @@ document.addEventListener("DOMContentLoaded", function() {
     }
   };
 
-  document.querySelectorAll('.product-tab').forEach(function(tab) {
-    tab.addEventListener('click', function() {
+  document.querySelectorAll('.product-tab').forEach(function (tab) {
+    tab.addEventListener('click', function () {
       // Tab active class toggle
-      document.querySelectorAll('.product-tab').forEach(function(t) { t.classList.remove('active'); });
+      document.querySelectorAll('.product-tab').forEach(function (t) { t.classList.remove('active'); });
       this.classList.add('active');
 
       // Get Data
@@ -182,7 +182,7 @@ document.addEventListener("DOMContentLoaded", function() {
       if (descEl) descEl.textContent = data.desc;
       if (imgEl) imgEl.src = data.image;
       if (noticeEl) noticeEl.textContent = data.notice;
-      
+
       // Update Dropdown and Price
       if (selectEl) {
         selectEl.innerHTML = data.options;
@@ -195,15 +195,15 @@ document.addEventListener("DOMContentLoaded", function() {
     });
   });
 
-    // ========== ADD TO CART ==========
+  // ========== ADD TO CART ==========
   if (addToCartBtn && quantitySelect) {
-    addToCartBtn.addEventListener('click', function() {
+    addToCartBtn.addEventListener('click', function () {
       const quantityText = quantitySelect.options[quantitySelect.selectedIndex].text;
       const price = parseFloat(quantitySelect.value);
-      
+
       // Yahan hum pata laga rahe hain ki konsa bread select hua hai
       const productName = addToCartBtn.getAttribute('data-product-name') || 'Señorita Bread';
-      
+
       // Cart me ab Bread ka Naam aur Quantity dono dikhenge
       const finalItemText = productName + ' (' + quantityText + ')';
 
@@ -215,10 +215,10 @@ document.addEventListener("DOMContentLoaded", function() {
       const btnText = addToCartBtn.querySelector('.btn-text');
       const originalText = btnText ? btnText.textContent : 'Add to Order';
       if (btnText) btnText.textContent = 'Added!';
-      
+
       showToast('Added to cart!');
-      
-      setTimeout(function() {
+
+      setTimeout(function () {
         addToCartBtn.classList.remove('added');
         if (btnText) btnText.textContent = originalText;
       }, 1500);
@@ -229,15 +229,15 @@ document.addEventListener("DOMContentLoaded", function() {
 
   // ========== REMOVE FROM CART ==========
   if (cartItems) {
-    cartItems.addEventListener("click", function(e) {
+    cartItems.addEventListener("click", function (e) {
       if (e.target.classList.contains("remove-btn")) {
         const id = Number(e.target.dataset.id);
-        const item = cart.find(function(i) { return i.id === id; });
+        const item = cart.find(function (i) { return i.id === id; });
         if (item) {
           e.target.parentElement.classList.add('removing');
-          setTimeout(function() {
+          setTimeout(function () {
             total -= item.price;
-            cart = cart.filter(function(i) { return i.id !== id; });
+            cart = cart.filter(function (i) { return i.id !== id; });
             updateCartDisplay();
           }, 300);
         }
@@ -247,14 +247,14 @@ document.addEventListener("DOMContentLoaded", function() {
 
   // ========== PRICE UPDATE ==========
   if (quantitySelect && selectedPriceDisplay) {
-    quantitySelect.addEventListener('change', function() {
+    quantitySelect.addEventListener('change', function () {
       selectedPriceDisplay.textContent = parseFloat(quantitySelect.value).toFixed(2);
     });
   }
 
   // ========== CART TOGGLE ==========
   if (cartToggle) {
-    cartToggle.addEventListener("click", function() {
+    cartToggle.addEventListener("click", function () {
       if (miniCart && miniCart.classList.contains("show")) {
         closeCart();
       } else {
@@ -265,56 +265,56 @@ document.addEventListener("DOMContentLoaded", function() {
   if (cartClose) cartClose.addEventListener("click", closeCart);
   if (cartOverlay) cartOverlay.addEventListener("click", closeCart);
 
-    // ========== ORDER FORM (Pickup Time + Phone Confirmation) ==========
+  // ========== ORDER FORM (Pickup Time + Phone Confirmation) ==========
   let orderFormCreated = false;
-  
+
   function createOrderForm() {
     if (orderFormCreated) return;
-    
+
     const cartFooter = document.querySelector('.cart-footer');
     if (!cartFooter) return;
-    
+
     const orderForm = document.createElement('div');
     orderForm.id = 'order-form';
     orderForm.className = 'order-form';
-    orderForm.innerHTML = 
+    orderForm.innerHTML =
       '<div class="order-form-header">' +
-        '<button type="button" class="back-btn" id="back-to-cart">← Back</button>' +
-        '<h4>Your Information</h4>' +
+      '<button type="button" class="back-btn" id="back-to-cart">← Back</button>' +
+      '<h4>Your Information</h4>' +
       '</div>' +
       '<form id="checkout-form">' +
-        '<div class="form-group">' +
-          '<label for="order-customer-name">Name *</label>' +
-          '<input type="text" id="order-customer-name" required placeholder="Your full name">' +
-        '</div>' +
-        '<div class="form-group">' +
-          '<label for="order-customer-phone">Phone *</label>' +
-          '<input type="tel" id="order-customer-phone" required placeholder="(209) 555-1234">' +
-        '</div>' +
-        '<div class="form-group">' +
-          '<label for="order-customer-email">Email (optional)</label>' +
-          '<input type="email" id="order-customer-email" placeholder="your@email.com">' +
-        '</div>' +
-        '<div class="form-group">' +
-          '<label for="order-pickup-time">Preferred Pickup Time *</label>' +
-          '<input type="text" id="order-pickup-time" required placeholder="e.g. 8:30 AM, 11:00 AM, ASAP">' +
-        '</div>' +
-        '<div class="form-group">' +
-          '<label for="order-notes">Special Notes</label>' +
-          '<textarea id="order-notes" rows="2" placeholder="Special requests..."></textarea>' +
-        '</div>' +
-        '<div class="pickup-notice-box">' +
-          '<strong>Please note:</strong> All orders will be confirmed by phone call.' +
-        '</div>' +
-        '<button type="submit" class="submit-order-btn">' +
-          'Place Order - $<span id="form-total">0.00</span>' +
-        '</button>' +
+      '<div class="form-group">' +
+      '<label for="order-customer-name">Name *</label>' +
+      '<input type="text" id="order-customer-name" required placeholder="Your full name">' +
+      '</div>' +
+      '<div class="form-group">' +
+      '<label for="order-customer-phone">Phone *</label>' +
+      '<input type="tel" id="order-customer-phone" required placeholder="(209) 555-1234">' +
+      '</div>' +
+      '<div class="form-group">' +
+      '<label for="order-customer-email">Email (optional)</label>' +
+      '<input type="email" id="order-customer-email" placeholder="your@email.com">' +
+      '</div>' +
+      '<div class="form-group">' +
+      '<label for="order-pickup-time">Preferred Pickup Time *</label>' +
+      '<input type="text" id="order-pickup-time" required placeholder="e.g. 8:30 AM, 11:00 AM, ASAP">' +
+      '</div>' +
+      '<div class="form-group">' +
+      '<label for="order-notes">Special Notes</label>' +
+      '<textarea id="order-notes" rows="2" placeholder="Special requests..."></textarea>' +
+      '</div>' +
+      '<div class="pickup-notice-box">' +
+      '<strong>Please note:</strong> All orders will be confirmed by phone call.' +
+      '</div>' +
+      '<button type="submit" class="submit-order-btn">' +
+      'Place Order - $<span id="form-total">0.00</span>' +
+      '</button>' +
       '</form>';
-    
+
     cartFooter.parentNode.insertBefore(orderForm, cartFooter.nextSibling);
-    
+
     // Styles
-        // Styles (Fixed Scrolling & Bottom Button Cutoff)
+    // Styles (Fixed Scrolling & Bottom Button Cutoff)
     const style = document.createElement('style');
     style.textContent = `
       #mini-cart {
@@ -353,19 +353,19 @@ document.addEventListener("DOMContentLoaded", function() {
       .order-success p { color: #555; margin-bottom: 6px; font-size: 14px; line-height: 1.4; }
       .order-success .call-warning { background: #EBF8FF; border: 1px solid #BEE3F8; color: #2B6CB0; padding: 10px; border-radius: 8px; font-size: 12px; margin: 14px 0; }
     `;
-      document.head.appendChild(style);
-    
+    document.head.appendChild(style);
+
     document.getElementById('back-to-cart').addEventListener('click', hideOrderForm);
     document.getElementById('checkout-form').addEventListener('submit', submitOrder);
-    
+
     orderFormCreated = true;
   }
-  
+
   function showOrderForm() {
     createOrderForm();
     const orderForm = document.getElementById('order-form');
     const cartFooter = document.querySelector('.cart-footer');
-    
+
     if (orderForm && cartFooter) {
       cartFooter.classList.add('hidden');
       orderForm.classList.add('show');
@@ -382,82 +382,82 @@ document.addEventListener("DOMContentLoaded", function() {
     if (orderForm) orderForm.classList.remove('show');
     if (cartFooter) cartFooter.classList.remove('hidden');
   }
-  
+
   async function submitOrder(e) {
     e.preventDefault();
-    
+
     const submitBtn = document.querySelector('.submit-order-btn');
     submitBtn.disabled = true;
     submitBtn.innerHTML = 'Processing...';
-    
+
     const pickupTime = document.getElementById('order-pickup-time').value.trim() || 'ASAP';
-    
+
     const orderData = {
       customerName: document.getElementById('order-customer-name').value,
       customerPhone: document.getElementById('order-customer-phone').value,
       customerEmail: document.getElementById('order-customer-email').value || '',
       pickupTime: pickupTime,
-      items: cart.map(function(item) { return item.quantityText; }).join(', '),
+      items: cart.map(function (item) { return item.quantityText; }).join(', '),
       total: total,
       notes: document.getElementById('order-notes').value || ''
     };
-    
+
     console.log('Sending order:', orderData);
-    
+
     fetch(API_URL + '/api/orders', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(orderData)
     })
-    .then(function(response) {
-      console.log('Response received:', response.status);
-      return response.json();
-    })
-    .then(function(result) {
-      console.log('Result:', result);
-      showOrderSuccess(orderData.customerName, result.orderId || Date.now(), pickupTime);
-      cart = [];
-      total = 0;
-      updateCartDisplay();
-    })
-    .catch(function(error) {
-      console.error('Order error:', error);
-      showOrderSuccess(orderData.customerName, Date.now(), pickupTime);
-      cart = [];
-      total = 0;
-      updateCartDisplay();
-    });
+      .then(function (response) {
+        console.log('Response received:', response.status);
+        return response.json();
+      })
+      .then(function (result) {
+        console.log('Result:', result);
+        showOrderSuccess(orderData.customerName, result.orderId || Date.now(), pickupTime);
+        cart = [];
+        total = 0;
+        updateCartDisplay();
+      })
+      .catch(function (error) {
+        console.error('Order error:', error);
+        showOrderSuccess(orderData.customerName, Date.now(), pickupTime);
+        cart = [];
+        total = 0;
+        updateCartDisplay();
+      });
   }
-  
+
   function showOrderSuccess(name, orderId, pickupTime) {
     const orderForm = document.getElementById('order-form');
     if (orderForm) {
-      orderForm.innerHTML = 
+      orderForm.innerHTML =
         '<div class="order-success">' +
-          '<div class="success-icon">✓</div>' +
-          '<h3>Thank You, ' + name + '!</h3>' +
-          '<p>Your order #' + orderId + ' has been received.</p>' +
-          '<p><strong>Requested Pickup Time:</strong> ' + pickupTime + '</p>' +
-          '<div class="call-warning">' +
-            '<strong>Please note:</strong> All orders will be confirmed by phone call.' +
-          '</div>' +
-          '<button onclick="location.reload()" class="submit-order-btn" style="margin-top: 15px;">' +
-            'Continue Shopping' +
-          '</button>' +
+        '<div class="success-icon">✓</div>' +
+        '<h3>Thank You, ' + name + '!</h3>' +
+        '<p>Your order #' + orderId + ' has been received.</p>' +
+        '<p><strong>Requested Pickup Time:</strong> ' + pickupTime + '</p>' +
+        '<div class="call-warning">' +
+        '<strong>Please note:</strong> All orders will be confirmed by phone call.' +
+        '</div>' +
+        '<button onclick="location.reload()" class="submit-order-btn" style="margin-top: 15px;">' +
+        'Continue Shopping' +
+        '</button>' +
         '</div>';
     }
   }
-  
+
   if (checkoutBtn) {
-    checkoutBtn.addEventListener("click", function() {
+    checkoutBtn.addEventListener("click", function () {
       if (cart.length > 0) showOrderForm();
     });
   }
   updateCartDisplay();
 
   // ========== SMOOTH SCROLLING ==========
-  document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {
-    anchor.addEventListener('click', function(e) {
+  document.querySelectorAll('a[href^="#"]').forEach(function (anchor) {
+    anchor.addEventListener('click', function (e) {
       e.preventDefault();
       const target = document.querySelector(this.getAttribute('href'));
       if (target) {
@@ -471,8 +471,8 @@ document.addEventListener("DOMContentLoaded", function() {
   });
 
   // ========== FADE IN ANIMATIONS ==========
-  const fadeObserver = new IntersectionObserver(function(entries) {
-    entries.forEach(function(entry) {
+  const fadeObserver = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
       if (entry.isIntersecting) {
         entry.target.classList.add('visible');
         fadeObserver.unobserve(entry.target);
@@ -480,15 +480,15 @@ document.addEventListener("DOMContentLoaded", function() {
     });
   }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
 
-  document.querySelectorAll('.fade-in').forEach(function(el) {
+  document.querySelectorAll('.fade-in').forEach(function (el) {
     fadeObserver.observe(el);
   });
 
   // ========== FAQ ACCORDION ==========
-  document.querySelectorAll('.faq-item').forEach(function(detail) {
-    detail.addEventListener('toggle', function() {
+  document.querySelectorAll('.faq-item').forEach(function (detail) {
+    detail.addEventListener('toggle', function () {
       if (this.open) {
-        document.querySelectorAll('.faq-item').forEach(function(other) {
+        document.querySelectorAll('.faq-item').forEach(function (other) {
           if (other !== detail && other.open) other.open = false;
         });
       }
@@ -496,14 +496,14 @@ document.addEventListener("DOMContentLoaded", function() {
   });
 
   // ========== GALLERY ==========
-  document.querySelectorAll('.gallery-item').forEach(function(item) {
-    item.addEventListener('click', function() {
+  document.querySelectorAll('.gallery-item').forEach(function (item) {
+    item.addEventListener('click', function () {
       this.classList.toggle('expanded');
     });
   });
 
   // ========== KEYBOARD ==========
-  document.addEventListener('keydown', function(e) {
+  document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape') {
       closeCart();
       if (hamburger) hamburger.classList.remove("active");
@@ -516,7 +516,7 @@ document.addEventListener("DOMContentLoaded", function() {
     try {
       const response = await fetch(API_URL + '/api/content/special_enabled');
       const data = await response.json();
-      
+
       const specialBadge = document.querySelector('.special-badge');
       if (specialBadge) {
         if (data.value === 'false' || data.value === false) {
@@ -529,10 +529,10 @@ document.addEventListener("DOMContentLoaded", function() {
       console.log('Could not load special offer setting, showing by default');
     }
   }
-  
+
   loadSpecialOfferVisibility();
 
-  
+
   // ========== LOAD DYNAMIC IMAGES FROM DATABASE ==========
   function optimizeImageUrl(url) {
     if (!url) return url;
@@ -542,7 +542,7 @@ document.addEventListener("DOMContentLoaded", function() {
     return url;
   }
 
-    // ========== LOAD DYNAMIC IMAGES FROM DATABASE ==========
+  // ========== LOAD DYNAMIC IMAGES FROM DATABASE ==========
   async function loadDynamicImages() {
     const imageMap = {
       'hero': '.hero-image-wrapper img',
@@ -564,15 +564,22 @@ document.addEventListener("DOMContentLoaded", function() {
     };
 
     for (const key in imageMap) {
+      // ========== PANDESAL DYNAMIC IMAGE ==========
       try {
-        const response = await fetch(API_URL + '/api/images/' + key);
+        const response = await fetch(API_URL + '/api/images/product-pandesal');
         if (response.ok) {
           const data = await response.json();
-          if (data.url) {
-            const elements = document.querySelectorAll(imageMap[key]);
-            elements.forEach(function(el) {
-              el.src = optimizeImageUrl(data.url); // Auto-optimized URL
-            });
+          if (data.url && typeof productData !== 'undefined') {
+            // Admin se uploaded Cloudinary URL set karo
+            const finalUrl = optimizeImageUrl(data.url);
+            productData.pandesal.image = finalUrl;
+
+            // Agar abhi Pandesal Tab active hai to live src badal do
+            const activeTab = document.querySelector('.product-tab.active');
+            if (activeTab && activeTab.getAttribute('data-target') === 'pandesal') {
+              const imgEl = document.getElementById('dynamic-product-image');
+              if (imgEl) imgEl.src = finalUrl;
+            }
           }
         }
       } catch (error) {
@@ -594,7 +601,7 @@ document.addEventListener("DOMContentLoaded", function() {
       // Continue silently
     }
   }
-    // ========== GALLERY CAROUSEL LOGIC ==========
+  // ========== GALLERY CAROUSEL LOGIC ==========
   const track = document.getElementById('gallery-track');
   const prevBtn = document.getElementById('gallery-prev');
   const nextBtn = document.getElementById('gallery-next');
@@ -608,10 +615,10 @@ document.addEventListener("DOMContentLoaded", function() {
       if (window.innerWidth <= 992) itemsVisible = 3;
       if (window.innerWidth <= 768) itemsVisible = 2;
       if (window.innerWidth <= 480) itemsVisible = 1;
-      
+
       const totalItems = track.children.length;
       const maxIndex = Math.max(0, totalItems - itemsVisible);
-      
+
       if (currentIndex > maxIndex) currentIndex = maxIndex;
 
       // Calculate width to slide
@@ -621,21 +628,21 @@ document.addEventListener("DOMContentLoaded", function() {
         const moveAmount = itemWidth + gap;
         track.style.transform = 'translateX(-' + (currentIndex * moveAmount) + 'px)';
       }
-      
+
       // Arrow states
       prevBtn.disabled = currentIndex === 0;
       nextBtn.disabled = currentIndex >= maxIndex;
-      
+
       prevBtn.style.opacity = currentIndex === 0 ? "0.5" : "1";
       nextBtn.style.opacity = currentIndex >= maxIndex ? "0.5" : "1";
     }
 
-    nextBtn.addEventListener('click', function() {
+    nextBtn.addEventListener('click', function () {
       let itemsVisible = 4;
       if (window.innerWidth <= 992) itemsVisible = 3;
       if (window.innerWidth <= 768) itemsVisible = 2;
       if (window.innerWidth <= 480) itemsVisible = 1;
-      
+
       const maxIndex = Math.max(0, track.children.length - itemsVisible);
       if (currentIndex < maxIndex) {
         currentIndex++;
@@ -643,7 +650,7 @@ document.addEventListener("DOMContentLoaded", function() {
       }
     });
 
-    prevBtn.addEventListener('click', function() {
+    prevBtn.addEventListener('click', function () {
       if (currentIndex > 0) {
         currentIndex--;
         updateSlider();
@@ -654,14 +661,14 @@ document.addEventListener("DOMContentLoaded", function() {
     setTimeout(updateSlider, 500); // Init after load
   }
 
-    // ========== LOAD DYNAMIC TEXT CONTENT FROM DATABASE ==========
+  // ========== LOAD DYNAMIC TEXT CONTENT FROM DATABASE ==========
   async function loadDynamicContent() {
     try {
       const response = await fetch(API_URL + '/api/content');
       if (!response.ok) return;
-      
+
       const data = await response.json();
-      
+
       // Handle both formats: { content: {...} } or direct object
       const content = data.content || data;
       if (!content || typeof content !== 'object') return;
@@ -676,12 +683,12 @@ document.addEventListener("DOMContentLoaded", function() {
           heroH1.innerHTML = content.hero_title + '<br><span class="highlight">Bread</span>';
         }
       }
-      
+
       if (content.hero_subtitle) {
         const el = document.querySelector('.hero-subtitle');
         if (el) el.textContent = content.hero_subtitle;
       }
-      
+
       if (content.hero_description) {
         const el = document.querySelector('.hero-description');
         if (el) el.textContent = content.hero_description;
@@ -692,12 +699,12 @@ document.addEventListener("DOMContentLoaded", function() {
         const el = document.querySelector('.special-label');
         if (el) el.textContent = content.special_label;
       }
-      
+
       if (content.special_discount) {
         const el = document.querySelector('.special-discount');
         if (el) el.textContent = content.special_discount;
       }
-      
+
       if (content.special_text) {
         const el = document.querySelector('.special-today');
         if (el) el.textContent = content.special_text;
@@ -708,7 +715,7 @@ document.addEventListener("DOMContentLoaded", function() {
         const el = document.querySelector('.product-header h3');
         if (el) el.textContent = content.product_name;
       }
-      
+
       if (content.product_description) {
         const el = document.querySelector('.product-desc');
         if (el) el.textContent = content.product_description;
@@ -722,7 +729,7 @@ document.addEventListener("DOMContentLoaded", function() {
           phoneLink.href = 'tel:' + content.phone.replace(/[^0-9+]/g, '');
         }
       }
-      
+
       if (content.email) {
         const emailLink = document.querySelector('.contact-card a[href^="mailto:"]');
         if (emailLink) {
@@ -730,7 +737,7 @@ document.addEventListener("DOMContentLoaded", function() {
           emailLink.href = 'mailto:' + content.email;
         }
       }
-      
+
       if (content.location) {
         // Location is in the 3rd contact-card
         const contactCards = document.querySelectorAll('.contact-card');
@@ -739,7 +746,7 @@ document.addEventListener("DOMContentLoaded", function() {
           if (p) p.innerHTML = content.location;
         }
       }
-      
+
       if (content.business_hours) {
         const contactCards = document.querySelectorAll('.contact-card');
         if (contactCards[3]) {
@@ -749,12 +756,12 @@ document.addEventListener("DOMContentLoaded", function() {
       }
 
       console.log(' Dynamic content loaded successfully');
-      
+
     } catch (error) {
       console.log('Could not load dynamic content:', error);
     }
   }
-  
+
 
   // Load everything
   loadDynamicImages();
