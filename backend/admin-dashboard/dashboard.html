@@ -677,314 +677,161 @@
       </form>
     </section>
 
-    <!-- Blogs Section -->
     <section class="content-section" id="section-blogs">
-      <div class="section-header">
-        <div class="section-header-top"
-          style="display:flex; justify-content:space-between; align-items:center; width:100%;">
-          <div>
-            <h1>Blog Manager</h1>
-            <p>Write and manage your bakery's blog posts</p>
-          </div>
-          <button class="save-btn" id="btn-create-new-blog" style="background:var(--blue);">+ New Blog Post</button>
-        </div>
+  <div class="section-header" style="margin-bottom: 24px;">
+    <div class="section-header-top" style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+      <div>
+        <h1>Blog Manager</h1>
+        <p>Write and manage your bakery's blog posts</p>
       </div>
+      <button class="save-btn" id="btn-create-new-blog" style="background:var(--blue); display:flex; align-items:center; gap:8px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        New Blog Post
+      </button>
+    </div>
+  </div>
 
-      <!-- Blog List View -->
-      <div id="blog-list-view">
-        <div id="admin-blog-list" class="orders-list full-list">
-          <p class="empty-state">Loading blogs...</p>
-        </div>
-      </div>
+  <!-- Blog List View -->
+  <div id="blog-list-view" style="width: 100%;">
+    <div id="admin-blog-list" class="orders-list full-list">
+      <p class="empty-state">Loading blogs...</p>
+    </div>
+  </div>
 
-      <!-- Blog Editor View (Premium UI) -->
-      <div id="blog-editor-view" style="display: none; max-width: 100%;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-          <button class="back-btn" id="btn-back-to-blogs"
-            style="background:none; border:none; color:var(--gray-600); cursor:pointer; font-size:15px; font-weight:600;">
-            ← Back to Blogs
-          </button>
-          <button type="submit" form="blog-form" class="save-btn" id="btn-save-blog"
-            style="background:#111; padding: 10px 24px; font-size: 16px;">
-            Save Blog Post
-          </button>
-        </div>
+  <!-- Blog Editor View (Full Width Professional UI) -->
+  <div id="blog-editor-view" style="display: none; width: 100%;">
+    
+    <!-- Top Action Bar -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; width: 100%; border-bottom: 1px solid #e2e8f0; padding-bottom: 16px;">
+      <button class="back-btn" id="btn-back-to-blogs" style="background:none; border:none; color:#64748b; cursor:pointer; font-size:15px; font-weight:600; display:flex; align-items:center; gap:8px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Back to Blogs
+      </button>
+      <button type="submit" form="blog-form" class="save-btn" id="btn-save-blog" style="background:#0f172a; padding: 10px 24px; font-size: 15px; display:flex; align-items:center; gap:8px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+          <polyline points="17 21 17 13 7 13 7 21"></polyline>
+          <polyline points="7 3 7 8 15 8"></polyline>
+        </svg>
+        Save Blog Post
+      </button>
+    </div>
 
-        <form id="blog-form" class="edit-form">
-          <input type="hidden" id="blog_id" name="blog_id">
+    <form id="blog-form" class="edit-form">
+      <input type="hidden" id="blog_id" name="blog_id">
 
-          <!-- Modern 2-Column Grid -->
-          <div style="display: grid; grid-template-columns: 2.5fr 1fr; gap: 24px; align-items: start;">
+      <!-- Layout Container -->
+      <div class="blog-editor-container" style="display: flex; gap: 24px; align-items: flex-start; width: 100%;">
 
-            <!-- LEFT COLUMN (Main Content) -->
-            <div style="display: flex; flex-direction: column; gap: 24px;">
+        <!-- LEFT MAIN COLUMN -->
+        <div class="blog-main-content" style="flex: 1; min-width: 0;">
 
-              <div class="form-card" style="margin:0; padding:30px;">
-                <input type="text" id="blog_title" required placeholder="Enter Blog Title Here..."
-                  style="font-size: 28px; font-weight: 700; border: none; border-bottom: 2px solid #eee; border-radius: 0; padding: 10px 0; margin-bottom: 15px; background: transparent; box-shadow:none;">
+          <!-- TOP WHITE BOX (Title, Slug, Quick Answer, Excerpt) -->
+          <div class="form-card" style="margin:0 0 24px 0; padding:28px; width:100%; box-sizing:border-box; border:1px solid #e2e8f0; border-radius:10px; background:#fff;">
+            
+            <input type="text" id="blog_title" required placeholder="Enter Blog Title Here..."
+              style="width: 100%; font-size: 28px; font-weight: 700; color:#0f172a; border: none; border-bottom: 2px solid #f1f5f9; border-radius: 0; padding: 0 0 12px 0; margin-bottom: 16px; background: transparent; box-shadow:none; outline:none; box-sizing:border-box;">
 
-                <div
-                  style="display:flex; align-items:center; gap:10px; color:#666; font-size:14px; margin-bottom: 30px;">
-                  <span>Slug: /</span>
-                  <input type="text" id="blog_slug" placeholder="auto-generated-slug"
-                    style="flex:1; border:none; background:#f9f9f9; padding:6px 12px; border-radius:4px; font-size:14px;">
-                </div>
-
-                <textarea id="blog_quick_answer" rows="3"
-                  placeholder="Write a short summary that directly answers the user's query..."
-                  style="border: 1px solid #ddd; background:#fafafa; border-radius:8px; padding:15px; font-size:15px;"></textarea>
-              </div>
-
-
-              <!-- NEW EXCERPT FIELD YAHAN ADD HUA HAI -->
-              <label style="font-weight:600; color:#1e293b; margin-bottom:8px; display:block; font-size: 14px;">Blog
-                Excerpt / Hero Summary</label>
-              <textarea id="blog_excerpt" rows="3"
-                placeholder="This summary appears in the Red Hero Banner and the Blog List page..."
-                style="width: 100%; border: 1px solid #cbd5e1; background:#f8fafc; border-radius:8px; padding:12px; font-size:14px; color:#334155; box-sizing: border-box; resize: vertical; outline:none; margin-bottom: 24px;"></textarea>
-              <!-- END EXCERPT -->
-
-              <label style="font-weight:600; color:#1e293b; margin-bottom:8px; display:block; font-size: 14px;">Quick
-                Answer (Top Highlighted Box)</label>
-
-              <div class="form-card"
-                style="margin:0; padding:0; overflow:hidden; border:none; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
-                <!-- TinyMCE will render here -->
-                <textarea id="blog_content" rows="20"></textarea>
-              </div>
+            <div style="display:flex; align-items:center; gap:8px; color:#64748b; font-size:14px; margin-bottom: 28px; width: 100%;">
+              <span style="font-weight: 500; white-space:nowrap;">Slug: /</span>
+              <input type="text" id="blog_slug" placeholder="auto-generated-slug"
+                style="flex:1; width: 100%; border:1px solid #cbd5e1; background:#f8fafc; padding:8px 12px; border-radius:6px; font-size:14px; color:#334155; outline:none; box-sizing:border-box;">
             </div>
 
-            <!-- RIGHT COLUMN (Settings & Media) -->
-            <div style="display: flex; flex-direction: column; gap: 20px;">
+            <!-- 1. QUICK ANSWER FIELD -->
+            <label style="font-weight:600; color:#1e293b; margin-bottom:8px; display:block; font-size: 14px;">Quick Answer (Top Highlighted Box)</label>
+            <textarea id="blog_quick_answer" rows="3"
+              placeholder="Write a short summary that directly answers the user's query..."
+              style="width: 100%; border: 1px solid #cbd5e1; background:#f8fafc; border-radius:8px; padding:12px; font-size:14px; color:#334155; box-sizing: border-box; resize: vertical; outline:none; margin-bottom: 24px;"></textarea>
 
-              <div class="form-card" style="margin:0;">
-                <h3 style="font-size:16px; margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">
-                  Publish Settings</h3>
-                <select id="blog_status"
-                  style="width:100%; padding:12px; border-radius:8px; border:1px solid #ddd; background:#f5f5f5; font-weight:600;">
-                  <option value="published">Published</option>
-                  <option value="draft">Draft</option>
-                </select>
-              </div>
-
-              <div class="form-card" style="margin:0;">
-                <h3 style="font-size:16px; margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">
-                  Featured Image</h3>
-
-                <!-- Image Paste/Drop Zone -->
-                <div id="featured-image-dropzone"
-                  style="border:2px dashed #ccc; border-radius:8px; padding:20px; text-align:center; cursor:pointer; background:#fafafa; transition:0.3s; position:relative; min-height:120px; display:flex; align-items:center; justify-content:center; flex-direction:column;">
-                  <span style="color:#888; font-size:14px; pointer-events:none;">
-                    📸 Click to Upload or<br><b>Ctrl+V to Paste Image</b>
-                  </span>
-                </div>
-                <input type="file" id="featured_image_file" accept="image/*" style="display:none;">
-                <input type="hidden" id="blog_image_url">
-              </div>
-
-              <div class="form-card" style="margin:0;">
-                <h3 style="font-size:16px; margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">Call
-                  to Action (CTA)</h3>
-                <textarea id="blog_cta" rows="3"
-                  placeholder="e.g. Ready to buy a home? Contact us today for a free consultation!"
-                  style="border: 1px solid #ddd; border-radius:8px; padding:12px; font-size:14px;"></textarea>
-              </div>
-
-              <div class="form-card" style="margin:0;">
-                <h3 style="font-size:16px; margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">
-                  Sources & References</h3>
-                <textarea id="blog_sources" rows="3"
-                  placeholder="[1] Internal Revenue Service...&#10;[2] HUD Guidelines..."
-                  style="border: 1px solid #ddd; border-radius:8px; padding:12px; font-size:14px;"></textarea>
-              </div>
-
-            </div>
+            <!-- 2. EXCERPT FIELD -->
+            <label style="font-weight:600; color:#1e293b; margin-bottom:8px; display:block; font-size: 14px;">Blog Excerpt / Hero Summary</label>
+            <textarea id="blog_excerpt" rows="2"
+              placeholder="This text will appear in the red banner and on the blog list page..."
+              style="width: 100%; border: 1px solid #cbd5e1; background:#f8fafc; border-radius:8px; padding:12px; font-size:14px; color:#334155; box-sizing: border-box; resize: vertical; outline:none;"></textarea>
           </div>
-        </form>
-      </div>
 
-    </section>
-
-    <section class="content-section" id="section-blogs">
-      <div class="section-header" style="margin-bottom: 24px;">
-        <div class="section-header-top"
-          style="display:flex; justify-content:space-between; align-items:center; width:100%;">
-          <div>
-            <h1>Blog Manager</h1>
-            <p>Write and manage your bakery's blog posts</p>
+          <!-- TINYMCE EDITOR -->
+          <div class="form-card" style="margin:0; padding:0; overflow:hidden; border:none; width: 100%; min-width: 0;">
+             <label style="font-weight:600; color:#1e293b; margin-bottom:8px; display:block; font-size: 14px;">Main Blog Content</label>
+             <textarea id="blog_content" style="width: 100%;"></textarea>
           </div>
-          <button class="save-btn" id="btn-create-new-blog"
-            style="background:var(--blue); display:flex; align-items:center; gap:8px;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="12" y1="5" x2="12" y2="19"></line>
-              <line x1="5" y1="12" x2="19" y2="12"></line>
-            </svg>
-            New Blog Post
-          </button>
-        </div>
-      </div>
-
-      <!-- Blog List View -->
-      <div id="blog-list-view" style="width: 100%;">
-        <div id="admin-blog-list" class="orders-list full-list">
-          <p class="empty-state">Loading blogs...</p>
-        </div>
-      </div>
-
-      <!-- Blog Editor View (Full Width Professional UI) -->
-      <div id="blog-editor-view" style="display: none; width: 100%;">
-        <div
-          style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; width: 100%; border-bottom: 1px solid #e2e8f0; padding-bottom: 16px;">
-          <button class="back-btn" id="btn-back-to-blogs"
-            style="background:none; border:none; color:#64748b; cursor:pointer; font-size:15px; font-weight:600; display:flex; align-items:center; gap:8px;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="19" y1="12" x2="5" y2="12"></line>
-              <polyline points="12 19 5 12 12 5"></polyline>
-            </svg>
-            Back to Blogs
-          </button>
-          <button type="submit" form="blog-form" class="save-btn" id="btn-save-blog"
-            style="background:#0f172a; padding: 10px 24px; font-size: 15px; display:flex; align-items:center; gap:8px;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
-              <polyline points="17 21 17 13 7 13 7 21"></polyline>
-              <polyline points="7 3 7 8 15 8"></polyline>
-            </svg>
-            Save Blog Post
-          </button>
         </div>
 
-        <form id="blog-form" class="edit-form">
-          <input type="hidden" id="blog_id" name="blog_id">
+        <!-- RIGHT SIDEBAR -->
+        <div class="blog-sidebar" style="width: 320px; flex-shrink: 0; display: flex; flex-direction: column; gap: 20px;">
 
-          <div class="blog-editor-container">
-
-            <!-- LEFT MAIN COLUMN -->
-            <div class="blog-main-content">
-
-              <div class="form-card"
-                style="margin:0; padding:28px; width:100%; box-sizing:border-box; border:1px solid #e2e8f0; border-radius:10px; background:#fff;">
-                <input type="text" id="blog_title" required placeholder="Enter Blog Title Here..."
-                  style="width: 100%; font-size: 28px; font-weight: 700; color:#0f172a; border: none; border-bottom: 2px solid #f1f5f9; border-radius: 0; padding: 0 0 12px 0; margin-bottom: 16px; background: transparent; box-shadow:none; outline:none; box-sizing:border-box;">
-
-                <div
-                  style="display:flex; align-items:center; gap:8px; color:#64748b; font-size:14px; margin-bottom: 24px; width: 100%;">
-                  <span style="font-weight: 500; white-space:nowrap;">Slug: /</span>
-                  <input type="text" id="blog_slug" placeholder="auto-generated-slug"
-                    style="flex:1; width: 100%; border:1px solid #cbd5e1; background:#f8fafc; padding:8px 12px; border-radius:6px; font-size:14px; color:#334155; outline:none; box-sizing:border-box;">
-                </div>
-
-                <!-- 1. EXCERPT FIELD -->
-                <label style="font-weight:600; color:#1e293b; margin-bottom:8px; display:block; font-size: 14px;">Blog
-                  Excerpt / Hero Summary</label>
-                <textarea id="blog_excerpt" rows="2"
-                  placeholder="This text will appear in the red banner and on the blog list page..."
-                  style="width: 100%; border: 1px solid #cbd5e1; background:#f8fafc; border-radius:8px; padding:12px; font-size:14px; color:#334155; box-sizing: border-box; resize: vertical; outline:none; margin-bottom: 24px;"></textarea>
-
-                <!-- 2. QUICK ANSWER FIELD -->
-                <label style="font-weight:600; color:#1e293b; margin-bottom:8px; display:block; font-size: 14px;">Quick
-                  Answer (Top Highlighted Box)</label>
-                <textarea id="blog_quick_answer" rows="3"
-                  placeholder="Write a short summary that directly answers the user's query..."
-                  style="width: 100%; border: 1px solid #cbd5e1; background:#f8fafc; border-radius:8px; padding:12px; font-size:14px; color:#334155; box-sizing: border-box; resize: vertical; outline:none;"></textarea>
-              </div>
-
-              <!-- TINYMCE EDITOR -->
-              <div class="form-card"
-                style="margin:0; padding:0; overflow:hidden; border:none; width: 100%; min-width: 0;">
-                <textarea id="blog_content" style="width: 100%;"></textarea>
-              </div>
-            </div>
-
-            <!-- RIGHT SIDEBAR -->
-            <div class="blog-sidebar">
-
-              <!-- Publish Settings -->
-              <div class="form-card"
-                style="margin:0; width: 100%; box-sizing: border-box; border: 1px solid #e2e8f0; border-radius:10px; background:#fff; padding: 20px;">
-                <h3
-                  style="font-size:15px; color:#0f172a; margin-bottom:14px; font-weight: 600; display:flex; align-items:center; gap:8px;">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="12" y1="16" x2="12" y2="12"></line>
-                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                  </svg>
-                  Publish Settings
-                </h3>
-                <select id="blog_status"
-                  style="width:100%; padding:10px 12px; border-radius:6px; border:1px solid #cbd5e1; background:#fff; color:#0f172a; font-weight:500; font-size: 14px; cursor: pointer; outline:none; box-sizing:border-box;">
-                  <option value="published">Published</option>
-                  <option value="draft">Draft</option>
-                </select>
-              </div>
-
-              <!-- Featured Image -->
-              <div class="form-card"
-                style="margin:0; width: 100%; box-sizing: border-box; border: 1px solid #e2e8f0; border-radius:10px; background:#fff; padding: 20px;">
-                <h3
-                  style="font-size:15px; color:#0f172a; margin-bottom:14px; font-weight: 600; display:flex; align-items:center; gap:8px;">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                    <polyline points="21 15 16 10 5 21"></polyline>
-                  </svg>
-                  Featured Image
-                </h3>
-
-                <div id="featured-image-dropzone"
-                  style="width: 100%; border:2px dashed #cbd5e1; border-radius:8px; padding:20px 12px; text-align:center; cursor:pointer; background:#f8fafc; transition:all 0.2s ease; position:relative; min-height:120px; display:flex; align-items:center; justify-content:center; flex-direction:column; box-sizing: border-box;">
-                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5"
-                    style="margin-bottom: 8px;">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                    <polyline points="17 8 12 3 7 8"></polyline>
-                    <line x1="12" y1="3" x2="12" y2="15"></line>
-                  </svg>
-                  <span style="color:#64748b; font-size:13px; line-height:1.4; pointer-events:none;">
-                    Click to Upload Image<br>
-                    <strong style="color:#0f172a; font-weight:600;">or Ctrl+V to Paste</strong>
-                  </span>
-                </div>
-                <input type="file" id="featured_image_file" accept="image/*" style="display:none;">
-                <input type="hidden" id="blog_image_url">
-              </div>
-
-              <!-- Call to Action -->
-              <div class="form-card"
-                style="margin:0; width: 100%; box-sizing: border-box; border: 1px solid #e2e8f0; border-radius:10px; background:#fff; padding: 20px;">
-                <h3
-                  style="font-size:15px; color:#0f172a; margin-bottom:14px; font-weight: 600; display:flex; align-items:center; gap:8px;">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path
-                      d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z">
-                    </path>
-                  </svg>
-                  Call to Action (CTA)
-                </h3>
-                <textarea id="blog_cta" rows="4" placeholder="Heading&#10;Description goes here...&#10;Button Text"
-                  style="width: 100%; border: 1px solid #cbd5e1; border-radius:6px; padding:10px; font-size:13px; box-sizing: border-box; resize: vertical; outline:none; color:#334155;"></textarea>
-              </div>
-
-              <!-- Sources & References -->
-              <div class="form-card"
-                style="margin:0; width: 100%; box-sizing: border-box; border: 1px solid #e2e8f0; border-radius:10px; background:#fff; padding: 20px;">
-                <h3
-                  style="font-size:15px; color:#0f172a; margin-bottom:14px; font-weight: 600; display:flex; align-items:center; gap:8px;">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
-                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
-                  </svg>
-                  Sources & References
-                </h3>
-                <textarea id="blog_sources" rows="3" placeholder="[1] Internal guidelines..."
-                  style="width: 100%; border: 1px solid #cbd5e1; border-radius:6px; padding:10px; font-size:13px; box-sizing: border-box; resize: vertical; outline:none; color:#334155;"></textarea>
-              </div>
-
-            </div>
+          <!-- Publish Settings -->
+          <div class="form-card" style="margin:0; width: 100%; box-sizing: border-box; border: 1px solid #e2e8f0; border-radius:10px; background:#fff; padding: 20px;">
+            <h3 style="font-size:15px; color:#0f172a; margin-bottom:14px; font-weight: 600; display:flex; align-items:center; gap:8px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line>
+              </svg>
+              Publish Settings
+            </h3>
+            <select id="blog_status" style="width:100%; padding:10px 12px; border-radius:6px; border:1px solid #cbd5e1; background:#fff; color:#0f172a; font-weight:500; font-size: 14px; cursor: pointer; outline:none; box-sizing:border-box;">
+              <option value="published">Published</option>
+              <option value="draft">Draft</option>
+            </select>
           </div>
-        </form>
-      </div>
-    </section>
 
+          <!-- Featured Image -->
+          <div class="form-card" style="margin:0; width: 100%; box-sizing: border-box; border: 1px solid #e2e8f0; border-radius:10px; background:#fff; padding: 20px;">
+            <h3 style="font-size:15px; color:#0f172a; margin-bottom:14px; font-weight: 600; display:flex; align-items:center; gap:8px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline>
+              </svg>
+              Featured Image
+            </h3>
+            <div id="featured-image-dropzone" style="width: 100%; border:2px dashed #cbd5e1; border-radius:8px; padding:20px 12px; text-align:center; cursor:pointer; background:#f8fafc; transition:all 0.2s ease; position:relative; min-height:120px; display:flex; align-items:center; justify-content:center; flex-direction:column; box-sizing: border-box;">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" style="margin-bottom: 8px;">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line>
+              </svg>
+              <span style="color:#64748b; font-size:13px; line-height:1.4; pointer-events:none;">
+                Click to Upload Image<br>
+                <strong style="color:#0f172a; font-weight:600;">or Ctrl+V to Paste</strong>
+              </span>
+            </div>
+            <input type="file" id="featured_image_file" accept="image/*" style="display:none;">
+            <input type="hidden" id="blog_image_url">
+          </div>
+
+          <!-- Call to Action -->
+          <div class="form-card" style="margin:0; width: 100%; box-sizing: border-box; border: 1px solid #e2e8f0; border-radius:10px; background:#fff; padding: 20px;">
+            <h3 style="font-size:15px; color:#0f172a; margin-bottom:14px; font-weight: 600; display:flex; align-items:center; gap:8px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+              </svg>
+              Call to Action (CTA)
+            </h3>
+            <textarea id="blog_cta" rows="4" placeholder="Heading&#10;Description goes here...&#10;Button Text"
+              style="width: 100%; border: 1px solid #cbd5e1; border-radius:6px; padding:10px; font-size:13px; box-sizing: border-box; resize: vertical; outline:none; color:#334155; background:#f8fafc;"></textarea>
+          </div>
+
+          <!-- Sources & References -->
+          <div class="form-card" style="margin:0; width: 100%; box-sizing: border-box; border: 1px solid #e2e8f0; border-radius:10px; background:#fff; padding: 20px;">
+            <h3 style="font-size:15px; color:#0f172a; margin-bottom:14px; font-weight: 600; display:flex; align-items:center; gap:8px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+              </svg>
+              Sources & References
+            </h3>
+            <textarea id="blog_sources" rows="3" placeholder="[1] Internal guidelines..."
+              style="width: 100%; border: 1px solid #cbd5e1; border-radius:6px; padding:10px; font-size:13px; box-sizing: border-box; resize: vertical; outline:none; color:#334155; background:#f8fafc;"></textarea>
+          </div>
+
+        </div>
+      </div>
+    </form>
+  </div>
+</section>
 
     <!-- Contact Section -->
     <section class="content-section" id="section-contact">
