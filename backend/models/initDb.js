@@ -187,6 +187,9 @@ async function initializeDatabase() {
           quick_answer TEXT,
           sources TEXT,
           cta TEXT,
+          meta_title TEXT,
+          meta_description TEXT,
+          schema_code TEXT,
           status TEXT DEFAULT 'published',
           created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
           updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -197,6 +200,9 @@ async function initializeDatabase() {
           database.run(`ALTER TABLE blogs ADD COLUMN quick_answer TEXT`, () => {});
           database.run(`ALTER TABLE blogs ADD COLUMN sources TEXT`, () => {});
           database.run(`ALTER TABLE blogs ADD COLUMN cta TEXT`, () => {});
+          database.run(`ALTER TABLE blogs ADD COLUMN meta_title TEXT`, () => {});
+          database.run(`ALTER TABLE blogs ADD COLUMN meta_description TEXT`, () => {});
+          database.run(`ALTER TABLE blogs ADD COLUMN schema_code TEXT`, () => {});
           console.log('Blogs table ready and updated with CTA');
         }
       });

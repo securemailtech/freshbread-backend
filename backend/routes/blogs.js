@@ -74,7 +74,7 @@ router.get('/:slugOrId', (req, res) => {
 // 3. CREATE NEW BLOG POST
 // ==========================================
 router.post('/', authenticateToken, (req, res) => {
-  const { title, slug, excerpt, content, image_url, quick_answer, sources, cta, status } = req.body;
+  const { title, slug, excerpt, content, image_url, quick_answer, sources, cta, status, meta_title, meta_description, schema_code } = req.body;
   const db = getDb();
 
   if (!title || !content) {
@@ -91,7 +91,7 @@ router.post('/', authenticateToken, (req, res) => {
 
   // EXACTLY 9 COLUMNS & EXACTLY 9 PLACEHOLDERS (?)
   const query = `
-    INSERT INTO blogs (title, slug, excerpt, content, image_url, quick_answer, sources, cta, status)
+    INSERT INTO blogs (title, slug, excerpt, content, image_url, quick_answer, sources, cta, status, meta_title, meta_description, schema_code)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
@@ -104,7 +104,8 @@ router.post('/', authenticateToken, (req, res) => {
     quick_answer || '',
     sources || '',
     cta || '',
-    status || 'published'
+    status || 'published',
+    'published', meta_title || '', meta_description || '', schema_code || ''
   ];
 
   db.run(query, params, function (err) {
@@ -142,7 +143,7 @@ router.put('/:id', authenticateToken, (req, res) => {
 
   const query = `
     UPDATE blogs 
-    SET title = ?, slug = ?, excerpt = ?, content = ?, image_url = ?, quick_answer = ?, sources = ?, cta = ?, status = ?, updated_at = CURRENT_TIMESTAMP
+    SET title = ?, slug = ?, excerpt = ?, content = ?, image_url = ?, quick_answer = ?, sources = ?, cta = ?, status = ?, meta_title = ?, meta_description = ?, schema_code = ?, updated_at = CURRENT_TIMESTAMP
     WHERE id = ?
   `;
 
@@ -156,6 +157,9 @@ router.put('/:id', authenticateToken, (req, res) => {
     sources || '',
     cta || '',
     status || 'published',
+    meta_title || '', 
+    meta_description || '', 
+    schema_code || '',
     id
   ];
 

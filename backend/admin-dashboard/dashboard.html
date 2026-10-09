@@ -717,6 +717,10 @@
             </svg>
             Back to Blogs
           </button>
+
+          <button type="button" id="btn-open-seo" style="background:#475569; color:#fff; border:none; padding:10px 20px; border-radius:6px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:8px;">
+            ⚙️ SEO Info
+          </button>
           <button type="submit" form="blog-form" class="save-btn" id="btn-save-blog"
             style="background:#0f172a; padding: 10px 24px; font-size: 15px; display:flex; align-items:center; gap:8px;">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -857,6 +861,26 @@
                   style="width: 100%; border: 1px solid #cbd5e1; border-radius:6px; padding:10px; font-size:13px; box-sizing: border-box; resize: vertical; outline:none; color:#334155; background:#f8fafc;"></textarea>
               </div>
 
+            </div>
+          </div>
+                    <!-- SEO MODAL -->
+          <div id="seo-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
+            <div style="background:#fff; width:600px; max-width:90%; border-radius:12px; padding:30px; box-shadow:0 20px 40px rgba(0,0,0,0.2);">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <h2 style="margin:0; font-size:22px; color:#0f172a;">SEO & Meta Information</h2>
+                <button type="button" id="btn-close-seo" style="background:none; border:none; font-size:24px; cursor:pointer; color:#64748b;">&times;</button>
+              </div>
+
+              <label style="font-weight:600; font-size:14px; margin-bottom:8px; display:block;">Meta Title</label>
+              <input type="text" id="blog_meta_title" placeholder="Best ITIN Lenders in Michigan..." style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:6px; margin-bottom:20px; box-sizing:border-box;">
+
+              <label style="font-weight:600; font-size:14px; margin-bottom:8px; display:block;">Meta Description</label>
+              <textarea id="blog_meta_description" rows="3" placeholder="Brief description for Google search results..." style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:6px; margin-bottom:20px; box-sizing:border-box; resize:vertical;"></textarea>
+
+              <label style="font-weight:600; font-size:14px; margin-bottom:8px; display:block;">Schema JSON-LD Code</label>
+              <textarea id="blog_schema_code" rows="5" placeholder='{"@context": "https://schema.org", "@type": "Article", ...}' style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:6px; margin-bottom:20px; box-sizing:border-box; resize:vertical; font-family:monospace; font-size:13px; background:#f8fafc;"></textarea>
+
+              <button type="button" id="btn-done-seo" style="background:#0f172a; color:#fff; width:100%; padding:12px; border:none; border-radius:6px; font-weight:600; cursor:pointer;">Save SEO Info</button>
             </div>
           </div>
         </form>

@@ -477,8 +477,23 @@
         } catch(e) { console.log('Could not load related articles'); }
 
         // SEO Updates
-        document.getElementById('post-title').textContent = blog.title + ' | Fresh Hot Bread';
-        document.getElementById('post-meta-desc').setAttribute('content', blog.excerpt || blog.title);
+                // ===== ADVANCED SEO UPDATES =====
+        document.title = blog.meta_title ? `${blog.meta_title} | Fresh Hot Bread` : `${blog.title} | Fresh Hot Bread`;
+        
+        const metaDesc = document.getElementById('post-meta-desc');
+        if (metaDesc) metaDesc.setAttribute('content', blog.meta_description || blog.excerpt || blog.title);
+
+        // Inject Schema JSON-LD properly into the <head>
+        if (blog.schema_code) {
+          try {
+            // Check if user accidentally pasted <script> tags, strip them if so
+            let cleanSchema = blog.schema_code.replace(/<script[^>]*>/gi, '').replace(/<\/script>/gi, '');
+            const scriptTag = document.createElement('script');
+            scriptTag.type = 'application/ld+json';
+            scriptTag.text = cleanSchema;
+            document.head.appendChild(scriptTag);
+          } catch(e) { console.error('Invalid Schema format'); }
+        }
 
         const date = new Date(blog.created_at).toLocaleDateString('en-US', {
           month: 'long', day: 'numeric', year: 'numeric'

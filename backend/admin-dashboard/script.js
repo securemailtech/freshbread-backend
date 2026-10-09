@@ -891,6 +891,16 @@ document.addEventListener('DOMContentLoaded', () => {
     if (this.value === '') delete this.dataset.manuallyEdited;
   });
 
+  document.getElementById('btn-open-seo')?.addEventListener('click', () => {
+    document.getElementById('seo-modal').style.display = 'flex';
+  });
+  document.getElementById('btn-close-seo')?.addEventListener('click', () => {
+    document.getElementById('seo-modal').style.display = 'none';
+  });
+  document.getElementById('btn-done-seo')?.addEventListener('click', () => {
+    document.getElementById('seo-modal').style.display = 'none';
+  });
+
   // Featured Image Upload + Paste
   const dropzone = document.getElementById('featured-image-dropzone');
   const fileInput = document.getElementById('featured_image_file');
@@ -1014,6 +1024,9 @@ function showBlogEditor(isNew = true, blog = null) {
     setVal('blog_sources', '');
     setVal('blog_image_url', '');
     setVal('blog_status', 'published');
+    setVal('blog_meta_title', blog?.meta_title || '');
+    setVal('blog_meta_description', blog?.meta_description || '');
+    setVal('blog_schema_code', blog?.schema_code || '');
 
     if (slugInput) delete slugInput.dataset.manuallyEdited;
     if (dropzone) dropzone.innerHTML = DROPZONE_DEFAULT;
@@ -1150,7 +1163,10 @@ document.addEventListener('DOMContentLoaded', () => {
         sources: document.getElementById('blog_sources')?.value || '',
         image_url: document.getElementById('blog_image_url')?.value || '',
         content: content,
-        status: document.getElementById('blog_status')?.value || 'published'
+        status: document.getElementById('blog_status')?.value || 'published',
+        meta_title: document.getElementById('blog_meta_title')?.value || '',
+        meta_description: document.getElementById('blog_meta_description')?.value || '',
+        schema_code: document.getElementById('blog_schema_code')?.value || '',
       };
 
       const method = id ? 'PUT' : 'POST';
