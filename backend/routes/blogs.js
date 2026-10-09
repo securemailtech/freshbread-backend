@@ -39,7 +39,6 @@ router.get('/', (req, res) => {
     query = "SELECT * FROM blogs WHERE status = ? ORDER BY created_at DESC";
     params = [status];
   } else if (!status) {
-    // Default public view: only published blogs
     query = "SELECT * FROM blogs WHERE status = 'published' ORDER BY created_at DESC";
   }
 
@@ -71,10 +70,15 @@ router.get('/:slugOrId', (req, res) => {
 });
 
 // ==========================================
-// 3. CREATE NEW BLOG POST
+// 3. CREATE NEW BLOG POST (POST)
 // ==========================================
 router.post('/', authenticateToken, (req, res) => {
-  const { title, slug, excerpt, content, image_url, quick_answer, sources, cta, status, meta_title, meta_description, schema_code } = req.body;
+  const { 
+    title, slug, excerpt, content, image_url, 
+    quick_answer, sources, cta, status, 
+    meta_title, meta_description, schema_code 
+  } = req.body;
+  
   const db = getDb();
 
   if (!title || !content) {
@@ -104,8 +108,8 @@ router.post('/', authenticateToken, (req, res) => {
     sources || '',
     cta || '',
     status || 'published',
-    meta_title || '', 
-    meta_description || '', 
+    meta_title || '',
+    meta_description || '',
     schema_code || ''
   ];
 
@@ -130,10 +134,16 @@ router.post('/', authenticateToken, (req, res) => {
 });
 
 // ==========================================
-// 4. UPDATE EXISTING BLOG POST
+// 4. UPDATE EXISTING BLOG POST (PUT - FIXED!)
 // ==========================================
 router.put('/:id', authenticateToken, (req, res) => {
-  const { title, slug, excerpt, content, image_url, quick_answer, sources, cta, status } = req.body;
+  // FIXED: meta_title, meta_description, schema_code match destructured req.body
+  const { 
+    title, slug, excerpt, content, image_url, 
+    quick_answer, sources, cta, status, 
+    meta_title, meta_description, schema_code 
+  } = req.body;
+
   const db = getDb();
   const id = req.params.id;
 
@@ -157,8 +167,8 @@ router.put('/:id', authenticateToken, (req, res) => {
     sources || '',
     cta || '',
     status || 'published',
-    meta_title || '', 
-    meta_description || '', 
+    meta_title || '',
+    meta_description || '',
     schema_code || '',
     id
   ];
