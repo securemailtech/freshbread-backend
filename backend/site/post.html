@@ -5,78 +5,128 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title id="post-title">Loading... | Fresh Hot Bread</title>
   <meta name="description" id="post-meta-desc" content="Fresh Hot Bread All Day blog post">
-  <link rel="stylesheet" href="styles.css">
+  
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="icon" type="image/jpeg" href="images/logo.jpg">
   <link rel="stylesheet" href="/styles.css">
+  
   <style>
     /* Modern Blog Typography & Variables */
     :root {
-      --text-color: #374151;
-      --heading-color: #111827;
+      --text-color: #334155;
+      --heading-color: #0f172a;
       --brand-red: #960909;
-      --light-bg: #F9FAFB;
-      --border-color: #E5E7EB;
+      --brand-red-dark: #6a0505;
+      --light-bg: #F8FAFC;
+      --border-color: #E2E8F0;
     }
 
     body {
       background-color: #ffffff;
       color: var(--text-color);
+      margin: 0;
+      padding: 0;
     }
 
-    /* Clean Hero Section */
-    .post-hero {
-      padding: 140px 20px 60px;
-      text-align: center;
-      background: #fff;
-      max-width: 900px;
+    /* 🌟 BURGUNDY HERO SECTION (LEFT ALIGNED) */
+    .post-hero-burgundy {
+      background-color: var(--brand-red);
+      color: #ffffff;
+      padding: 140px 20px 80px;
+      margin-top: -80px; /* Pulls it up behind transparent nav if needed */
+    }
+    
+    .post-hero-inner {
+      max-width: 1100px;
       margin: 0 auto;
+      text-align: left;
     }
-    .post-date-tag {
+
+    .hero-badge {
       display: inline-block;
-      color: var(--brand-red);
-      font-size: 14px;
-      font-weight: 700;
+      border: 1px solid rgba(255,255,255,0.4);
+      color: #ffffff;
+      padding: 6px 16px;
+      border-radius: 50px;
+      font-size: 12px;
+      font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 1.5px;
-      margin-bottom: 15px;
+      letter-spacing: 1px;
+      margin-bottom: 24px;
     }
-    .post-hero h1 {
+
+    .post-hero-burgundy h1 {
       font-family: 'Playfair Display', serif;
-      font-size: 52px;
-      line-height: 1.15;
-      color: var(--heading-color);
-      margin: 0 0 30px;
+      font-size: 48px;
+      line-height: 1.2;
+      margin: 0 0 24px;
       font-weight: 800;
+      max-width: 900px;
     }
+
+    .post-meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      align-items: center;
+      font-size: 14px;
+      color: rgba(255,255,255,0.8);
+      font-family: 'DM Sans', sans-serif;
+      margin-bottom: 24px;
+    }
+    
+    .post-meta-row span {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .hero-excerpt {
+      font-size: 18px;
+      line-height: 1.6;
+      color: rgba(255,255,255,0.9);
+      max-width: 800px;
+      margin: 0;
+    }
+
+    /* 🌟 TWO-COLUMN LAYOUT */
+    .blog-layout-wrapper {
+      max-width: 1100px;
+      margin: -40px auto 80px;
+      padding: 0 20px;
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 50px;
+      align-items: start;
+    }
+
+    /* 🌟 LEFT: MAIN CONTENT */
+    .blog-main-content {
+      background: #fff;
+      border-radius: 12px;
+      padding-top: 40px;
+    }
+
     .post-featured-image {
       width: 100%;
       height: auto;
-      max-height: 550px;
+      max-height: 500px;
       object-fit: cover;
       border-radius: 12px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.08);
-      margin-bottom: 50px;
+      margin-bottom: 40px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
     }
 
-    /* Post Content Container */
-    .post-container {
-      max-width: 760px;
-      margin: 0 auto 80px;
-      padding: 0 20px;
-    }
-
-    /* 🌟 QUICK ANSWER BOX */
+    /* Quick Answer Box */
     .quick-answer-box {
       background: var(--light-bg);
       border-left: 5px solid var(--brand-red);
       padding: 24px 30px;
       border-radius: 0 8px 8px 0;
       margin-bottom: 40px;
-      font-size: 17px;
+      font-size: 16px;
       line-height: 1.7;
-      color: var(--text-color);
     }
     .quick-answer-box strong {
       color: var(--heading-color);
@@ -86,11 +136,10 @@
       margin-bottom: 8px;
     }
 
-    /* Content Styling (TinyMCE Output) */
+    /* TinyMCE Content Styles */
     .post-content {
-      font-size: 18px;
+      font-size: 17px;
       line-height: 1.8;
-      font-family: 'DM Sans', sans-serif;
     }
     .post-content p { margin: 0 0 24px; }
     .post-content h2, .post-content h3 {
@@ -98,132 +147,123 @@
       color: var(--heading-color);
       margin: 45px 0 20px;
     }
-    .post-content h2 { font-size: 32px; font-weight: 700; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
+    .post-content h2 { font-size: 30px; font-weight: 700; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
     .post-content h3 { font-size: 24px; font-weight: 600; }
-    
-    /* 🌟 RESPONSIVE IMAGES */
-    .post-content img {
-      max-width: 100%;
-      height: auto !important;
-      border-radius: 8px;
-      margin: 30px 0;
-      display: block;
-    }
+    .post-content img { max-width: 100%; height: auto !important; border-radius: 8px; margin: 30px 0; }
 
-    /* 🌟 MODERN TABLES */
-    .post-content table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 35px 0;
-      font-size: 16px;
-      background: #fff;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-      border-radius: 8px;
-      overflow: hidden;
-    }
-    .post-content th {
-      background-color: #1a202c;
-      color: #fff;
-      font-weight: 600;
-      padding: 16px;
-      text-align: left;
-    }
-    .post-content td {
-      padding: 16px;
-      border-bottom: 1px solid var(--border-color);
-      color: #4b5563;
-    }
+    /* Tables & Accordions */
+    .post-content table { width: 100%; border-collapse: collapse; margin: 30px 0; font-size: 16px; background: #fff; border-radius: 8px; overflow: hidden; }
+    .post-content th { background-color: var(--heading-color); color: #fff; padding: 16px; text-align: left; }
+    .post-content td { padding: 16px; border-bottom: 1px solid var(--border-color); }
     .post-content tr:nth-child(even) { background-color: var(--light-bg); }
 
-    /* 🌟 FAQ ACCORDION (Details/Summary from TinyMCE) */
-    .post-content details {
-      background: #fff;
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      margin-bottom: 16px;
-      overflow: hidden;
-      transition: all 0.2s;
-    }
-    .post-content summary {
-      padding: 20px;
-      font-weight: 600;
-      font-size: 18px;
-      color: var(--heading-color);
-      cursor: pointer;
-      list-style: none;
+    .sources-section { margin-top: 50px; padding-top: 20px; border-top: 1px solid var(--border-color); font-size: 14px; color: #64748b; }
+
+    /* 🌟 RIGHT: STICKY SIDEBAR */
+    .blog-sidebar {
+      position: sticky;
+      top: 100px;
       display: flex;
-      justify-content: space-between;
-      align-items: center;
+      flex-direction: column;
+      gap: 30px;
+      margin-top: 40px;
+    }
+
+    /* Sidebar Cards */
+    .sidebar-card {
       background: var(--light-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 24px;
     }
-    .post-content summary::-webkit-details-marker { display: none; }
-    .post-content summary::after {
-      content: '+';
-      color: var(--brand-red);
-      font-size: 24px;
-    }
-    .post-content details[open] summary::after { content: '−'; }
-    .post-content details p { padding: 20px; margin: 0; border-top: 1px solid var(--border-color); }
-
-    /* 🌟 CTA / BUTTONS */
-    .post-content a.btn {
-      display: inline-block;
-      background: #10B981;
-      color: #fff;
-      padding: 12px 24px;
-      border-radius: 6px;
-      text-decoration: none;
-      font-weight: 600;
-      margin: 20px 0;
-    }
-
-    /* 🌟 SOURCES SECTION */
-    .sources-section {
-      margin-top: 60px;
-      padding-top: 30px;
-      border-top: 2px solid var(--border-color);
-      font-size: 14px;
-      color: #6B7280;
-    }
-    .sources-section h4 {
+    
+    .sidebar-card h4 {
       font-family: 'DM Sans', sans-serif;
-      font-size: 16px;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
       color: var(--heading-color);
-      margin-bottom: 15px;
-    }
-
-    /* Footer & Utils */
-    .post-footer { text-align: center; margin-top: 60px; }
-    .btn-back-blog {
-      display: inline-block;
-      background: var(--heading-color);
-      color: #fff !important;
-      padding: 14px 32px;
-      border-radius: 50px;
-      text-decoration: none;
       font-weight: 700;
-      transition: all 0.3s;
+      margin: 0 0 16px;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 12px;
     }
-    .btn-back-blog:hover { background: var(--brand-red); }
 
-    @media (max-width: 768px) {
-      .post-hero h1 { font-size: 36px; }
-      .post-content { font-size: 16px; }
-      .post-content table { display: block; overflow-x: auto; white-space: nowrap; }
+    /* Contact Card Specific */
+    .contact-info-p {
+      font-size: 14px;
+      color: #475569;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+    .btn-sidebar-contact {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: #0f172a; /* Dark Navy/Black button */
+      color: #ffffff !important;
+      text-decoration: none;
+      padding: 14px;
+      border-radius: 8px;
+      font-size: 18px;
+      font-weight: 700;
+      transition: 0.3s;
+      margin-bottom: 16px;
+    }
+    .btn-sidebar-contact:hover { background: var(--brand-red); }
+    .sidebar-email {
+      font-size: 14px;
+      color: #3b82f6;
+      text-decoration: none;
+      word-break: break-all;
+    }
+
+    /* Related Links Card */
+    .related-links {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .related-links li {
+      margin-bottom: 12px;
+    }
+    .related-links a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #334155;
+      text-decoration: none;
+      font-size: 15px;
+      transition: 0.2s;
+    }
+    .related-links a:hover { color: var(--brand-red); }
+    .related-links a::before {
+      content: '→';
+      color: #94a3b8;
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 992px) {
+      .blog-layout-wrapper {
+        grid-template-columns: 1fr;
+        margin-top: 0;
+      }
+      .post-hero-burgundy h1 { font-size: 36px; }
+      .blog-sidebar { position: relative; top: 0; margin-top: 20px; }
     }
   </style>
 </head>
 <body>
 
-   <!-- Navigation -->
+  <!-- Navigation -->
   <nav class="navbar" id="navbar">
-    <a href="#hero" class="logo">
-      <img src="images/logo.jpg" alt="Fresh Hot Bread Logo" width="120" height="120">
+    <a href="/#hero" class="logo">
+      <img src="/images/logo.jpg" alt="Fresh Hot Bread Logo" width="120" height="120">
       <div class="logo-text">
         <span>Fresh Hot</span>
         <strong>Bread</strong>
       </div>
-
       <div class="logo-mobile-text">
         <span class="line1"><span class="fresh">Fresh</span> <span class="hot">Hot</span></span>
         <span class="line2"><span class="bread">Bread</span> <span class="all-day">All Day</span></span>
@@ -231,21 +271,18 @@
     </a>
 
     <ul class="nav-links" id="nav-links">
-      <li><a href="#about">About</a></li>
-      <li><a href="#menu">Menu</a></li>
-      <li><a href="#testimonials">Reviews</a></li>
-      <li><a href="#gallery">Gallery</a></li>
-      <li><a href="#faq">FAQ</a></li>
-      <li><a href="#contact">Contact</a></li>
+      <li><a href="/#about">About</a></li>
+      <li><a href="/#menu">Menu</a></li>
+      <li><a href="/#testimonials">Reviews</a></li>
+      <li><a href="/#gallery">Gallery</a></li>
+      <li><a href="/#faq">FAQ</a></li>
+      <li><a href="/#contact">Contact</a></li>
     </ul>
 
     <div class="nav-right">
       <button class="hamburger" id="hamburger" aria-label="Menu">
-        <span></span>
-        <span></span>
-        <span></span>
+        <span></span><span></span><span></span>
       </button>
-
       <button class="cart-toggle" id="cart-toggle" aria-label="Shopping Cart">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="9" cy="21" r="1" />
@@ -263,81 +300,47 @@
     <div class="cart-header">
       <h4>Your Order</h4>
       <button class="cart-close" id="cart-close" aria-label="Close cart">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M18 6L6 18M6 6l12 12" />
-        </svg>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12" /></svg>
       </button>
     </div>
-
     <ul id="cart-items"></ul>
     <p class="cart-empty">Your cart is empty.</p>
-
-    <!-- Cart Footer -->
     <div class="cart-footer">
-      <p class="cart-total-row">
-        Total: <span>$<span id="cart-total">0.00</span></span>
-      </p>
+      <p class="cart-total-row">Total: <span>$<span id="cart-total">0.00</span></span></p>
       <button class="checkout-btn" id="checkout-btn" disabled>Place Order</button>
     </div>
   </div>
 
-  <!-- Dynamic Post Content -->
+  <!-- Dynamic Post Content injected here -->
   <div id="post-wrapper">
-    <p style="text-align:center; padding:100px; color:#888;">Loading post...</p>
+    <div style="padding: 150px 20px; text-align: center; color: #888;">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="spin">
+        <circle cx="12" cy="12" r="10"></circle>
+        <path d="M12 2v4"></path>
+      </svg>
+      <p style="margin-top:15px;">Loading article...</p>
+    </div>
   </div>
 
- <!-- Footer -->
+  <!-- Footer -->
   <footer class="footer">
     <div class="container">
       <div class="footer-content">
         <div class="footer-brand">
-          <img src="images/logo.jpg" alt="Fresh Hot Bread Logo" class="footer-logo">
+          <img src="/images/logo.jpg" alt="Fresh Hot Bread Logo" class="footer-logo">
           <div class="footer-brand-text">
             <h3>Fresh Hot Bread All Day</h3>
             <p>Warm • Sweet • Made Fresh Daily</p>
           </div>
         </div>
-
-        <div class="footer-socials">
-          <a href="#" aria-label="Facebook" class="social-link">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
-            </svg>
-          </a>
-          <a href="https://www.instagram.com/freshhot_bread_allday/?hl=en" aria-label="Instagram" class="social-link">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
-              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-              <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
-            </svg>
-          </a>
-          <a href="#" aria-label="TikTok" class="social-link">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-              <path
-                d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" />
-            </svg>
-          </a>
-        </div>
       </div>
-
       <div class="footer-bottom">
         <p>© 2025 Fresh Hot Bread All Day — All Rights Reserved</p>
       </div>
     </div>
   </footer>
 
-  <!-- Back to Top -->
-  <a href="#hero" class="back-to-top" id="back-to-top" aria-label="Back to top">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <path d="M18 15l-6-6-6 6" />
-    </svg>
-  </a>
-
-  <!-- Toast Notification -->
-  <div class="toast" id="toast">
-    <span id="toast-message">Item added to cart!</span>
-  </div>
-<script src="/main.js"></script>
+  <script src="/main.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
       const wrapper = document.getElementById('post-wrapper');
@@ -345,7 +348,7 @@
       const slug = urlParams.get('slug');
 
       if (!slug) {
-        wrapper.innerHTML = '<p style="text-align:center; padding:100px;">Blog not found. <a href="/blog">Back to Blog</a></p>';
+        wrapper.innerHTML = '<p style="text-align:center; padding:150px;">Blog not found. <a href="/blog">Back to Blog</a></p>';
         return;
       }
 
@@ -361,53 +364,107 @@
         const date = new Date(blog.created_at).toLocaleDateString('en-US', {
           month: 'long', day: 'numeric', year: 'numeric'
         });
+        
+        // Calculate rough reading time based on word count
+        const wordCount = blog.content ? blog.content.replace(/<[^>]*>?/gm, '').split(' ').length : 0;
+        const readTime = Math.max(1, Math.ceil(wordCount / 200));
 
+        // Generate HTML Structure
         let htmlContent = `
-          <section class="post-hero">
-            <span class="post-date-tag">Published on ${date}</span>
-            <h1>${blog.title}</h1>
+          <!-- Burgundy Left-Aligned Hero -->
+          <section class="post-hero-burgundy">
+            <div class="post-hero-inner">
+              <span class="hero-badge">Bakery News</span>
+              <h1>${blog.title}</h1>
+              
+              <div class="post-meta-row">
+                <span>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                  ${date}
+                </span>
+                <span>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                  ${readTime} min read
+                </span>
+                <span>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                  Fresh Hot Bread
+                </span>
+              </div>
+
+              ${blog.excerpt ? `<p class="hero-excerpt">${blog.excerpt}</p>` : ''}
+            </div>
           </section>
 
-          <article class="post-container">
-            ${blog.image_url ? `<img src="${blog.image_url}" alt="${blog.title}" class="post-featured-image">` : ''}
+          <!-- 2-Column Layout -->
+          <div class="blog-layout-wrapper">
             
-            ${blog.quick_answer ? `
-              <div class="quick-answer-box">
-                <strong>Quick Answer:</strong>
-                ${blog.quick_answer}
-              </div>
-            ` : ''}
+            <!-- Left: Main Content -->
+            <div class="blog-main-content">
+              ${blog.image_url ? `<img src="${blog.image_url}" alt="${blog.title}" class="post-featured-image">` : ''}
+              
+              ${blog.quick_answer ? `
+                <div class="quick-answer-box">
+                  <strong>Quick Answer:</strong>
+                  ${blog.quick_answer}
+                </div>
+              ` : ''}
 
-            <div class="post-content">
-              ${blog.content}
+              <article class="post-content">
+                ${blog.content}
+              </article>
+
+              ${blog.cta ? `
+                <div style="background: var(--light-bg); border: 1px solid var(--border-color); padding: 30px; border-radius: 12px; margin: 40px 0; text-align: center;">
+                  <h3 style="font-family: 'Playfair Display', serif; font-size: 24px; color:var(--heading-color); margin-top:0;">Special Offer</h3>
+                  <p style="font-size: 16px; margin-bottom: 20px;">${blog.cta.replace(/\n/g, '<br>')}</p>
+                  <a href="/#contact" style="display:inline-block; background:var(--brand-red); color:white; padding:12px 30px; border-radius:8px; text-decoration:none; font-weight:600;">Get in Touch</a>
+                </div>
+              ` : ''}
+
+              ${blog.sources ? `
+                <div class="sources-section">
+                  <h4 style="margin:0 0 10px;">Sources & References:</h4>
+                  ${blog.sources.replace(/\n/g, '<br>')}
+                </div>
+              ` : ''}
             </div>
 
-             <!-- CTA SECTION -->
-            ${blog.cta ? `
-              <div style="background: #111827; color: white; padding: 30px; border-radius: 12px; margin: 50px 0; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
-                <h3 style="font-family: 'Playfair Display', serif; font-size: 26px; color:white; margin-top:0;">Special Offer</h3>
-                <p style="font-size: 18px; margin-bottom: 20px;">${blog.cta.replace(/\n/g, '<br>')}</p>
-                <a href="/#contact" style="display:inline-block; background:#960909; color:white; padding:12px 30px; border-radius:50px; text-decoration:none; font-weight:700;">Get in Touch</a>
+            <!-- Right: Sticky Sidebar -->
+            <aside class="blog-sidebar">
+              
+              <!-- Contact Card -->
+              <div class="sidebar-card">
+                <h4>Contact Us</h4>
+                <p class="contact-info-p">Tues-Sun 6AM-6PM, Mon Closed.<br>Call us to place a large order or ask a question.</p>
+                
+                <a href="tel:+12094207925" class="btn-sidebar-contact">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                  209-420-7925
+                </a>
+                
+                <a href="mailto:freshhotbread@gmail.com" class="sidebar-email">freshhotbread@gmail.com</a>
               </div>
-            ` : ''}
 
-            ${blog.sources ? `
-              <div class="sources-section">
-                <h4>Sources & References</h4>
-                ${blog.sources.replace(/\n/g, '<br>')}
+              <!-- Related Resources Card -->
+              <div class="sidebar-card">
+                <h4>Helpful Links</h4>
+                <ul class="related-links">
+                  <li><a href="/#menu">View Our Menu</a></li>
+                  <li><a href="/#gallery">Bakery Gallery</a></li>
+                  <li><a href="/#faq">Frequently Asked Questions</a></li>
+                  <li><a href="/blog">Read More Articles</a></li>
+                </ul>
               </div>
-            ` : ''}
 
-            <div class="post-footer">
-              <a href="/blog" class="btn-back-blog">← View More Articles</a>
-            </div>
-          </article>
+            </aside>
+          </div>
         `;
 
         wrapper.innerHTML = htmlContent;
 
       } catch (error) {
-        wrapper.innerHTML = '<p style="text-align:center; padding:100px;">Blog not found. <a href="/blog">Back to Blog</a></p>';
+        wrapper.innerHTML = '<p style="text-align:center; padding:150px;">Blog not found. <a href="/blog">Back to Blog</a></p>';
       }
     });
 
