@@ -17,13 +17,13 @@ async function checkAuth() {
     window.location.href = 'index.html';
     return false;
   }
-  
+
   try {
     const response = await fetch(`${API_URL}/api/auth/verify`, {
       headers: { 'Authorization': `Bearer ${authToken}` }
     });
     const data = await response.json();
-    
+
     if (!data.valid) {
       localStorage.removeItem('adminToken');
       window.location.href = 'index.html';
@@ -40,7 +40,7 @@ async function checkAuth() {
 document.addEventListener('DOMContentLoaded', async () => {
   const isAuth = await checkAuth();
   if (!isAuth) return;
-  
+
   setupNavigation();
   setupMobileMenu();
   setupLogout();
@@ -52,16 +52,16 @@ document.addEventListener('DOMContentLoaded', async () => {
   setupRevenueControls();
   setupSoundToggle();
   setupImageUploads();
-  
+
   // Initialize audio on first user interaction
   document.body.addEventListener('click', initAudio, { once: true });
   document.body.addEventListener('keydown', initAudio, { once: true });
-  
+
   loadStats();
   loadOrders();
   loadContent();
   loadImagePreviews();
-  
+
   // Auto-refresh every 30 seconds
   setInterval(() => {
     loadStats();
@@ -82,60 +82,60 @@ function initAudio() {
 
 function playNotificationSound() {
   if (!soundEnabled || !audioContext) return;
-  
+
   try {
     // Create a pleasant chime sound
     const oscillator1 = audioContext.createOscillator();
     const oscillator2 = audioContext.createOscillator();
     const gainNode = audioContext.createGain();
-    
+
     oscillator1.connect(gainNode);
     oscillator2.connect(gainNode);
     gainNode.connect(audioContext.destination);
-    
+
     // Two-tone chime
     oscillator1.frequency.setValueAtTime(880, audioContext.currentTime); // A5
     oscillator2.frequency.setValueAtTime(1108.73, audioContext.currentTime); // C#6
-    
+
     oscillator1.type = 'sine';
     oscillator2.type = 'sine';
-    
+
     // Volume envelope
     gainNode.gain.setValueAtTime(0, audioContext.currentTime);
     gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.05);
     gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.8);
-    
+
     oscillator1.start(audioContext.currentTime);
     oscillator2.start(audioContext.currentTime + 0.1);
     oscillator1.stop(audioContext.currentTime + 0.8);
     oscillator2.stop(audioContext.currentTime + 0.9);
-    
+
     // Play second chime
     setTimeout(() => {
       const osc3 = audioContext.createOscillator();
       const osc4 = audioContext.createOscillator();
       const gain2 = audioContext.createGain();
-      
+
       osc3.connect(gain2);
       osc4.connect(gain2);
       gain2.connect(audioContext.destination);
-      
+
       osc3.frequency.setValueAtTime(1318.51, audioContext.currentTime); // E6
       osc4.frequency.setValueAtTime(1567.98, audioContext.currentTime); // G6
-      
+
       osc3.type = 'sine';
       osc4.type = 'sine';
-      
+
       gain2.gain.setValueAtTime(0, audioContext.currentTime);
       gain2.gain.linearRampToValueAtTime(0.25, audioContext.currentTime + 0.05);
       gain2.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 1);
-      
+
       osc3.start(audioContext.currentTime);
       osc4.start(audioContext.currentTime + 0.1);
       osc3.stop(audioContext.currentTime + 1);
       osc4.stop(audioContext.currentTime + 1.1);
     }, 300);
-    
+
   } catch (e) {
     console.log('Sound play failed:', e);
   }
@@ -143,7 +143,7 @@ function playNotificationSound() {
 
 function setupSoundToggle() {
   updateSoundUI();
-  
+
   // Mobile toggle
   document.getElementById('sound-toggle')?.addEventListener('click', toggleSound);
   // Desktop toggle
@@ -154,7 +154,7 @@ function toggleSound() {
   soundEnabled = !soundEnabled;
   localStorage.setItem('soundEnabled', soundEnabled);
   updateSoundUI();
-  
+
   // Play test sound when enabling
   if (soundEnabled) {
     initAudio();
@@ -171,7 +171,7 @@ function updateSoundUI() {
     const soundOn = toggle.querySelector('.sound-on');
     const soundOff = toggle.querySelector('.sound-off');
     const label = toggle.querySelector('.sound-label');
-    
+
     if (soundEnabled) {
       toggle.classList.remove('muted');
       if (soundOn) soundOn.style.display = 'block';
@@ -189,11 +189,11 @@ function updateSoundUI() {
 function showNewOrderAlert(order) {
   const alert = document.getElementById('new-order-alert');
   const info = document.getElementById('alert-order-info');
-  
+
   if (alert && info) {
     info.textContent = `Order #${order.id} - $${parseFloat(order.total).toFixed(2)}`;
     alert.classList.add('show');
-    
+
     // Auto-hide after 10 seconds
     setTimeout(() => {
       alert.classList.remove('show');
@@ -205,22 +205,22 @@ function showNewOrderAlert(order) {
 function setupNavigation() {
   const navItems = document.querySelectorAll('.nav-item');
   const sections = document.querySelectorAll('.content-section');
-  
+
   navItems.forEach(item => {
     item.addEventListener('click', (e) => {
       e.preventDefault();
       const sectionId = item.dataset.section;
-      
+
       navItems.forEach(nav => nav.classList.remove('active'));
       item.classList.add('active');
-      
+
       sections.forEach(section => section.classList.remove('active'));
       document.getElementById(`section-${sectionId}`)?.classList.add('active');
-      
+
       document.getElementById('sidebar')?.classList.remove('open');
     });
   });
-  
+
   document.querySelectorAll('[data-goto]').forEach(btn => {
     btn.addEventListener('click', () => {
       const target = btn.dataset.goto;
@@ -232,9 +232,9 @@ function setupNavigation() {
 function setupMobileMenu() {
   const toggle = document.getElementById('menu-toggle');
   const sidebar = document.getElementById('sidebar');
-  
+
   toggle?.addEventListener('click', () => sidebar?.classList.toggle('open'));
-  
+
   document.addEventListener('click', (e) => {
     if (sidebar && toggle && !sidebar.contains(e.target) && !toggle.contains(e.target)) {
       sidebar.classList.remove('open');
@@ -257,23 +257,23 @@ async function loadStats() {
     const response = await fetch(`${API_URL}/api/orders/stats`, {
       headers: { 'Authorization': `Bearer ${authToken}` }
     });
-    
+
     if (!response.ok) return;
-    
+
     const stats = await response.json();
     lastStats = stats;
-    
+
     document.getElementById('stat-today-orders').textContent = stats.today_orders || 0;
     document.getElementById('stat-today-revenue').textContent = `$${(stats.today_revenue || 0).toFixed(2)}`;
     document.getElementById('stat-pending').textContent = stats.pending || 0;
     document.getElementById('stat-total-revenue').textContent = `$${(stats.total_revenue || 0).toFixed(2)}`;
-    
+
     // Revenue page stats
     const onlineRevenue = (stats.total_revenue || 0) - (stats.manual_revenue || 0);
     document.getElementById('online-revenue').textContent = `$${onlineRevenue.toFixed(2)}`;
     document.getElementById('manual-revenue').textContent = `$${(stats.manual_revenue || 0).toFixed(2)}`;
     document.getElementById('combined-revenue').textContent = `$${(stats.total_revenue || 0).toFixed(2)}`;
-    
+
     const badge = document.getElementById('pending-badge');
     if (badge) {
       badge.textContent = stats.pending || 0;
@@ -286,22 +286,22 @@ async function loadStats() {
 
 async function loadOrders(filter = 'all') {
   currentFilter = filter;
-  
+
   try {
     let url = `${API_URL}/api/orders`;
     if (filter !== 'all') url += `?status=${filter}`;
-    
+
     const response = await fetch(url, {
       headers: { 'Authorization': `Bearer ${authToken}` }
     });
-    
+
     if (!response.ok) {
       setEmptyOrders();
       return;
     }
-    
+
     const orders = await response.json();
-    
+
     // Check for new orders
     if (orders.length > 0) {
       const newestOrder = orders[0];
@@ -312,7 +312,7 @@ async function loadOrders(filter = 'all') {
       }
       lastOrderId = newestOrder.id;
     }
-    
+
     renderOrders(orders.slice(0, 5), 'recent-orders-list');
     renderOrders(orders, 'all-orders-list');
   } catch (error) {
@@ -329,15 +329,15 @@ function setEmptyOrders() {
 function renderOrders(orders, containerId) {
   const container = document.getElementById(containerId);
   if (!container) return;
-  
+
   if (!orders || orders.length === 0) {
     container.innerHTML = '<p class="empty-state">No orders found</p>';
     return;
   }
-  
+
   container.innerHTML = orders.map(order => {
     const timeStr = formatOrderTime(order.created_at);
-    
+
     return `
       <div class="order-row" data-order-id="${order.id}">
         <span class="order-id">#${order.id}</span>
@@ -351,7 +351,7 @@ function renderOrders(orders, containerId) {
       </div>
     `;
   }).join('');
-  
+
   container.querySelectorAll('.order-row').forEach((row, index) => {
     row.addEventListener('click', () => showOrderModal(orders[index]));
   });
@@ -359,7 +359,7 @@ function renderOrders(orders, containerId) {
 
 function formatOrderTime(timeStr) {
   if (!timeStr) return 'Unknown';
-  
+
   try {
     if (timeStr.includes(',') || timeStr.includes('/')) {
       const date = new Date(timeStr);
@@ -371,7 +371,7 @@ function formatOrderTime(timeStr) {
         hour12: true
       });
     }
-    
+
     const date = new Date(timeStr);
     return date.toLocaleString('en-US', {
       month: 'short',
@@ -391,7 +391,7 @@ async function loadContent() {
     const response = await fetch(`${API_URL}/api/content`);
     const data = await response.json();
     const content = data.content || data;
-    
+
     if (content) {
       Object.keys(content).forEach(key => {
         const input = document.getElementById(key);
@@ -419,22 +419,22 @@ function setupRevenueControls() {
   document.getElementById('add-revenue-btn')?.addEventListener('click', async () => {
     const input = document.getElementById('add-revenue-amount');
     const amount = parseFloat(input.value);
-    
+
     if (!amount || amount <= 0) {
       showToast('Enter a valid amount', true);
       return;
     }
-    
+
     try {
       const response = await fetch(`${API_URL}/api/revenue/add`, {
         method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json', 
-          'Authorization': `Bearer ${authToken}` 
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authToken}`
         },
         body: JSON.stringify({ amount })
       });
-      
+
       if (response.ok) {
         showToast(`Added $${amount.toFixed(2)} to walk-in sales`);
         input.value = '';
@@ -446,27 +446,27 @@ function setupRevenueControls() {
       showToast('Failed to add revenue', true);
     }
   });
-  
+
   // Set revenue
   document.getElementById('set-revenue-btn')?.addEventListener('click', async () => {
     const input = document.getElementById('set-revenue-amount');
     const amount = parseFloat(input.value);
-    
+
     if (isNaN(amount) || amount < 0) {
       showToast('Enter a valid amount', true);
       return;
     }
-    
+
     try {
       const response = await fetch(`${API_URL}/api/revenue/set`, {
         method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json', 
-          'Authorization': `Bearer ${authToken}` 
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authToken}`
         },
         body: JSON.stringify({ amount })
       });
-      
+
       if (response.ok) {
         showToast(`Walk-in revenue set to $${amount.toFixed(2)}`);
         input.value = '';
@@ -478,17 +478,17 @@ function setupRevenueControls() {
       showToast('Failed to set revenue', true);
     }
   });
-  
+
   // Reset revenue
   document.getElementById('reset-revenue-btn')?.addEventListener('click', async () => {
     if (!confirm('Reset all walk-in revenue to $0? This cannot be undone.')) return;
-    
+
     try {
       const response = await fetch(`${API_URL}/api/revenue/reset`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${authToken}` }
       });
-      
+
       if (response.ok) {
         showToast('Walk-in revenue reset to $0');
         loadStats();
@@ -510,7 +510,7 @@ function setupFilters() {
       loadOrders(btn.dataset.filter);
     });
   });
-  
+
   document.getElementById('refresh-orders')?.addEventListener('click', () => {
     loadStats();
     loadOrders(currentFilter);
@@ -529,10 +529,10 @@ function setupModal() {
 function showOrderModal(order) {
   const modal = document.getElementById('order-modal');
   const detail = document.getElementById('order-detail');
-  
+
   const dateStr = formatOrderTime(order.created_at);
   const phoneClean = order.customer_phone.replace(/[^0-9]/g, '');
-  
+
   detail.innerHTML = `
     <div class="detail-section">
       <div class="detail-section-title">Customer</div>
@@ -586,10 +586,10 @@ function showOrderModal(order) {
       <button class="btn-delete" id="delete-order-btn">🗑️ Delete</button>
     </div>
   `;
-  
+
   document.getElementById('modal-status')?.addEventListener('change', (e) => updateOrderStatus(order.id, e.target.value));
   document.getElementById('delete-order-btn')?.addEventListener('click', () => deleteOrder(order.id));
-  
+
   modal?.classList.add('show');
 }
 
@@ -600,7 +600,7 @@ async function updateOrderStatus(orderId, status) {
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
       body: JSON.stringify({ status })
     });
-    
+
     if (response.ok) {
       showToast(`Order #${orderId} → ${status}`);
       loadStats();
@@ -615,13 +615,13 @@ async function updateOrderStatus(orderId, status) {
 
 async function deleteOrder(orderId) {
   if (!confirm(`Delete order #${orderId}?`)) return;
-  
+
   try {
     const response = await fetch(`${API_URL}/api/orders/${orderId}`, {
       method: 'DELETE',
       headers: { 'Authorization': `Bearer ${authToken}` }
     });
-    
+
     if (response.ok) {
       document.getElementById('order-modal')?.classList.remove('show');
       showToast(`Order #${orderId} deleted`);
@@ -641,14 +641,14 @@ function setupForms() {
     e.preventDefault();
     await saveContent(['hero_title', 'hero_subtitle', 'hero_description', 'product_name', 'product_description']);
   });
-  
+
   document.getElementById('special-form')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const specialEnabled = document.getElementById('special_enabled')?.checked;
     await saveContent(['special_label', 'special_discount', 'special_text']);
     await saveContent([{ key: 'special_enabled', value: specialEnabled.toString() }]);
   });
-  
+
   document.getElementById('contact-form')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     await saveContent(['phone', 'email', 'location', 'business_hours']);
@@ -657,7 +657,7 @@ function setupForms() {
 
 async function saveContent(fields) {
   const updates = {};
-  
+
   fields.forEach(field => {
     if (typeof field === 'object') {
       updates[field.key] = field.value;
@@ -668,14 +668,14 @@ async function saveContent(fields) {
       }
     }
   });
-  
+
   try {
     let response = await fetch(`${API_URL}/api/content/batch`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
       body: JSON.stringify({ updates })
     });
-    
+
     if (!response.ok) {
       for (const [key, value] of Object.entries(updates)) {
         await fetch(`${API_URL}/api/content`, {
@@ -685,7 +685,7 @@ async function saveContent(fields) {
         });
       }
     }
-    
+
     showToast('Saved!');
     updateSpecialPreview();
   } catch (error) {
@@ -743,59 +743,59 @@ function setupImageUploads() {
     'gallery7': { path: 'images/Screenshot 2025-12-04 123539.png', previewId: 'preview-gallery7' },
     'gallery8': { path: 'images/frontview.webp', previewId: 'preview-gallery8' }
   };
-  
+
   // Set up file input handlers
   document.querySelectorAll('input[type="file"][data-image-key]').forEach(input => {
     input.addEventListener('change', async (e) => {
       const file = e.target.files[0];
       if (!file) return;
-      
+
       const imageKey = input.dataset.imageKey;
       const mapping = imageMap[imageKey];
-      
+
       if (!mapping) {
         showToast('Unknown image type', true);
         return;
       }
-      
+
       // Validate file
       if (!file.type.startsWith('image/')) {
         showToast('Please select an image file', true);
         return;
       }
-      
+
       if (file.size > 10 * 1024 * 1024) { // 10MB limit
         showToast('Image too large (max 10MB)', true);
         return;
       }
-      
+
       // Show loading state
       const preview = document.getElementById(mapping.previewId);
       if (preview) {
         preview.classList.add('uploading');
       }
-      
+
       try {
         const formData = new FormData();
         formData.append('image', file);
         formData.append('key', imageKey);
         formData.append('targetPath', mapping.path);
-        
+
         const response = await fetch(`${API_URL}/api/images/upload`, {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${authToken}` },
           body: formData
         });
-        
+
         if (response.ok) {
           const result = await response.json();
-          
+
           // Update preview with new image
           const img = preview?.querySelector('img');
           if (img) {
             img.src = result.url || `/${mapping.path}?t=${Date.now()}`;
           }
-          
+
           showToast('Image uploaded! Refresh your website to see changes.');
         } else {
           const error = await response.json();
@@ -813,7 +813,7 @@ function setupImageUploads() {
       }
     });
   });
-  
+
   // Make preview areas clickable
   document.querySelectorAll('.image-preview').forEach(preview => {
     preview.addEventListener('click', () => {
@@ -829,12 +829,12 @@ async function loadImagePreviews() {
     const response = await fetch(`${API_URL}/api/content`);
     const data = await response.json();
     const content = data.content || data;
-    
+
     // Check for custom image paths
-    const imageKeys = ['hero', 'logo', 'product', 'coffee-machine', 'coffee-menu', 
-                       'feature1', 'feature2', 'feature3', 
-                       'gallery1', 'gallery2', 'gallery3', 'gallery4', 'gallery5', 'gallery6', 'gallery7', 'gallery8'];
-    
+    const imageKeys = ['hero', 'logo', 'product', 'coffee-machine', 'coffee-menu',
+      'feature1', 'feature2', 'feature3',
+      'gallery1', 'gallery2', 'gallery3', 'gallery4', 'gallery5', 'gallery6', 'gallery7', 'gallery8'];
+
     imageKeys.forEach(key => {
       const customPath = content[`image_${key}`];
       if (customPath) {
@@ -855,7 +855,7 @@ function showToast(message, isError = false) {
   const toast = document.getElementById('toast');
   const msgEl = document.getElementById('toast-message');
   if (!toast || !msgEl) return;
-  
+
   msgEl.textContent = message;
   toast.classList.toggle('error', isError);
   toast.classList.add('show');
@@ -980,14 +980,12 @@ async function loadAdminBlogs() {
   }
 }
 
-// ---------- Show Editor (DATA PRESERVE) ----------
 function showBlogEditor(isNew = true, blog = null) {
   document.getElementById('blog-list-view').style.display = 'none';
   document.getElementById('blog-editor-view').style.display = 'block';
 
   const dropzone = document.getElementById('featured-image-dropzone');
   const slugInput = document.getElementById('blog_slug');
-  const imageUrlInput = document.getElementById('blog_image_url');
 
   // Helper to safely set value
   const setVal = (id, val) => {
@@ -998,7 +996,9 @@ function showBlogEditor(isNew = true, blog = null) {
   if (isNew) {
     document.getElementById('blog-form')?.reset();
     setVal('blog_id', '');
+    setVal('blog_title', '');
     setVal('blog_image_url', '');
+    setVal('blog_excerpt', '');
     setVal('blog_quick_answer', '');
     setVal('blog_sources', '');
     setVal('blog_cta', '');
@@ -1027,9 +1027,9 @@ function showBlogEditor(isNew = true, blog = null) {
     setVal('blog_id', blog.id);
     setVal('blog_title', blog.title);
     setVal('blog_slug', blog.slug);
-     setVal('blog_excerpt', blog.excerpt || '');
     setVal('blog_image_url', blog.image_url || '');
-    setVal('blog_quick_answer', blog.quick_answer || blog.excerpt || '');
+    setVal('blog_excerpt', blog.excerpt || ''); // Proper Excerpt Map
+    setVal('blog_quick_answer', blog.quick_answer || ''); // Proper Quick Answer Map
     setVal('blog_sources', blog.sources || '');
     setVal('blog_cta', blog.cta || '');
     setVal('blog_status', blog.status || 'published');
@@ -1039,25 +1039,14 @@ function showBlogEditor(isNew = true, blog = null) {
     // Restore Featured Image
     if (blog.image_url && dropzone) {
       dropzone.innerHTML = `<img src="${blog.image_url}" style="max-width:100%;max-height:140px;border-radius:6px;object-fit:cover;" alt="Featured">`;
-    } else if (dropzone) {
-      dropzone.innerHTML = `
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" style="margin-bottom:8px;">
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-          <polyline points="17 8 12 3 7 8"></polyline>
-          <line x1="12" y1="3" x2="12" y2="15"></line>
-        </svg>
-        <span style="color:#64748b;font-size:13px;">Click to Upload or Ctrl+V</span>`;
     }
 
     // Restore TinyMCE content
     if (typeof tinymce !== 'undefined' && tinymce.get('blog_content')) {
       tinymce.get('blog_content').setContent(blog.content || '');
     } else {
-      // TinyMCE not ready yet - wait a bit
       setTimeout(() => {
-        if (tinymce.get('blog_content')) {
-          tinymce.get('blog_content').setContent(blog.content || '');
-        }
+        if (tinymce.get('blog_content')) tinymce.get('blog_content').setContent(blog.content || '');
       }, 600);
     }
   }
@@ -1145,17 +1134,17 @@ document.addEventListener('DOMContentLoaded', () => {
       btn.disabled = true;
 
       const id = document.getElementById('blog_id')?.value;
-     const excerpt = document.getElementById('blog_excerpt')?.value || ''; // <-- Ye add karo
-     const quickAnswer = document.getElementById('blog_quick_answer')?.value || '';
+      const excerpt = document.getElementById('blog_excerpt')?.value || ''; // <-- Ye add karo
+      const quickAnswer = document.getElementById('blog_quick_answer')?.value || '';
 
       // ALL FIELDS - nothing left behind
       const payload = {
         title: document.getElementById('blog_title')?.value || '',
         slug: document.getElementById('blog_slug')?.value || '',
-        excerpt: excerpt, // <-- Ise update karo
-        quick_answer: quickAnswer,
-        sources: document.getElementById('blog_sources')?.value || '',
-        cta: document.getElementById('blog_cta')?.value || '',
+        excerpt: document.getElementById('blog_excerpt')?.value || '', // EXCERPT HERE
+        quick_answer: document.getElementById('blog_quick_answer')?.value || '', // QUICK ANSWER HERE
+        sources: document.getElementById('blog_sources')?.value || '', // SOURCES HERE
+        cta: document.getElementById('blog_cta')?.value || '', // CTA HERE
         content: content,
         image_url: document.getElementById('blog_image_url')?.value || '',
         status: document.getElementById('blog_status')?.value || 'published'

@@ -1059,3 +1059,10 @@ body {
           width: 100%;
         }
       }
+
+      .tox-promotion {
+    display: none !important;
+}
+span.tox-statusbar__branding {
+    display: none !important;
+}
