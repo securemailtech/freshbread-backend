@@ -1035,7 +1035,7 @@ function showBlogEditor(isNew = true, blog = null) {
       tinymce.get('blog_content').setContent('');
     }
   } else if (blog) {
-    // EDIT BLOG - SAARI FIELDS BHARO (ye lines miss nahi honi chahiye)
+    // EDIT BLOG - SAARI FIELDS BHARO
     setVal('blog_id', blog.id);
     setVal('blog_title', blog.title || '');
     setVal('blog_slug', blog.slug || '');
@@ -1045,6 +1045,11 @@ function showBlogEditor(isNew = true, blog = null) {
     setVal('blog_sources', blog.sources || '');
     setVal('blog_image_url', blog.image_url || '');
     setVal('blog_status', blog.status || 'published');
+    
+    // YE 3 LINES MISSING THI EDIT KE LIYE:
+    setVal('blog_meta_title', blog.meta_title || '');
+    setVal('blog_meta_description', blog.meta_description || '');
+    setVal('blog_schema_code', blog.schema_code || '');
 
     if (slugInput) slugInput.dataset.manuallyEdited = 'true';
 

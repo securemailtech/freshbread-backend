@@ -446,6 +446,8 @@
         if (!response.ok) throw new Error('Not found');
         const blog = await response.json();
 
+        
+
         // Fetch Related Articles
         let relatedHtml = '';
         try {
@@ -476,24 +478,88 @@
           }
         } catch(e) { console.log('Could not load related articles'); }
 
-        // SEO Updates
-                // ===== ADVANCED SEO UPDATES =====
-        document.title = blog.meta_title ? `${blog.meta_title} | Fresh Hot Bread` : `${blog.title} | Fresh Hot Bread`;
+               // ==========================================
+        // LIVE SEO + SCHEMA INJECTOR (FIXED)
+        // ==========================================
         
-        const metaDesc = document.getElementById('post-meta-desc');
-        if (metaDesc) metaDesc.setAttribute('content', blog.meta_description || blog.excerpt || blog.title);
+        // Debug - console me dekhna data aa raha hai ya nahi
+        console.log('SEO Data from API:', {
+          meta_title: blog.meta_title,
+          meta_description: blog.meta_description,
+          schema_code: blog.schema_code ? blog.schema_code.substring(0, 80) + '...' : null
+        });
 
-        // Inject Schema JSON-LD properly into the <head>
-        if (blog.schema_code) {
-          try {
-            // Check if user accidentally pasted <script> tags, strip them if so
-            let cleanSchema = blog.schema_code.replace(/<script[^>]*>/gi, '').replace(/<\/script>/gi, '');
-            const scriptTag = document.createElement('script');
-            scriptTag.type = 'application/ld+json';
-            scriptTag.text = cleanSchema;
-            document.head.appendChild(scriptTag);
-          } catch(e) { console.error('Invalid Schema format'); }
+        // 1. TITLE
+        const pageTitle = (blog.meta_title && blog.meta_title.trim())
+          ? blog.meta_title.trim()
+          : (blog.title + ' | Fresh Hot Bread');
+        document.title = pageTitle;
+
+        // title tag me id="post-title" bhi update karo
+        const titleEl = document.getElementById('post-title');
+        if (titleEl) titleEl.textContent = pageTitle;
+
+        // 2. META DESCRIPTION
+        const pageDesc = (blog.meta_description && blog.meta_description.trim())
+          ? blog.meta_description.trim()
+          : (blog.excerpt || blog.title || 'Fresh Hot Bread All Day');
+
+        let metaDescTag = document.getElementById('post-meta-desc');
+        if (!metaDescTag) {
+          metaDescTag = document.createElement('meta');
+          metaDescTag.setAttribute('name', 'description');
+          metaDescTag.id = 'post-meta-desc';
+          document.head.appendChild(metaDescTag);
         }
+        metaDescTag.setAttribute('content', pageDesc);
+
+        // 3. OPEN GRAPH (social share ke liye)
+        function setOrCreateMeta(attr, key, value) {
+          let el = document.querySelector(`meta[${attr}="${key}"]`);
+          if (!el) {
+            el = document.createElement('meta');
+            el.setAttribute(attr, key);
+            document.head.appendChild(el);
+          }
+          el.setAttribute('content', value);
+        }
+        setOrCreateMeta('property', 'og:title', pageTitle);
+        setOrCreateMeta('property', 'og:description', pageDesc);
+        setOrCreateMeta('property', 'og:type', 'article');
+        if (blog.image_url) {
+          setOrCreateMeta('property', 'og:image', blog.image_url);
+        }
+
+        // 4. SCHEMA JSON-LD
+        // pehle se injected schema hata do (duplicate na bane)
+        document.querySelectorAll('script.dynamic-schema, script[type="application/ld+json"]').forEach(s => {
+          if (s.classList.contains('dynamic-schema') || s.textContent.includes('@context')) {
+            // sirf humara dynamic wala hatao, baaki mat chhedo
+          }
+        });
+        document.querySelectorAll('script.dynamic-schema').forEach(s => s.remove());
+
+        if (blog.schema_code && blog.schema_code.trim()) {
+          try {
+            let cleanSchema = blog.schema_code
+              .replace(/<script[^>]*>/gi, '')
+              .replace(/<\/script>/gi, '')
+              .trim();
+
+            // JSON valid hai ya nahi check
+            JSON.parse(cleanSchema);
+
+            const schemaScript = document.createElement('script');
+            schemaScript.type = 'application/ld+json';
+            schemaScript.className = 'dynamic-schema';
+            schemaScript.textContent = cleanSchema;  // .text nahi, .textContent use karo
+            document.head.appendChild(schemaScript);
+            console.log('✅ Schema injected into <head>');
+          } catch (err) {
+            console.error('❌ Schema invalid / inject failed:', err.message);
+          }
+        }
+        // ==========================================
 
         const date = new Date(blog.created_at).toLocaleDateString('en-US', {
           month: 'long', day: 'numeric', year: 'numeric'

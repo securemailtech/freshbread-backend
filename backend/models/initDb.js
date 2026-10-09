@@ -104,9 +104,28 @@ async function restoreDatabaseFromCloudinary() {
                 stmt.finalize();
               }
               // Restore Blogs
+                           // Restore Blogs
               if (parsed.blogs && parsed.blogs.length > 0) {
-                const stmt = database.prepare("INSERT OR REPLACE INTO blogs (id, title, slug, excerpt, content, image_url, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-                parsed.blogs.forEach(b => stmt.run(b.id, b.title, b.slug, b.excerpt || '', b.content, b.image_url || '', b.status || 'published', b.created_at || new Date().toISOString(), b.updated_at || new Date().toISOString()));
+                // YAHAN PURE 15 COLUMNS HAIN
+                const stmt = database.prepare("INSERT OR REPLACE INTO blogs (id, title, slug, excerpt, content, image_url, quick_answer, sources, cta, meta_title, meta_description, schema_code, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                
+                parsed.blogs.forEach(b => {
+                  stmt.run(
+                    b.id, b.title, b.slug, 
+                    b.excerpt || '', 
+                    b.content, 
+                    b.image_url || '', 
+                    b.quick_answer || '', 
+                    b.sources || '', 
+                    b.cta || '', 
+                    b.meta_title || '', 
+                    b.meta_description || '', 
+                    b.schema_code || '', 
+                    b.status || 'published', 
+                    b.created_at || new Date().toISOString(), 
+                    b.updated_at || new Date().toISOString()
+                  );
+                });
                 stmt.finalize();
               }
             });

@@ -81,7 +81,6 @@ router.post('/', authenticateToken, (req, res) => {
     return res.status(400).json({ error: 'Title and Content are required.' });
   }
 
-  // Generate slug if not provided
   const finalSlug = (slug || title)
     .toLowerCase()
     .trim()
@@ -89,10 +88,10 @@ router.post('/', authenticateToken, (req, res) => {
     .replace(/[\s_-]+/g, '-')
     .replace(/^-+|-+$/g, '');
 
-  // EXACTLY 9 COLUMNS & EXACTLY 9 PLACEHOLDERS (?)
+  // EXACTLY 12 COLUMNS & EXACTLY 12 PLACEHOLDERS (?)
   const query = `
     INSERT INTO blogs (title, slug, excerpt, content, image_url, quick_answer, sources, cta, status, meta_title, meta_description, schema_code)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
   const params = [
@@ -105,7 +104,9 @@ router.post('/', authenticateToken, (req, res) => {
     sources || '',
     cta || '',
     status || 'published',
-    'published', meta_title || '', meta_description || '', schema_code || ''
+    meta_title || '', 
+    meta_description || '', 
+    schema_code || ''
   ];
 
   db.run(query, params, function (err) {
@@ -116,7 +117,6 @@ router.post('/', authenticateToken, (req, res) => {
       return res.status(500).json({ error: err.message });
     }
 
-    // Backup to Cloudinary if available
     if (typeof backupDatabaseToCloudinary === 'function') {
       backupDatabaseToCloudinary();
     }
