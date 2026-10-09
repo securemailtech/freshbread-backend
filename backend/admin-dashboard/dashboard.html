@@ -706,8 +706,9 @@
       <!-- Blog Editor View (Full Width Professional UI) -->
       <div id="blog-editor-view" style="display: none; width: 100%;">
 
-               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; width: 100%; border-bottom: 1px solid #e2e8f0; padding-bottom: 16px;">
-          
+        <div
+          style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; width: 100%; border-bottom: 1px solid #e2e8f0; padding-bottom: 16px;">
+
           <!-- LEFT: Back -->
           <button class="back-btn" id="btn-back-to-blogs"
             style="background:none; border:none; color:#64748b; cursor:pointer; font-size:15px; font-weight:600; display:flex; align-items:center; gap:8px;">
@@ -724,7 +725,9 @@
               style="background:#475569; color:#fff; border:none; padding:10px 18px; border-radius:6px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:8px; font-size:14px;">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="12" cy="12" r="3"></circle>
-                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                <path
+                  d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+                </path>
               </svg>
               SEO Info
             </button>
@@ -872,24 +875,35 @@
 
             </div>
           </div>
-                    <!-- SEO MODAL -->
-          <div id="seo-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
-            <div style="background:#fff; width:600px; max-width:90%; border-radius:12px; padding:30px; box-shadow:0 20px 40px rgba(0,0,0,0.2);">
+          <!-- SEO MODAL -->
+          <!-- SEO MODAL -->
+          <div id="seo-modal"
+            style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
+            <div
+              style="background:#fff; width:600px; max-width:92%; border-radius:12px; padding:28px; box-shadow:0 25px 50px rgba(0,0,0,0.25);">
               <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                <h2 style="margin:0; font-size:22px; color:#0f172a;">SEO & Meta Information</h2>
-                <button type="button" id="btn-close-seo" style="background:none; border:none; font-size:24px; cursor:pointer; color:#64748b;">&times;</button>
+                <h2 style="margin:0; font-size:20px; color:#0f172a;">SEO & Meta Information</h2>
+                <button type="button" id="btn-close-seo"
+                  style="background:none; border:none; font-size:28px; cursor:pointer; color:#64748b; line-height:1;">&times;</button>
               </div>
 
-              <label style="font-weight:600; font-size:14px; margin-bottom:8px; display:block;">Meta Title</label>
-              <input type="text" id="blog_meta_title" placeholder="Best ITIN Lenders in Michigan..." style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:6px; margin-bottom:20px; box-sizing:border-box;">
+              <label style="font-weight:600; font-size:13px; display:block; margin-bottom:6px;">Meta Title</label>
+              <input type="text" id="blog_meta_title" placeholder="Custom title for Google search..."
+                style="width:100%; padding:10px 12px; border:1px solid #cbd5e1; border-radius:6px; margin-bottom:16px; box-sizing:border-box;">
 
-              <label style="font-weight:600; font-size:14px; margin-bottom:8px; display:block;">Meta Description</label>
-              <textarea id="blog_meta_description" rows="3" placeholder="Brief description for Google search results..." style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:6px; margin-bottom:20px; box-sizing:border-box; resize:vertical;"></textarea>
+              <label style="font-weight:600; font-size:13px; display:block; margin-bottom:6px;">Meta Description</label>
+              <textarea id="blog_meta_description" rows="3" placeholder="Brief description for search results..."
+                style="width:100%; padding:10px 12px; border:1px solid #cbd5e1; border-radius:6px; margin-bottom:16px; box-sizing:border-box; resize:vertical;"></textarea>
 
-              <label style="font-weight:600; font-size:14px; margin-bottom:8px; display:block;">Schema JSON-LD Code</label>
-              <textarea id="blog_schema_code" rows="5" placeholder='{"@context": "https://schema.org", "@type": "Article", ...}' style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:6px; margin-bottom:20px; box-sizing:border-box; resize:vertical; font-family:monospace; font-size:13px; background:#f8fafc;"></textarea>
+              <label style="font-weight:600; font-size:13px; display:block; margin-bottom:6px;">Schema JSON-LD
+                Code</label>
+              <textarea id="blog_schema_code" rows="6"
+                placeholder='{"@context":"https://schema.org","@type":"Article",...}'
+                style="width:100%; padding:10px 12px; border:1px solid #cbd5e1; border-radius:6px; margin-bottom:20px; box-sizing:border-box; resize:vertical; font-family:monospace; font-size:12px; background:#f8fafc;"></textarea>
 
-              <button type="button" id="btn-done-seo" style="background:#0f172a; color:#fff; width:100%; padding:12px; border:none; border-radius:6px; font-weight:600; cursor:pointer;">Save SEO Info</button>
+              <button type="button" id="btn-done-seo"
+                style="width:100%; background:#0f172a; color:#fff; border:none; padding:12px; border-radius:6px; font-weight:600; cursor:pointer;">Save
+                SEO Info</button>
             </div>
           </div>
         </form>

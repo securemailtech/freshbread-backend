@@ -1014,7 +1014,7 @@ function showBlogEditor(isNew = true, blog = null) {
   };
 
   if (isNew) {
-    // NEW BLOG - sab khali
+    // NEW BLOG - Sab khali karo
     setVal('blog_id', '');
     setVal('blog_title', '');
     setVal('blog_slug', '');
@@ -1024,9 +1024,9 @@ function showBlogEditor(isNew = true, blog = null) {
     setVal('blog_sources', '');
     setVal('blog_image_url', '');
     setVal('blog_status', 'published');
-    setVal('blog_meta_title', blog?.meta_title || '');
-    setVal('blog_meta_description', blog?.meta_description || '');
-    setVal('blog_schema_code', blog?.schema_code || '');
+    setVal('blog_meta_title', '');
+    setVal('blog_meta_description', '');
+    setVal('blog_schema_code', '');
 
     if (slugInput) delete slugInput.dataset.manuallyEdited;
     if (dropzone) dropzone.innerHTML = DROPZONE_DEFAULT;
@@ -1035,7 +1035,7 @@ function showBlogEditor(isNew = true, blog = null) {
       tinymce.get('blog_content').setContent('');
     }
   } else if (blog) {
-    // EDIT BLOG - SAARI FIELDS BHARO
+    // EDIT BLOG - Sab fields DB se bharo (SEO fields included!)
     setVal('blog_id', blog.id);
     setVal('blog_title', blog.title || '');
     setVal('blog_slug', blog.slug || '');
@@ -1045,8 +1045,8 @@ function showBlogEditor(isNew = true, blog = null) {
     setVal('blog_sources', blog.sources || '');
     setVal('blog_image_url', blog.image_url || '');
     setVal('blog_status', blog.status || 'published');
-    
-    // YE 3 LINES MISSING THI EDIT KE LIYE:
+
+    // 🌟 FIXED: SEO FIELDS LOADED IN EDIT MODE
     setVal('blog_meta_title', blog.meta_title || '');
     setVal('blog_meta_description', blog.meta_description || '');
     setVal('blog_schema_code', blog.schema_code || '');
@@ -1062,7 +1062,6 @@ function showBlogEditor(isNew = true, blog = null) {
     if (typeof tinymce !== 'undefined' && tinymce.get('blog_content')) {
       tinymce.get('blog_content').setContent(blog.content || '');
     } else {
-      // TinyMCE abhi load nahi hua - thodi der baad try karo
       setTimeout(() => {
         if (tinymce.get('blog_content')) {
           tinymce.get('blog_content').setContent(blog.content || '');
@@ -1131,17 +1130,33 @@ function initBlogEditor() {
   });
 }
 
-// ---------- BUTTONS + FORM SUBMIT (EK HI BAAR BIND) ----------
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btn-create-new-blog')?.addEventListener('click', () => showBlogEditor(true));
   document.getElementById('btn-back-to-blogs')?.addEventListener('click', hideBlogEditor);
 
+  // SEO Modal Listeners (FIXED WITH TOAST)
+  document.getElementById('btn-open-seo')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    document.getElementById('seo-modal').style.display = 'flex';
+  });
+
+  document.getElementById('btn-close-seo')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    document.getElementById('seo-modal').style.display = 'none';
+  });
+
+  document.getElementById('btn-done-seo')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    document.getElementById('seo-modal').style.display = 'none';
+    showToast('SEO Info saved! Now click "Save Blog Post" to publish.');
+  });
+
+  // Blog Form Submit
   const blogForm = document.getElementById('blog-form');
   if (blogForm) {
     blogForm.onsubmit = async (e) => {
       e.preventDefault();
 
-      // Editor ka content textarea me sync karo
       if (typeof tinymce !== 'undefined' && tinymce.get('blog_content')) {
         tinymce.triggerSave();
       }
@@ -1158,7 +1173,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const id = document.getElementById('blog_id')?.value;
 
-      // SAARI FIELDS PAYLOAD ME - kuch bhi miss nahi
+      // PAYLOAD WITH ALL SEO FIELDS
       const payload = {
         title: document.getElementById('blog_title')?.value || '',
         slug: document.getElementById('blog_slug')?.value || '',
@@ -1171,7 +1186,7 @@ document.addEventListener('DOMContentLoaded', () => {
         status: document.getElementById('blog_status')?.value || 'published',
         meta_title: document.getElementById('blog_meta_title')?.value || '',
         meta_description: document.getElementById('blog_meta_description')?.value || '',
-        schema_code: document.getElementById('blog_schema_code')?.value || '',
+        schema_code: document.getElementById('blog_schema_code')?.value || ''
       };
 
       const method = id ? 'PUT' : 'POST';
