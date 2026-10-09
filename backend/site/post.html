@@ -253,6 +253,93 @@
       .post-hero-burgundy h1 { font-size: 36px; }
       .blog-sidebar { position: relative; top: 0; margin-top: 20px; }
     }
+    /* ============================================
+   FAQ ACCORDION - FORCE CLEAN FULL WIDTH
+   ============================================ */
+.post-content details,
+.post-content .mce-accordion,
+.post-content [data-mce-name="accordion"],
+.post-content .tox-accordion {
+  background: #ffffff !important;
+  border: 1px solid #E2E8F0 !important;
+  border-radius: 10px !important;
+  margin: 0 0 12px 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  display: block !important;
+  overflow: hidden !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+.post-content summary,
+.post-content .mce-accordion-summary,
+.post-content details > summary {
+  padding: 18px 50px 18px 20px !important;
+  font-weight: 600 !important;
+  font-size: 17px !important;
+  color: #0f172a !important;
+  cursor: pointer !important;
+  list-style: none !important;
+  background: #F8FAFC !important;
+  border: none !important;
+  margin: 0 !important;
+  display: block !important;
+  position: relative !important;
+  line-height: 1.4 !important;
+  font-family: 'DM Sans', sans-serif !important;
+}
+
+/* Hide default arrow */
+.post-content summary::-webkit-details-marker,
+.post-content summary::marker {
+  display: none !important;
+  content: '' !important;
+}
+
+/* Custom + / − icon */
+.post-content summary::after {
+  content: '+' !important;
+  position: absolute !important;
+  right: 20px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  color: #960909 !important;
+  font-size: 24px !important;
+  font-weight: 400 !important;
+  line-height: 1 !important;
+}
+
+.post-content details[open] > summary::after {
+  content: '−' !important;
+}
+
+/* Answer body */
+.post-content details[open] > summary {
+  border-bottom: 1px solid #E2E8F0 !important;
+  margin-bottom: 0 !important;
+  background: #F1F5F9 !important;
+}
+
+.post-content details > *:not(summary) {
+  padding: 20px !important;
+  margin: 0 !important;
+  font-size: 16px !important;
+  line-height: 1.7 !important;
+  color: #334155 !important;
+  background: #fff !important;
+  display: block !important;
+}
+
+/* TinyMCE sometimes wraps answer in extra divs */
+.post-content details div,
+.post-content details p {
+  padding: 0 !important;
+  margin: 0 0 12px 0 !important;
+}
+.post-content details > div {
+  padding: 20px !important;
+}
   </style>
 </head>
 <body>
@@ -479,6 +566,29 @@
         `;
 
         wrapper.innerHTML = htmlContent;
+
+       // ===== FIX BROKEN TINYMCE ACCORDIONS =====
+        setTimeout(() => {
+          const contentArea = wrapper.querySelector('.post-content');
+          if (!contentArea) return;
+
+          // Case 1: Already proper <details> — just ensure clean
+          contentArea.querySelectorAll('details').forEach(det => {
+            det.style.width = '100%';
+            det.style.display = 'block';
+          });
+
+          // Case 2: TinyMCE accordion plugin sometimes outputs weird structure
+          // Convert any leftover accordion-like blocks
+          contentArea.querySelectorAll('.mce-accordion, [class*="accordion"]').forEach(acc => {
+            if (acc.tagName === 'DETAILS') return;
+            const summaryText = acc.querySelector('summary, .mce-accordion-summary, strong, b')?.textContent || acc.textContent.split('\n')[0];
+            const answerHTML = acc.innerHTML;
+            const details = document.createElement('details');
+            details.innerHTML = `<summary>${summaryText}</summary><div>${answerHTML}</div>`;
+            acc.replaceWith(details);
+          });
+        }, 100);  
 
       } catch (error) {
         wrapper.innerHTML = '<p style="text-align:center; padding:150px;">Blog not found. <a href="/blog">Back to Blog</a></p>';
