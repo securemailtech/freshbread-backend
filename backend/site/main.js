@@ -151,11 +151,13 @@ document.addEventListener("DOMContentLoaded", function () {
       title: "Pandesal Bread",
       desc: "Classic Filipino bread rolls, baked fresh daily. Soft, fluffy, and perfect for breakfast or snacks.",
       image: "images/download (1).jpg",
-      notice: "Fresh Pandesal batches are baked every morning.",
+      notice: "• A minimum order of 1 Dozen (12 pcs) Pandesal is required.<br>• For pickup or delivery before 10:00 AM, please place your order at least 1 day in advance.",
       options: `
-        <option value="15">20 pieces - $15.00</option>
-        <option value="8">10 pieces - $8.00</option>
-        <option value="4.5">5 pieces - $4.50</option>
+        <option value="9">1 Dozen (12 pieces) - $9.00</option>
+        <option value="18">2 Dozen (24 pieces) - $18.00</option>
+        <option value="27">3 Dozen (36 pieces) - $27.00</option>
+        <option value="36">4 Dozen (48 pieces) - $36.00</option>
+        <option value="45">5 Dozen (60 pieces) - $45.00</option>
       `
     }
   };
