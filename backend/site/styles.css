@@ -2885,3 +2885,31 @@ h1, h2, h3, h4 {
   .next-arrow { right: 5px; }
 }
 
+/* Product Tabs */
+.product-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 30px;
+}
+.product-tab {
+  background: #f1f5f9;
+  border: 2px solid transparent;
+  padding: 10px 24px;
+  border-radius: 50px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'DM Sans', sans-serif;
+}
+.product-tab:hover {
+  background: #e2e8f0;
+}
+.product-tab.active {
+  background: #fff;
+  border-color: var(--brand-red, #960909);
+  color: var(--brand-red, #960909);
+  box-shadow: 0 4px 12px rgba(150, 9, 9, 0.1);
+}

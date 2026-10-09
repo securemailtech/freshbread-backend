@@ -129,13 +129,85 @@ document.addEventListener("DOMContentLoaded", function() {
     hideOrderForm();
   }
 
-  // ========== ADD TO CART ==========
+    // ========== PRODUCT TABS LOGIC ==========
+  const productData = {
+    senorita: {
+      title: "Señorita Bread",
+      desc: "Our signature soft, sweet bread that's become a Stockton favorite. Perfect for any occasion.",
+      image: "images/download (1).jpg",
+      notice: "Large Orders (50+ pieces) require 30 minutes' prior notice.",
+      options: `
+        <option value="45">50 pieces - $45.00</option>
+        <option value="36">40 pieces - $36.00</option>
+        <option value="27">30 pieces - $27.00</option>
+        <option value="22.5">25 pieces - $22.50</option>
+        <option value="18">20 pieces - $18.00</option>
+        <option value="13.5">15 pieces - $13.50</option>
+        <option value="9">10 pieces - $9.00</option>
+        <option value="4.5">5 pieces - $4.50</option>
+      `
+    },
+    pandesal: {
+      title: "Pandesal Bread",
+      desc: "Classic Filipino bread rolls, baked fresh daily. Soft, fluffy, and perfect for breakfast or snacks.",
+      image: "images/pandesal-image.jpg", /* Apni Pandesal image ka path yahan daal do */
+      notice: "Fresh Pandesal batches are baked every morning.",
+      options: `
+        <option value="15">20 pieces - $15.00</option>
+        <option value="8">10 pieces - $8.00</option>
+        <option value="4.5">5 pieces - $4.50</option>
+      `
+    }
+  };
+
+  document.querySelectorAll('.product-tab').forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      // Tab active class toggle
+      document.querySelectorAll('.product-tab').forEach(function(t) { t.classList.remove('active'); });
+      this.classList.add('active');
+
+      // Get Data
+      const target = this.getAttribute('data-target');
+      const data = productData[target];
+
+      // Update HTML Elements
+      const titleEl = document.getElementById('dynamic-product-title');
+      const descEl = document.getElementById('dynamic-product-desc');
+      const imgEl = document.getElementById('dynamic-product-image');
+      const noticeEl = document.getElementById('dynamic-product-notice');
+      const selectEl = document.getElementById('quantity');
+      const addToCartBtn = document.getElementById('add-to-cart-btn');
+
+      if (titleEl) titleEl.textContent = data.title;
+      if (descEl) descEl.textContent = data.desc;
+      if (imgEl) imgEl.src = data.image;
+      if (noticeEl) noticeEl.textContent = data.notice;
+      
+      // Update Dropdown and Price
+      if (selectEl) {
+        selectEl.innerHTML = data.options;
+        const selectedPriceDisplay = document.getElementById('selected-price');
+        if (selectedPriceDisplay) selectedPriceDisplay.textContent = parseFloat(selectEl.value).toFixed(2);
+      }
+
+      // Update button data attribute so Cart knows which product it is
+      if (addToCartBtn) addToCartBtn.setAttribute('data-product-name', data.title);
+    });
+  });
+
+    // ========== ADD TO CART ==========
   if (addToCartBtn && quantitySelect) {
     addToCartBtn.addEventListener('click', function() {
       const quantityText = quantitySelect.options[quantitySelect.selectedIndex].text;
       const price = parseFloat(quantitySelect.value);
+      
+      // Yahan hum pata laga rahe hain ki konsa bread select hua hai
+      const productName = addToCartBtn.getAttribute('data-product-name') || 'Señorita Bread';
+      
+      // Cart me ab Bread ka Naam aur Quantity dono dikhenge
+      const finalItemText = productName + ' (' + quantityText + ')';
 
-      cart.push({ id: Date.now(), quantityText: quantityText, price: price });
+      cart.push({ id: Date.now(), quantityText: finalItemText, price: price });
       total += price;
       updateCartDisplay();
 
