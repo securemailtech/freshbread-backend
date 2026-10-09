@@ -353,10 +353,41 @@
         return;
       }
 
-      try {
+            try {
+        // Fetch current blog
         const response = await fetch('/api/blogs/' + encodeURIComponent(slug));
         if (!response.ok) throw new Error('Not found');
         const blog = await response.json();
+
+        // Fetch Related Articles
+        let relatedHtml = '';
+        try {
+          const allBlogsRes = await fetch('/api/blogs');
+          if(allBlogsRes.ok) {
+            const allBlogs = await allBlogsRes.json();
+            // Filter out current blog and get top 3
+            const related = allBlogs.filter(b => b.id !== blog.id).slice(0, 3);
+            
+            if(related.length > 0) {
+              relatedHtml = `
+                <div class="related-articles-section" style="margin-top: 60px; border-top: 2px solid var(--border-color); padding-top: 40px;">
+                  <h3 style="font-family: 'Playfair Display', serif; font-size: 28px; color: var(--heading-color); margin-bottom: 30px;">Related Articles</h3>
+                  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 24px;">
+                    ${related.map(r => `
+                      <a href="?slug=${r.slug}" style="text-decoration:none; color:inherit; background:var(--light-bg); border-radius:12px; overflow:hidden; border:1px solid var(--border-color); display:block; transition:0.3s;" onmouseover="this.style.borderColor='var(--brand-red)'" onmouseout="this.style.borderColor='var(--border-color)'">
+                        ${r.image_url ? `<img src="${r.image_url}" style="width:100%; height:160px; object-fit:cover;" alt="${r.title}">` : `<div style="width:100%; height:160px; background:#e2e8f0; display:flex; align-items:center; justify-content:center; color:#94a3b8;">No Image</div>`}
+                        <div style="padding: 20px;">
+                          <h4 style="font-family: 'DM Sans', sans-serif; margin:0 0 10px; font-size:16px; color:var(--heading-color); line-height:1.4; font-weight:700;">${r.title}</h4>
+                          <span style="color:var(--brand-red); font-size:14px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">Read Article →</span>
+                        </div>
+                      </a>
+                    `).join('')}
+                  </div>
+                </div>
+              `;
+            }
+          }
+        } catch(e) { console.log('Could not load related articles'); }
 
         // SEO Updates
         document.getElementById('post-title').textContent = blog.title + ' | Fresh Hot Bread';
@@ -366,18 +397,14 @@
           month: 'long', day: 'numeric', year: 'numeric'
         });
         
-        // Calculate rough reading time based on word count
         const wordCount = blog.content ? blog.content.replace(/<[^>]*>?/gm, '').split(' ').length : 0;
         const readTime = Math.max(1, Math.ceil(wordCount / 200));
 
-        // Generate HTML Structure
         let htmlContent = `
-          <!-- Burgundy Left-Aligned Hero -->
           <section class="post-hero-burgundy">
             <div class="post-hero-inner">
               <span class="hero-badge">Bakery News</span>
               <h1>${blog.title}</h1>
-              
               <div class="post-meta-row">
                 <span>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
@@ -387,20 +414,12 @@
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                   ${readTime} min read
                 </span>
-                <span>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                  Fresh Hot Bread
-                </span>
               </div>
-
               ${blog.excerpt ? `<p class="hero-excerpt">${blog.excerpt}</p>` : ''}
             </div>
           </section>
 
-          <!-- 2-Column Layout -->
           <div class="blog-layout-wrapper">
-            
-            <!-- Left: Main Content -->
             <div class="blog-main-content">
               ${blog.image_url ? `<img src="${blog.image_url}" alt="${blog.title}" class="post-featured-image">` : ''}
               
@@ -429,25 +448,23 @@
                   ${blog.sources.replace(/\n/g, '<br>')}
                 </div>
               ` : ''}
+
+              <!-- RELATED ARTICLES INJECTED HERE -->
+              ${relatedHtml}
+
             </div>
 
             <!-- Right: Sticky Sidebar -->
             <aside class="blog-sidebar">
-              
-              <!-- Contact Card -->
               <div class="sidebar-card">
                 <h4>Contact Us</h4>
                 <p class="contact-info-p">Tues-Sun 6AM-6PM, Mon Closed.<br>Call us to place a large order or ask a question.</p>
-                
                 <a href="tel:+12094207925" class="btn-sidebar-contact">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
                   209-420-7925
                 </a>
-                
                 <a href="mailto:freshhotbread@gmail.com" class="sidebar-email">freshhotbread@gmail.com</a>
               </div>
-
-              <!-- Related Resources Card -->
               <div class="sidebar-card">
                 <h4>Helpful Links</h4>
                 <ul class="related-links">
@@ -457,7 +474,6 @@
                   <li><a href="/blog">Read More Articles</a></li>
                 </ul>
               </div>
-
             </aside>
           </div>
         `;
