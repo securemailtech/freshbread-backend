@@ -97,36 +97,38 @@ async function restoreDatabaseFromCloudinary() {
                 parsed.orders.forEach(o => stmt.run(o.id, o.customer_name, o.customer_phone, o.customer_email || '', o.items, o.total, o.status || 'pending', o.notes || '', o.created_at || new Date().toISOString(), o.updated_at || new Date().toISOString()));
                 stmt.finalize();
               }
-              // Restore Images
-              if (parsed.images && parsed.images.length > 0) {
-                const stmt = database.prepare("INSERT OR REPLACE INTO site_images (id, key, filename, url, updated_at) VALUES (?, ?, ?, ?, ?)");
-                parsed.images.forEach(img => stmt.run(img.id, img.key, img.filename, img.url, img.updated_at || new Date().toISOString()));
-                stmt.finalize();
-              }
-              // Restore Blogs
-                           // Restore Blogs
+              // Restore Blogs (ALL SEO + EXTRA FIELDS)
               if (parsed.blogs && parsed.blogs.length > 0) {
-                // YAHAN PURE 15 COLUMNS HAIN
-                const stmt = database.prepare("INSERT OR REPLACE INTO blogs (id, title, slug, excerpt, content, image_url, quick_answer, sources, cta, meta_title, meta_description, schema_code, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-                
+                const stmt = database.prepare(`
+                  INSERT OR REPLACE INTO blogs (
+                    id, title, slug, excerpt, content, image_url,
+                    quick_answer, sources, cta,
+                    meta_title, meta_description, schema_code,
+                    status, created_at, updated_at
+                  ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                `);
+
                 parsed.blogs.forEach(b => {
                   stmt.run(
-                    b.id, b.title, b.slug, 
-                    b.excerpt || '', 
-                    b.content, 
-                    b.image_url || '', 
-                    b.quick_answer || '', 
-                    b.sources || '', 
-                    b.cta || '', 
-                    b.meta_title || '', 
-                    b.meta_description || '', 
-                    b.schema_code || '', 
-                    b.status || 'published', 
-                    b.created_at || new Date().toISOString(), 
+                    b.id,
+                    b.title || '',
+                    b.slug || '',
+                    b.excerpt || '',
+                    b.content || '',
+                    b.image_url || '',
+                    b.quick_answer || '',
+                    b.sources || '',
+                    b.cta || '',
+                    b.meta_title || '',
+                    b.meta_description || '',
+                    b.schema_code || '',
+                    b.status || 'published',
+                    b.created_at || new Date().toISOString(),
                     b.updated_at || new Date().toISOString()
                   );
                 });
                 stmt.finalize();
+                console.log(`Restored ${parsed.blogs.length} blogs WITH meta fields`);
               }
             });
             console.log(`SQLite Database restored from Cloudinary! (${parsed.orders ? parsed.orders.length : 0} orders, ${parsed.blogs ? parsed.blogs.length : 0} blogs loaded)`);
@@ -248,6 +250,7 @@ async function initializeDatabase() {
     });
   });
 
+  await new Promise(r => setTimeout(r, 800));
   // 2. Restore data from Cloudinary (if available)
   await restoreDatabaseFromCloudinary();
 

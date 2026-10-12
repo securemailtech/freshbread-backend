@@ -122,7 +122,7 @@ router.post('/', authenticateToken, (req, res) => {
     }
 
     if (typeof backupDatabaseToCloudinary === 'function') {
-      backupDatabaseToCloudinary();
+      setTimeout(() => backupDatabaseToCloudinary(), 500);
     }
 
     res.json({
