@@ -118,6 +118,7 @@ app.get('/', (req, res) => {
 });
 
 // ========== CLEAN BLOG URL + SERVER SIDE META INJECTION ==========
+// ========== CLEAN BLOG URL + SERVER SIDE META & SCHEMA INJECTION ==========
 app.get('/blog/:slug', async (req, res) => {
   try {
     const db = getDb();
@@ -136,29 +137,27 @@ app.get('/blog/:slug', async (req, res) => {
 
       let html = fs.readFileSync(filePath, 'utf8');
 
-      // Meta values
+      // 1. Meta Title (Prefers meta_title if available, else falls back to title)
       const metaTitle = (blog.meta_title && blog.meta_title.trim()) 
         ? blog.meta_title.trim() 
         : `${blog.title} | Fresh Hot Bread`;
       
+      // 2. Meta Description (Prefers meta_description if available, else falls back to excerpt)
       const metaDesc = (blog.meta_description && blog.meta_description.trim()) 
         ? blog.meta_description.trim() 
         : (blog.excerpt || blog.title || 'Fresh Hot Bread All Day');
 
-      // Replace title tag
-      html = html.replace(
-        /<title[^>]*>.*?<\/title>/i,
-        `<title>${metaTitle}</title>`
-      );
+      // Replace Title Tag
+      html = html.replace(/<title[^>]*>.*?<\/title>/i, `<title>${metaTitle}</title>`);
 
-      // Replace meta description tag
+      // Replace Meta Description Tag
       html = html.replace(
         /<meta\s+name="description"[^>]*>/i,
         `<meta name="description" id="post-meta-desc" content="${metaDesc.replace(/"/g, '&quot;')}">`
       );
 
-      // Open Graph tags add/inject
-      const ogTags = `
+      // Open Graph Tags
+      let headInject = `
   <meta property="og:title" content="${metaTitle.replace(/"/g, '&quot;')}">
   <meta property="og:description" content="${metaDesc.replace(/"/g, '&quot;')}">
   <meta property="og:type" content="article">
@@ -166,29 +165,22 @@ app.get('/blog/:slug', async (req, res) => {
   <meta property="og:url" content="https://freshhotbreadallday.com/blog/${blog.slug}">
 `;
 
-      html = html.replace('</head>', `${ogTags}\n</head>`);
-
-      // Schema inject (agar available hai)
+      // 3. Schema Code Inject (Clean up any accidentally pasted <script> tags)
       if (blog.schema_code && blog.schema_code.trim()) {
         let cleanSchema = blog.schema_code
           .replace(/<script[^>]*>/gi, '')
           .replace(/<\/script>/gi, '')
           .trim();
-        
-        try {
-          JSON.parse(cleanSchema); // Validate JSON
-          const schemaTag = `<script type="application/ld+json">${cleanSchema}</script>`;
-          html = html.replace('</head>', `${schemaTag}\n</head>`);
-        } catch (e) {
-          console.log('Invalid schema format, skipping schema injection');
+
+        if (cleanSchema) {
+          headInject += `\n<script type="application/ld+json">\n${cleanSchema}\n</script>`;
         }
       }
 
-      // Inject blog slug variable for frontend fallback script
-      html = html.replace(
-        '<body>',
-        `<body>\n<script>window.__BLOG_SLUG__ = "${blog.slug}";</script>`
-      );
+      html = html.replace('</head>', `${headInject}\n</head>`);
+
+      // Inject blog slug variable for frontend script fallback
+      html = html.replace('<body>', `<body>\n<script>window.__BLOG_SLUG__ = "${blog.slug}";</script>`);
 
       res.send(html);
     });

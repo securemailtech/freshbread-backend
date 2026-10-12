@@ -70,7 +70,7 @@ router.get('/:slugOrId', (req, res) => {
 });
 
 // ==========================================
-// 3. CREATE NEW BLOG POST (POST)
+// 3. CREATE NEW BLOG POST (POST - FIXED 12 PARAMS)
 // ==========================================
 router.post('/', authenticateToken, (req, res) => {
   const { 
@@ -134,10 +134,9 @@ router.post('/', authenticateToken, (req, res) => {
 });
 
 // ==========================================
-// 4. UPDATE EXISTING BLOG POST (PUT - FIXED!)
+// 4. UPDATE EXISTING BLOG POST (PUT - FIXED 12 PARAMS)
 // ==========================================
 router.put('/:id', authenticateToken, (req, res) => {
-  // FIXED: meta_title, meta_description, schema_code match destructured req.body
   const { 
     title, slug, excerpt, content, image_url, 
     quick_answer, sources, cta, status, 
@@ -182,7 +181,7 @@ router.put('/:id', authenticateToken, (req, res) => {
     }
 
     if (typeof backupDatabaseToCloudinary === 'function') {
-      backupDatabaseToCloudinary();
+      setTimeout(() => backupDatabaseToCloudinary(), 500);
     }
 
     res.json({ message: 'Blog updated successfully!' });
@@ -205,7 +204,7 @@ router.delete('/:id', authenticateToken, (req, res) => {
     }
 
     if (typeof backupDatabaseToCloudinary === 'function') {
-      backupDatabaseToCloudinary();
+      setTimeout(() => backupDatabaseToCloudinary(), 500);
     }
 
     res.json({ message: 'Blog deleted successfully!' });
