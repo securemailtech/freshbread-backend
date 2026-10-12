@@ -60,6 +60,12 @@ async function backupDatabaseToCloudinary() {
       invalidate: true
     });
     console.log(`Cloudinary Auto-Backup SUCCESS! (${orders.length} orders, ${content.length} content, ${(blogs || []).length} blogs backed up)`);
+    console.log('Backup blogs sample meta:', (blogs[0] && {
+    id: blogs[0].id,
+    meta_title: blogs[0].meta_title,
+    meta_description: blogs[0].meta_description,
+    has_schema: !!(blogs[0].schema_code)
+}));
   } catch (err) {
     console.error('DB Backup warning:', err.message);
   }
@@ -68,73 +74,112 @@ async function backupDatabaseToCloudinary() {
 // ==========================================
 // AUTO-RESTORE DATA FROM CLOUDINARY
 // ==========================================
+// ==========================================
+// AUTO-RESTORE DATA FROM CLOUDINARY (FIXED)
+// ==========================================
 async function restoreDatabaseFromCloudinary() {
   if (!process.env.CLOUDINARY_CLOUD_NAME) return false;
-  
+
   const backupUrl = `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/raw/upload/freshbread_data_backup.json?t=${Date.now()}`;
-  
+
   return new Promise((resolve) => {
     console.log('Checking for Database JSON backup on Cloudinary...');
     https.get(backupUrl, (res) => {
       let data = '';
       if (res.statusCode === 200) {
         res.on('data', chunk => data += chunk);
-        res.on('end', () => {
+        res.on('end', async () => {
           try {
             const parsed = JSON.parse(data);
             const database = getDb();
 
-            database.serialize(() => {
-              // Restore Content
-              if (parsed.content && parsed.content.length > 0) {
-                const stmt = database.prepare("INSERT OR REPLACE INTO site_content (id, key, value, updated_at) VALUES (?, ?, ?, ?)");
-                parsed.content.forEach(c => stmt.run(c.id, c.key, c.value, c.updated_at || new Date().toISOString()));
-                stmt.finalize();
-              }
-              // Restore Orders
-              if (parsed.orders && parsed.orders.length > 0) {
-                const stmt = database.prepare("INSERT OR REPLACE INTO orders (id, customer_name, customer_phone, customer_email, items, total, status, notes, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-                parsed.orders.forEach(o => stmt.run(o.id, o.customer_name, o.customer_phone, o.customer_email || '', o.items, o.total, o.status || 'pending', o.notes || '', o.created_at || new Date().toISOString(), o.updated_at || new Date().toISOString()));
-                stmt.finalize();
-              }
-              // Restore Blogs (ALL SEO + EXTRA FIELDS)
-              if (parsed.blogs && parsed.blogs.length > 0) {
-                const stmt = database.prepare(`
-                  INSERT OR REPLACE INTO blogs (
-                    id, title, slug, excerpt, content, image_url,
-                    quick_answer, sources, cta,
-                    meta_title, meta_description, schema_code,
-                    status, created_at, updated_at
-                  ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                `);
+            // Helper to run statement and WAIT
+            const runStmt = (sql, rows, mapFn) => {
+              return new Promise((res, rej) => {
+                if (!rows || rows.length === 0) return res();
+                const stmt = database.prepare(sql);
+                let pending = rows.length;
+                let hasError = null;
 
-                parsed.blogs.forEach(b => {
-                  stmt.run(
-                    b.id,
-                    b.title || '',
-                    b.slug || '',
-                    b.excerpt || '',
-                    b.content || '',
-                    b.image_url || '',
-                    b.quick_answer || '',
-                    b.sources || '',
-                    b.cta || '',
-                    b.meta_title || '',
-                    b.meta_description || '',
-                    b.schema_code || '',
-                    b.status || 'published',
-                    b.created_at || new Date().toISOString(),
-                    b.updated_at || new Date().toISOString()
-                  );
+                rows.forEach((row) => {
+                  const params = mapFn(row);
+                  stmt.run(params, (err) => {
+                    if (err && !hasError) hasError = err;
+                    pending--;
+                    if (pending === 0) {
+                      stmt.finalize(() => {
+                        if (hasError) rej(hasError);
+                        else res();
+                      });
+                    }
+                  });
                 });
-                stmt.finalize();
-                console.log(`Restored ${parsed.blogs.length} blogs WITH meta fields`);
-              }
-            });
-            console.log(`SQLite Database restored from Cloudinary! (${parsed.orders ? parsed.orders.length : 0} orders, ${parsed.blogs ? parsed.blogs.length : 0} blogs loaded)`);
+              });
+            };
+
+            // 1. Content
+            await runStmt(
+              "INSERT OR REPLACE INTO site_content (id, key, value, updated_at) VALUES (?, ?, ?, ?)",
+              parsed.content,
+              (c) => [c.id, c.key, c.value, c.updated_at || new Date().toISOString()]
+            );
+
+            // 2. Orders
+            await runStmt(
+              `INSERT OR REPLACE INTO orders
+              (id, customer_name, customer_phone, customer_email, items, total, status, notes, created_at, updated_at)
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+              parsed.orders,
+              (o) => [
+                o.id, o.customer_name, o.customer_phone, o.customer_email || '',
+                o.items, o.total, o.status || 'pending', o.notes || '',
+                o.created_at || new Date().toISOString(),
+                o.updated_at || new Date().toISOString()
+              ]
+            );
+
+            // 3. Images (if any)
+            if (parsed.images && parsed.images.length > 0) {
+              await runStmt(
+                `INSERT OR REPLACE INTO site_images (id, key, filename, url, updated_at)
+                 VALUES (?, ?, ?, ?, ?)`,
+                parsed.images,
+                (img) => [img.id, img.key, img.filename || '', img.url, img.updated_at || new Date().toISOString()]
+              );
+            }
+
+            // 4. Blogs — ALL SEO FIELDS
+            await runStmt(
+              `INSERT OR REPLACE INTO blogs (
+                id, title, slug, excerpt, content, image_url,
+                quick_answer, sources, cta,
+                meta_title, meta_description, schema_code,
+                status, created_at, updated_at
+              ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+              parsed.blogs,
+              (b) => [
+                b.id,
+                b.title || '',
+                b.slug || '',
+                b.excerpt || '',
+                b.content || '',
+                b.image_url || '',
+                b.quick_answer || '',
+                b.sources || '',
+                b.cta || '',
+                b.meta_title || '',
+                b.meta_description || '',
+                b.schema_code || '',
+                b.status || 'published',
+                b.created_at || new Date().toISOString(),
+                b.updated_at || new Date().toISOString()
+              ]
+            );
+
+            console.log(`SQLite Database restored from Cloudinary! (${(parsed.orders || []).length} orders, ${(parsed.blogs || []).length} blogs loaded)`);
             resolve(true);
           } catch (e) {
-            console.log('Failed to parse backup JSON:', e.message);
+            console.log('Failed to parse/restore backup JSON:', e.message);
             resolve(false);
           }
         });
