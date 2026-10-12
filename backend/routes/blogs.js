@@ -70,7 +70,7 @@ router.get('/:slugOrId', (req, res) => {
 });
 
 // ==========================================
-// 3. CREATE NEW BLOG POST (POST - FIXED 12 PARAMS)
+// 3. CREATE NEW BLOG POST (POST)
 // ==========================================
 router.post('/', authenticateToken, (req, res) => {
   const { 
@@ -92,7 +92,6 @@ router.post('/', authenticateToken, (req, res) => {
     .replace(/[\s_-]+/g, '-')
     .replace(/^-+|-+$/g, '');
 
-  // EXACTLY 12 COLUMNS & EXACTLY 12 PLACEHOLDERS (?)
   const query = `
     INSERT INTO blogs (title, slug, excerpt, content, image_url, quick_answer, sources, cta, status, meta_title, meta_description, schema_code)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -134,7 +133,7 @@ router.post('/', authenticateToken, (req, res) => {
 });
 
 // ==========================================
-// 4. UPDATE EXISTING BLOG POST (PUT - FIXED 12 PARAMS)
+// 4. UPDATE EXISTING BLOG POST (PUT)
 // ==========================================
 router.put('/:id', authenticateToken, (req, res) => {
   const { 
