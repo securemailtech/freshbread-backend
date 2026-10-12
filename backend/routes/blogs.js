@@ -70,9 +70,9 @@ router.get('/:slugOrId', (req, res) => {
 });
 
 // ==========================================
-// 3. CREATE NEW BLOG POST (POST)
+// 3. CREATE NEW BLOG POST (POST) - UPDATED WITH AWAIT
 // ==========================================
-router.post('/', authenticateToken, (req, res) => {
+router.post('/', authenticateToken, async (req, res) => {
   const { 
     title, slug, excerpt, content, image_url, 
     quick_answer, sources, cta, status, 
@@ -98,21 +98,12 @@ router.post('/', authenticateToken, (req, res) => {
   `;
 
   const params = [
-    title,
-    finalSlug,
-    excerpt || '',
-    content,
-    image_url || '',
-    quick_answer || '',
-    sources || '',
-    cta || '',
-    status || 'published',
-    meta_title || '',
-    meta_description || '',
-    schema_code || ''
+    title, finalSlug, excerpt || '', content, image_url || '',
+    quick_answer || '', sources || '', cta || '', status || 'published',
+    meta_title || '', meta_description || '', schema_code || ''
   ];
 
-  db.run(query, params, function (err) {
+  db.run(query, params, async function (err) {
     if (err) {
       if (err.message.includes('UNIQUE constraint failed')) {
         return res.status(400).json({ error: 'A blog with this title or slug already exists.' });
@@ -120,8 +111,9 @@ router.post('/', authenticateToken, (req, res) => {
       return res.status(500).json({ error: err.message });
     }
 
+    // 🔥 FIX: AWAIT added so backup completes before sending response
     if (typeof backupDatabaseToCloudinary === 'function') {
-      setTimeout(() => backupDatabaseToCloudinary(), 500);
+      await backupDatabaseToCloudinary();
     }
 
     res.json({
@@ -133,9 +125,9 @@ router.post('/', authenticateToken, (req, res) => {
 });
 
 // ==========================================
-// 4. UPDATE EXISTING BLOG POST (PUT)
+// 4. UPDATE EXISTING BLOG POST (PUT) - UPDATED WITH AWAIT
 // ==========================================
-router.put('/:id', authenticateToken, (req, res) => {
+router.put('/:id', authenticateToken, async (req, res) => {
   const { 
     title, slug, excerpt, content, image_url, 
     quick_answer, sources, cta, status, 
@@ -156,22 +148,12 @@ router.put('/:id', authenticateToken, (req, res) => {
   `;
 
   const params = [
-    title,
-    finalSlug,
-    excerpt || '',
-    content,
-    image_url || '',
-    quick_answer || '',
-    sources || '',
-    cta || '',
-    status || 'published',
-    meta_title || '',
-    meta_description || '',
-    schema_code || '',
-    id
+    title, finalSlug, excerpt || '', content, image_url || '',
+    quick_answer || '', sources || '', cta || '', status || 'published',
+    meta_title || '', meta_description || '', schema_code || '', id
   ];
 
-  db.run(query, params, function (err) {
+  db.run(query, params, async function (err) {
     if (err) {
       return res.status(500).json({ error: err.message });
     }
@@ -179,8 +161,9 @@ router.put('/:id', authenticateToken, (req, res) => {
       return res.status(404).json({ error: 'Blog not found' });
     }
 
+    // 🔥 FIX: AWAIT added here
     if (typeof backupDatabaseToCloudinary === 'function') {
-      setTimeout(() => backupDatabaseToCloudinary(), 500);
+      await backupDatabaseToCloudinary();
     }
 
     res.json({ message: 'Blog updated successfully!' });
@@ -188,13 +171,13 @@ router.put('/:id', authenticateToken, (req, res) => {
 });
 
 // ==========================================
-// 5. DELETE BLOG POST
+// 5. DELETE BLOG POST - UPDATED WITH AWAIT
 // ==========================================
-router.delete('/:id', authenticateToken, (req, res) => {
+router.delete('/:id', authenticateToken, async (req, res) => {
   const db = getDb();
   const id = req.params.id;
 
-  db.run("DELETE FROM blogs WHERE id = ?", [id], function (err) {
+  db.run("DELETE FROM blogs WHERE id = ?", [id], async function (err) {
     if (err) {
       return res.status(500).json({ error: err.message });
     }
@@ -202,8 +185,9 @@ router.delete('/:id', authenticateToken, (req, res) => {
       return res.status(404).json({ error: 'Blog not found' });
     }
 
+    // 🔥 FIX: AWAIT added here
     if (typeof backupDatabaseToCloudinary === 'function') {
-      setTimeout(() => backupDatabaseToCloudinary(), 500);
+      await backupDatabaseToCloudinary();
     }
 
     res.json({ message: 'Blog deleted successfully!' });

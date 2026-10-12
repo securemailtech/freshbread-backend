@@ -66,7 +66,7 @@ async function backupDatabaseToCloudinary() {
 }
 
 // ==========================================
-// AUTO-RESTORE DATA FROM CLOUDINARY (FIXED 15 COLUMNS)
+// AUTO-RESTORE DATA FROM CLOUDINARY
 // ==========================================
 async function restoreDatabaseFromCloudinary() {
   if (!process.env.CLOUDINARY_CLOUD_NAME) return false;
@@ -97,16 +97,17 @@ async function restoreDatabaseFromCloudinary() {
                 parsed.orders.forEach(o => stmt.run(o.id, o.customer_name, o.customer_phone, o.customer_email || '', o.items, o.total, o.status || 'pending', o.notes || '', o.created_at || new Date().toISOString(), o.updated_at || new Date().toISOString()));
                 stmt.finalize();
               }
-              // Restore Images
-              if (parsed.images && parsed.images.length > 0) {
-                const stmt = database.prepare("INSERT OR REPLACE INTO site_images (id, key, filename, url, updated_at) VALUES (?, ?, ?, ?, ?)");
-                parsed.images.forEach(img => stmt.run(img.id, img.key, img.filename, img.url, img.updated_at || new Date().toISOString()));
-                stmt.finalize();
-              }
-              // Restore Blogs (EXACT 15 COLUMNS - PRESERVES META TITLE, META DESC, SCHEMA)
+              // Restore Blogs (ALL SEO + EXTRA FIELDS)
               if (parsed.blogs && parsed.blogs.length > 0) {
-                const stmt = database.prepare("INSERT OR REPLACE INTO blogs (id, title, slug, excerpt, content, image_url, quick_answer, sources, cta, meta_title, meta_description, schema_code, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-                
+                const stmt = database.prepare(`
+                  INSERT OR REPLACE INTO blogs (
+                    id, title, slug, excerpt, content, image_url,
+                    quick_answer, sources, cta,
+                    meta_title, meta_description, schema_code,
+                    status, created_at, updated_at
+                  ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                `);
+
                 parsed.blogs.forEach(b => {
                   stmt.run(
                     b.id,
@@ -127,6 +128,7 @@ async function restoreDatabaseFromCloudinary() {
                   );
                 });
                 stmt.finalize();
+                console.log(`Restored ${parsed.blogs.length} blogs WITH meta fields`);
               }
             });
             console.log(`SQLite Database restored from Cloudinary! (${parsed.orders ? parsed.orders.length : 0} orders, ${parsed.blogs ? parsed.blogs.length : 0} blogs loaded)`);
@@ -153,8 +155,10 @@ async function restoreDatabaseFromCloudinary() {
 async function initializeDatabase() {
   const database = getDb();
 
-  await new Promise((resolve) => {
+  // 1. Create Tables First
+  await new Promise((resolve, reject) => {
     database.serialize(() => {
+      // (Baki tables admin_users, site_content, site_images, orders waise hi rahenge)
       database.run(`
         CREATE TABLE IF NOT EXISTS admin_users (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -191,7 +195,8 @@ async function initializeDatabase() {
         )
       `);
 
-      // BLOGS TABLE WITH ALL SEO COLUMNS
+      // NEW UPDATED BLOGS TABLE
+            // NEW UPDATED BLOGS TABLE (Added CTA)
       database.run(`
         CREATE TABLE IF NOT EXISTS blogs (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -212,16 +217,18 @@ async function initializeDatabase() {
         )
       `, (err) => {
         if (!err) {
+          // AUTO MIGRATION
           database.run(`ALTER TABLE blogs ADD COLUMN quick_answer TEXT`, () => {});
           database.run(`ALTER TABLE blogs ADD COLUMN sources TEXT`, () => {});
           database.run(`ALTER TABLE blogs ADD COLUMN cta TEXT`, () => {});
           database.run(`ALTER TABLE blogs ADD COLUMN meta_title TEXT`, () => {});
           database.run(`ALTER TABLE blogs ADD COLUMN meta_description TEXT`, () => {});
           database.run(`ALTER TABLE blogs ADD COLUMN schema_code TEXT`, () => {});
-          console.log('Blogs table ready and verified with all SEO columns.');
+          console.log('Blogs table ready and updated with CTA');
         }
       });
 
+      // Default Content Insertion... (Tumhara purana code)
       const defaultContent = [
         ['hero_title', 'Señorita'],
         ['hero_subtitle', 'Made Fresh Daily'],
@@ -243,9 +250,11 @@ async function initializeDatabase() {
     });
   });
 
-  // Restore data from Cloudinary
+  await new Promise(r => setTimeout(r, 800));
+  // 2. Restore data from Cloudinary (if available)
   await restoreDatabaseFromCloudinary();
 
+  // 3. Default Admin User Creation
   return new Promise((resolve) => {
     const adminUsername = process.env.ADMIN_USERNAME || 'admin';
     const adminPassword = process.env.ADMIN_PASSWORD || 'Blues@13';
