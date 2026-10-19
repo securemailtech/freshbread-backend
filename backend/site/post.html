@@ -414,10 +414,25 @@
     .post-content details>div {
       padding: 20px !important;
     }
-    a {
+   /* Sirf Blog Content ke andar wale links ke liye */
+.post-content a {
     color: #960909 !important;
     text-decoration: none !important;
     font-weight: bold !important;
+}
+
+.post-content a:hover {
+    text-decoration: underline !important;
+}
+
+/* CTA buttons aur Sidebar links ko isolate (safe) rakhne ke liye */
+.post-cta a,
+.cta-box a,
+.sidebar a,
+.btn a {
+    color: inherit;
+    text-decoration: none;
+    font-weight: normal;
 }
   </style>
 </head>
