@@ -770,3 +770,56 @@ document.addEventListener("DOMContentLoaded", function () {
   loadDynamicContent();
 
 });
+
+// Google Reviews Custom Slider Navigation
+document.addEventListener('DOMContentLoaded', () => {
+    const track = document.getElementById('grCardsTrack');
+    const prevBtn = document.getElementById('grPrevBtn');
+    const nextBtn = document.getElementById('grNextBtn');
+    const dotsWrapper = document.getElementById('grDotsWrapper');
+
+    if (!track || !prevBtn || !nextBtn || !dotsWrapper) return;
+
+    const cards = track.querySelectorAll('.gr-card');
+    
+    // Create pagination dots based on card steps
+    dotsWrapper.innerHTML = '';
+    cards.forEach((_, idx) => {
+        const dot = document.createElement('div');
+        dot.className = `gr-dot ${idx === 0 ? 'active' : ''}`;
+        dot.addEventListener('click', () => scrollToCard(idx));
+        dotsWrapper.appendChild(dot);
+    });
+
+    const dots = dotsWrapper.querySelectorAll('.gr-dot');
+
+    function updateDots() {
+        const scrollPos = track.scrollLeft;
+        const cardWidth = cards[0].offsetWidth + 20;
+        const activeIdx = Math.round(scrollPos / cardWidth);
+        
+        dots.forEach((dot, idx) => {
+            dot.classList.toggle('active', idx === activeIdx);
+        });
+    }
+
+    function scrollToCard(idx) {
+        const cardWidth = cards[0].offsetWidth + 20;
+        track.scrollTo({
+            left: idx * cardWidth,
+            behavior: 'smooth'
+        });
+    }
+
+    nextBtn.addEventListener('click', () => {
+        const cardWidth = cards[0].offsetWidth + 20;
+        track.scrollBy({ left: cardWidth, behavior: 'smooth' });
+    });
+
+    prevBtn.addEventListener('click', () => {
+        const cardWidth = cards[0].offsetWidth + 20;
+        track.scrollBy({ left: -cardWidth, behavior: 'smooth' });
+    });
+
+    track.addEventListener('scroll', updateDots);
+});

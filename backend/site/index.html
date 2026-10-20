@@ -450,57 +450,301 @@
     </div>
   </section>
 
-  <!-- Google Reviews (Elfsight Widget) -->
- <section id="testimonials" class="testimonials-section">
+  <!-- Google Reviews Section (Custom Elfsight-Style Slider with All 11 Reviews) -->
+<section id="testimonials" class="testimonials-section">
     <div class="container">
-        <div class="section-header">
+        <div class="section-header fade-in">
             <span class="section-tag">Google Reviews</span>
             <h2>What Our Customers Say</h2>
         </div>
-        
-        <div class="custom-reviews-grid">
-            <!-- Review 1 -->
-            <div class="review-card">
-                <div class="review-header">
-                    <img src="https://ui-avatars.com/api/?name=John+Doe&background=960909&color=fff" alt="User">
-                    <div>
-                        <h4>Windie Wells</h4>
-                        <div class="stars">⭐⭐⭐⭐⭐</div>
+
+        <div class="gr-widget-wrapper">
+            <!-- Top Google Rating Header -->
+            <div class="gr-header-card">
+                <div class="gr-header-left">
+                    <div class="gr-google-brand">
+                        <svg class="gr-google-icon" viewBox="0 0 24 24" width="32" height="32">
+                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                        </svg>
+                        <span class="gr-brand-title">Reviews</span>
+                    </div>
+                    <div class="gr-rating-info">
+                        <span class="gr-rating-num">5.0</span>
+                        <div class="gr-stars">
+                            <svg class="gr-star" viewBox="0 0 24 24"><path fill="#FFC107" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                            <svg class="gr-star" viewBox="0 0 24 24"><path fill="#FFC107" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                            <svg class="gr-star" viewBox="0 0 24 24"><path fill="#FFC107" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                            <svg class="gr-star" viewBox="0 0 24 24"><path fill="#FFC107" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                            <svg class="gr-star" viewBox="0 0 24 24"><path fill="#FFC107" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                        </div>
+                        <span class="gr-count">(64)</span>
                     </div>
                 </div>
-                <p>"Wish I didn’t crave this bread as much as I do- it’s addicting!! It’s always fresh and delicious. Hope this place stays open forever!!"</p>
-                <span class="review-date">1 month ago</span>
+                <a href="https://maps.google.com" target="_blank" rel="noopener" class="gr-review-btn">
+                    Review us on Google
+                </a>
             </div>
 
-            <!-- Review 2 -->
-            <div class="review-card">
-                <div class="review-header">
-                    <img src="https://ui-avatars.com/api/?name=Maria+S&background=960909&color=fff" alt="User">
-                    <div>
-                        <h4>Maria S.</h4>
-                        <div class="stars">⭐⭐⭐⭐⭐</div>
+            <!-- Slider Wrapper -->
+            <div class="gr-slider-container">
+                <button class="gr-nav-btn gr-prev-btn" id="grPrevBtn" aria-label="Previous review">
+                    <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+                </button>
+                <button class="gr-nav-btn gr-next-btn" id="grNextBtn" aria-label="Next review">
+                    <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+                </button>
+
+                <div class="gr-cards-track" id="grCardsTrack">
+                    <!-- Review 1: Windie Wells -->
+                    <div class="gr-card">
+                        <div class="gr-card-user">
+                            <div class="gr-avatar-wrapper">
+                                <span class="gr-avatar-initial" style="background-color: #8E24AA;">W</span>
+                                <span class="gr-avatar-g"><svg viewBox="0 0 24 24" width="10" height="10"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg></span>
+                            </div>
+                            <div class="gr-user-meta">
+                                <div class="gr-user-name">Windie Wells <svg class="gr-verified-icon" viewBox="0 0 24 24" width="14" height="14"><path fill="#1A73E8" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></div>
+                                <div class="gr-review-time">1 month ago</div>
+                            </div>
+                        </div>
+                        <div class="gr-card-stars">
+                            <svg class="gr-star" viewBox="0 0 24 24"><path fill="#FFC107" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                            <svg class="gr-star" viewBox="0 0 24 24"><path fill="#FFC107" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                            <svg class="gr-star" viewBox="0 0 24 24"><path fill="#FFC107" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                            <svg class="gr-star" viewBox="0 0 24 24"><path fill="#FFC107" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                            <svg class="gr-star" viewBox="0 0 24 24"><path fill="#FFC107" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                        </div>
+                        <p class="gr-card-text">Wish I didn’t crave this bread as much as I do- it’s addicting!! It’s always fresh and delicious. Hope this place stays open forever!!</p>
                     </div>
-                </div>
-                <p>"Love their Pandesal. It reminds me of home. Highly recommended!"</p>
-                <span class="review-date">1 week ago</span>
-            </div>
 
-            <!-- Review 3 -->
-            <div class="review-card">
-                <div class="review-header">
-                    <img src="https://ui-avatars.com/api/?name=Kevin+L&background=960909&color=fff" alt="User">
-                    <div>
-                        <h4>Kevin L.</h4>
-                        <div class="stars">⭐⭐⭐⭐⭐</div>
+                    <!-- Review 2: Lynnvill -->
+                    <div class="gr-card">
+                        <div class="gr-card-user">
+                            <div class="gr-avatar-wrapper">
+                                <span class="gr-avatar-initial" style="background-color: #00897B;">L</span>
+                                <span class="gr-avatar-g"><svg viewBox="0 0 24 24" width="10" height="10"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg></span>
+                            </div>
+                            <div class="gr-user-meta">
+                                <div class="gr-user-name">Lynnvill <svg class="gr-verified-icon" viewBox="0 0 24 24" width="14" height="14"><path fill="#1A73E8" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></div>
+                                <div class="gr-review-time">2 months ago</div>
+                            </div>
+                        </div>
+                        <div class="gr-card-stars">
+                            <svg class="gr-star" viewBox="0 0 24 24"><path fill="#FFC107" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                            <svg class="gr-star" viewBox="0 0 24 24"><path fill="#FFC107" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                            <svg class="gr-star" viewBox="0 0 24 24"><path fill="#FFC107" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                            <svg class="gr-star" viewBox="0 0 24 24"><path fill="#FFC107" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                            <svg class="gr-star" viewBox="0 0 24 24"><path fill="#FFC107" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                        </div>
+                        <p class="gr-card-text">Quick, easy, and easily the best place to get Spanish bread from. You can taste the quality every time and it’s a staple in Stockton CA.</p>
                     </div>
-                </div>
-                <p>"Quick service and the bread is incredibly soft. My kids love it."</p>
-                <span class="review-date">2 weeks ago</span>
-            </div>
-        </div>
 
-        <div style="text-align: center; margin-top: 30px;">
-            <a href="https://www.google.com/maps" target="_blank" class="btn" style="background:#4285F4; color:white;">Write a Review on Google</a>
+                    <!-- Review 3: Patty C -->
+                    <div class="gr-card">
+                        <div class="gr-card-user">
+                            <div class="gr-avatar-wrapper">
+                                <span class="gr-avatar-initial" style="background-color: #5C6BC0;">P</span>
+                                <span class="gr-avatar-g"><svg viewBox="0 0 24 24" width="10" height="10"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg></span>
+                            </div>
+                            <div class="gr-user-meta">
+                                <div class="gr-user-name">Patty C <svg class="gr-verified-icon" viewBox="0 0 24 24" width="14" height="14"><path fill="#1A73E8" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></div>
+                                <div class="gr-review-time">4 months ago</div>
+                            </div>
+                        </div>
+                        <div class="gr-card-stars">
+                            <svg class="gr-star" viewBox="0 0 24 24"><path fill="#FFC107" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                            <svg class="gr-star" viewBox="0 0 24 24"><path fill="#FFC107" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                            <svg class="gr-star" viewBox="0 0 24 24"><path fill="#FFC107" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                            <svg class="gr-star" viewBox="0 0 24 24"><path fill="#FFC107" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                            <svg class="gr-star" viewBox="0 0 24 24"><path fill="#FFC107" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                        </div>
+                        <p class="gr-card-text">This bread is soon good! It's fresh, soft and delicious ! It was my first time there and had to go back to buy more!</p>
+                    </div>
+
+                    <!-- Review 4: Juanita Raso -->
+                    <div class="gr-card">
+                        <div class="gr-card-user">
+                            <div class="gr-avatar-wrapper">
+                                <span class="gr-avatar-initial" style="background-color: #E53935;">J</span>
+                                <span class="gr-avatar-g"><svg viewBox="0 0 24 24" width="10" height="10"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg></span>
+                            </div>
+                            <div class="gr-user-meta">
+                                <div class="gr-user-name">Juanita Raso <svg class="gr-verified-icon" viewBox="0 0 24 24" width="14" height="14"><path fill="#1A73E8" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></div>
+                                <div class="gr-review-time">4 months ago</div>
+                            </div>
+                        </div>
+                        <div class="gr-card-stars">
+                            <svg class="gr-star" viewBox="0 0 24 24"><path fill="#FFC107" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                            <svg class="gr-star" viewBox="0 0 24 24"><path fill="#FFC107" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                            <svg class="gr-star" viewBox="0 0 24 24"><path fill="#FFC107" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                            <svg class="gr-star" viewBox="0 0 24 24"><path fill="#FFC107" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                            <svg class="gr-star" viewBox="0 0 24 24"><path fill="#FFC107" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                        </div>
+                        <p class="gr-card-text">Awsome bread.</p>
+                    </div>
+
+                    <!-- Review 5: Tefi -->
+                    <div class="gr-card">
+                        <div class="gr-card-user">
+                            <div class="gr-avatar-wrapper">
+                                <span class="gr-avatar-initial" style="background-color: #FB8C00;">T</span>
+                                <span class="gr-avatar-g"><svg viewBox="0 0 24 24" width="10" height="10"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg></span>
+                            </div>
+                            <div class="gr-user-meta">
+                                <div class="gr-user-name">Tefi <svg class="gr-verified-icon" viewBox="0 0 24 24" width="14" height="14"><path fill="#1A73E8" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></div>
+                                <div class="gr-review-time">5 months ago</div>
+                            </div>
+                        </div>
+                        <div class="gr-card-stars">
+                            <svg class="gr-star" viewBox="0 0 24 24"><path fill="#FFC107" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                            <svg class="gr-star" viewBox="0 0 24 24"><path fill="#FFC107" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                            <svg class="gr-star" viewBox="0 0 24 24"><path fill="#FFC107" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                            <svg class="gr-star" viewBox="0 0 24 24"><path fill="#FFC107" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                            <svg class="gr-star" viewBox="0 0 24 24"><path fill="#FFC107" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                        </div>
+                        <p class="gr-card-text">Bread is delicious and fresh!</p>
+                    </div>
+
+                    <!-- Review 6: Robert Bautista -->
+                    <div class="gr-card">
+                        <div class="gr-card-user">
+                            <div class="gr-avatar-wrapper">
+                                <span class="gr-avatar-initial" style="background-color: #3949AB;">R</span>
+                                <span class="gr-avatar-g"><svg viewBox="0 0 24 24" width="10" height="10"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg></span>
+                            </div>
+                            <div class="gr-user-meta">
+                                <div class="gr-user-name">Robert Bautista <svg class="gr-verified-icon" viewBox="0 0 24 24" width="14" height="14"><path fill="#1A73E8" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></div>
+                                <div class="gr-review-time">5 months ago</div>
+                            </div>
+                        </div>
+                        <div class="gr-card-stars">
+                            <svg class="gr-star" viewBox="0 0 24 24"><path fill="#FFC107" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                            <svg class="gr-star" viewBox="0 0 24 24"><path fill="#FFC107" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                            <svg class="gr-star" viewBox="0 0 24 24"><path fill="#FFC107" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                            <svg class="gr-star" viewBox="0 0 24 24"><path fill="#FFC107" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                            <svg class="gr-star" viewBox="0 0 24 24"><path fill="#FFC107" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                        </div>
+                        <p class="gr-card-text">Our favorite secret place to get hot señorita bread is out. Used to walk in get hot bread no wait. Now there can be a bit of a wait, but it's worth it. Good for the business though they need it.</p>
+                    </div>
+
+                    <!-- Review 7: Corinna Herber -->
+                    <div class="gr-card">
+                        <div class="gr-card-user">
+                            <div class="gr-avatar-wrapper">
+                                <span class="gr-avatar-initial" style="background-color: #D81B60;">C</span>
+                                <span class="gr-avatar-g"><svg viewBox="0 0 24 24" width="10" height="10"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg></span>
+                            </div>
+                            <div class="gr-user-meta">
+                                <div class="gr-user-name">Corinna Herber <svg class="gr-verified-icon" viewBox="0 0 24 24" width="14" height="14"><path fill="#1A73E8" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></div>
+                                <div class="gr-review-time">5 months ago</div>
+                            </div>
+                        </div>
+                        <div class="gr-card-stars">
+                            <svg class="gr-star" viewBox="0 0 24 24"><path fill="#FFC107" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                            <svg class="gr-star" viewBox="0 0 24 24"><path fill="#FFC107" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                            <svg class="gr-star" viewBox="0 0 24 24"><path fill="#FFC107" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                            <svg class="gr-star" viewBox="0 0 24 24"><path fill="#FFC107" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                            <svg class="gr-star" viewBox="0 0 24 24"><path fill="#FFC107" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                        </div>
+                        <p class="gr-card-text">Love the senorita bread, the prices are great, the service is great, I can order for myself or a large group</p>
+                    </div>
+
+                    <!-- Review 8: Natalie Groom -->
+                    <div class="gr-card">
+                        <div class="gr-card-user">
+                            <div class="gr-avatar-wrapper">
+                                <span class="gr-avatar-initial" style="background-color: #43A047;">N</span>
+                                <span class="gr-avatar-g"><svg viewBox="0 0 24 24" width="10" height="10"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg></span>
+                            </div>
+                            <div class="gr-user-meta">
+                                <div class="gr-user-name">Natalie Groom <svg class="gr-verified-icon" viewBox="0 0 24 24" width="14" height="14"><path fill="#1A73E8" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></div>
+                                <div class="gr-review-time">6 months ago</div>
+                            </div>
+                        </div>
+                        <div class="gr-card-stars">
+                            <svg class="gr-star" viewBox="0 0 24 24"><path fill="#FFC107" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                            <svg class="gr-star" viewBox="0 0 24 24"><path fill="#FFC107" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                            <svg class="gr-star" viewBox="0 0 24 24"><path fill="#FFC107" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                            <svg class="gr-star" viewBox="0 0 24 24"><path fill="#FFC107" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                            <svg class="gr-star" viewBox="0 0 24 24"><path fill="#FFC107" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                        </div>
+                        <p class="gr-card-text">I was staying at nearby hotel and stopped in for the fresh bread. It was indeed hot and delicious!</p>
+                    </div>
+
+                    <!-- Review 9: Sabrina Ahmed -->
+                    <div class="gr-card">
+                        <div class="gr-card-user">
+                            <div class="gr-avatar-wrapper">
+                                <span class="gr-avatar-initial" style="background-color: #1E88E5;">S</span>
+                                <span class="gr-avatar-g"><svg viewBox="0 0 24 24" width="10" height="10"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg></span>
+                            </div>
+                            <div class="gr-user-meta">
+                                <div class="gr-user-name">Sabrina Ahmed <svg class="gr-verified-icon" viewBox="0 0 24 24" width="14" height="14"><path fill="#1A73E8" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></div>
+                                <div class="gr-review-time">10 months ago</div>
+                            </div>
+                        </div>
+                        <div class="gr-card-stars">
+                            <svg class="gr-star" viewBox="0 0 24 24"><path fill="#FFC107" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                            <svg class="gr-star" viewBox="0 0 24 24"><path fill="#FFC107" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                            <svg class="gr-star" viewBox="0 0 24 24"><path fill="#FFC107" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                            <svg class="gr-star" viewBox="0 0 24 24"><path fill="#FFC107" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                            <svg class="gr-star" viewBox="0 0 24 24"><path fill="#FFC107" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                        </div>
+                        <p class="gr-card-text">Fresh, hot, delicious señorita bread, a fresh batch just took a few minutes to bake. Thank you!!</p>
+                    </div>
+
+                    <!-- Review 10: Faith R -->
+                    <div class="gr-card">
+                        <div class="gr-card-user">
+                            <div class="gr-avatar-wrapper">
+                                <span class="gr-avatar-initial" style="background-color: #8D6E63;">F</span>
+                                <span class="gr-avatar-g"><svg viewBox="0 0 24 24" width="10" height="10"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg></span>
+                            </div>
+                            <div class="gr-user-meta">
+                                <div class="gr-user-name">Faith R <svg class="gr-verified-icon" viewBox="0 0 24 24" width="14" height="14"><path fill="#1A73E8" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></div>
+                                <div class="gr-review-time">11 months ago</div>
+                            </div>
+                        </div>
+                        <div class="gr-card-stars">
+                            <svg class="gr-star" viewBox="0 0 24 24"><path fill="#FFC107" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                            <svg class="gr-star" viewBox="0 0 24 24"><path fill="#FFC107" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                            <svg class="gr-star" viewBox="0 0 24 24"><path fill="#FFC107" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                            <svg class="gr-star" viewBox="0 0 24 24"><path fill="#FFC107" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                            <svg class="gr-star" viewBox="0 0 24 24"><path fill="#FFC107" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                        </div>
+                        <p class="gr-card-text">The bread is so delicious, and soft. I definitely recommend Fresh Hot Bread All Day.</p>
+                    </div>
+
+                    <!-- Review 11: Angela Guidry -->
+                    <div class="gr-card">
+                        <div class="gr-card-user">
+                            <div class="gr-avatar-wrapper">
+                                <span class="gr-avatar-initial" style="background-color: #5E35B1;">A</span>
+                                <span class="gr-avatar-g"><svg viewBox="0 0 24 24" width="10" height="10"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg></span>
+                            </div>
+                            <div class="gr-user-meta">
+                                <div class="gr-user-name">Angela Guidry <svg class="gr-verified-icon" viewBox="0 0 24 24" width="14" height="14"><path fill="#1A73E8" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></div>
+                                <div class="gr-review-time">1 year ago</div>
+                            </div>
+                        </div>
+                        <div class="gr-card-stars">
+                            <svg class="gr-star" viewBox="0 0 24 24"><path fill="#FFC107" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                            <svg class="gr-star" viewBox="0 0 24 24"><path fill="#FFC107" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                            <svg class="gr-star" viewBox="0 0 24 24"><path fill="#FFC107" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                            <svg class="gr-star" viewBox="0 0 24 24"><path fill="#FFC107" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                            <svg class="gr-star" viewBox="0 0 24 24"><path fill="#FFC107" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                        </div>
+                        <p class="gr-card-text">Finally ordered, BOMB! I will be back for more real soon!!!!</p>
+                    </div>
+
+                </div>
+
+                <!-- Pagination Dots -->
+                <div class="gr-dots-wrapper" id="grDotsWrapper"></div>
+            </div>
         </div>
     </div>
 </section>
