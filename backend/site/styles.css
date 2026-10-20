@@ -2913,3 +2913,48 @@ h1, h2, h3, h4 {
   color: var(--brand-red, #960909);
   box-shadow: 0 4px 12px rgba(150, 9, 9, 0.1);
 }
+
+.custom-reviews-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 40px;
+}
+
+.review-card {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    border: 1px solid #eee;
+}
+
+.review-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.review-header img {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+}
+
+.review-header h4 {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.stars {
+    color: #ffb400;
+    font-size: 0.9rem;
+}
+
+.review-date {
+    display: block;
+    margin-top: 15px;
+    font-size: 0.8rem;
+    color: #888;
+}
