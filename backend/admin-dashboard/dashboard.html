@@ -935,6 +935,61 @@
       </div>
     </section>
 
+    <section class="content-section active" id="section-special">
+      <div class="section-header">
+        <h1>Special Offer</h1>
+        <p>Control the special offer badge on your website</p>
+      </div>
+      
+      <form id="special-form" class="edit-form">
+        <div class="form-card">
+          <h3>Show/Hide Special Offer</h3>
+          <div class="toggle-container">
+            <label class="toggle-label">
+              <input type="checkbox" id="special_enabled" name="special_enabled">
+              <span class="toggle-switch"></span>
+              <span class="toggle-text">Show Special Offer on Website</span>
+            </label>
+          </div>
+          <p class="form-hint" style="margin-top: 12px;">When disabled, the special offer badge will be hidden from your website.</p>
+        </div>
+        
+        <div class="form-card" id="special-settings" style="opacity: 0.5; pointer-events: none;">
+          <h3>Special of the Day Badge</h3>
+          <div class="special-preview">
+            <div class="preview-badge">
+              <span class="preview-label" id="preview-label">Special of the Day</span>
+              <span class="preview-discount" id="preview-discount">20% OFF </span>
+              <span class="preview-text" id="preview-text">TODAY </span>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="special_label">Top Label</label>
+              <input type="text" id="special_label" name="special_label" placeholder="e.g., Special of the Day">
+            </div>
+            <div class="form-group">
+              <label for="special_discount">Discount/Offer</label>
+              <input type="text" id="special_discount" name="special_discount" placeholder="e.g., 20% OFF">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="special_text">Bottom Text</label>
+            <input type="text" id="special_text" name="special_text" placeholder="e.g., TODAY">
+          </div>
+        </div>
+        
+        <div class="form-actions">
+          <button type="submit" class="save-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+            </svg>
+            Save Special Offer
+          </button>
+        </div>
+      </form>
+    </section>
+
     <!-- Contact Section -->
     <section class="content-section" id="section-contact">
       <div class="section-header">
