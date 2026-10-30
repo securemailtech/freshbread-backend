@@ -83,6 +83,7 @@ app.get('/api/health', (req, res) => {
   res.json({
     status: 'ok',
     message: 'Fresh Bread API is running',
+    nodeVersion: process.version,
     timestamp: new Date().toISOString(),
     features: {
       orders: true,
