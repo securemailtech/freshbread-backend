@@ -148,14 +148,14 @@ async function restoreDatabaseFromCloudinary() {
               );
             }
 
-            // 4. Blogs — ALL SEO FIELDS
+                        // 4. Blogs — ALL SEO FIELDS
             await runStmt(
               `INSERT OR REPLACE INTO blogs (
                 id, title, slug, excerpt, content, image_url,
                 quick_answer, sources, cta,
                 meta_title, meta_description, schema_code,
-                status, created_at, updated_at
-              ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                status, published_at, created_at, updated_at
+              ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
               parsed.blogs,
               (b) => [
                 b.id,
@@ -171,6 +171,7 @@ async function restoreDatabaseFromCloudinary() {
                 b.meta_description || '',
                 b.schema_code || '',
                 b.status || 'published',
+                b.published_at || b.created_at || new Date().toISOString(), // <-- YE LINE ADD HUI
                 b.created_at || new Date().toISOString(),
                 b.updated_at || new Date().toISOString()
               ]
@@ -242,6 +243,7 @@ async function initializeDatabase() {
 
       // NEW UPDATED BLOGS TABLE
             // NEW UPDATED BLOGS TABLE (Added CTA)
+            // NEW UPDATED BLOGS TABLE (Added CTA & published_at)
       database.run(`
         CREATE TABLE IF NOT EXISTS blogs (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -257,6 +259,7 @@ async function initializeDatabase() {
           meta_description TEXT,
           schema_code TEXT,
           status TEXT DEFAULT 'published',
+          published_at DATETIME,  -- <-- YE NAYA COLUMN HAI
           created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
           updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )
@@ -269,7 +272,8 @@ async function initializeDatabase() {
           database.run(`ALTER TABLE blogs ADD COLUMN meta_title TEXT`, () => {});
           database.run(`ALTER TABLE blogs ADD COLUMN meta_description TEXT`, () => {});
           database.run(`ALTER TABLE blogs ADD COLUMN schema_code TEXT`, () => {});
-          console.log('Blogs table ready and updated with CTA');
+          database.run(`ALTER TABLE blogs ADD COLUMN published_at DATETIME`, () => {}); // <-- YE LINE ADD KARO
+          console.log('Blogs table ready and updated with CTA and published_at');
         }
       });
 

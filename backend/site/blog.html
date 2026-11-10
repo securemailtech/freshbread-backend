@@ -317,7 +317,7 @@
         }
 
         container.innerHTML = blogs.map(blog => {
-          const date = new Date(blog.created_at).toLocaleDateString('en-US', { 
+          const date = new Date(blog.published_at || blog.created_at).toLocaleDateString('en-US', { 
             month: 'long', day: 'numeric', year: 'numeric' 
           });
           const imageUrl = blog.image_url || 'images/logo.jpg';

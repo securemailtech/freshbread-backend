@@ -977,7 +977,7 @@ async function loadAdminBlogs() {
           <span style="color:#64748b;font-size:13px;display:block;">/${escapeHtml(blog.slug)}</span>
         </div>
         <div style="display:flex;align-items:center;gap:12px;flex-shrink:0;">
-          <span style="color:#64748b;font-size:13px;white-space:nowrap;">${blog.created_at ? new Date(blog.created_at).toLocaleDateString() : ''}</span>
+          <span style="color:#64748b;font-size:13px;white-space:nowrap;">${(blog.published_at || blog.created_at) ? new Date(blog.published_at || blog.created_at).toLocaleDateString() : ''}</span>
           <span class="order-status ${blog.status === 'published' ? 'status-completed' : 'status-pending'}" style="margin:0;">${(blog.status || 'draft').toUpperCase()}</span>
           <button onclick="editBlog(${blog.id})" style="background:var(--blue);color:#fff;border:none;padding:8px 14px;border-radius:6px;font-weight:600;cursor:pointer;">Edit</button>
           <button onclick="deleteBlog(${blog.id})" style="background:var(--red);color:#fff;border:none;padding:8px 14px;border-radius:6px;font-weight:600;cursor:pointer;">Delete</button>

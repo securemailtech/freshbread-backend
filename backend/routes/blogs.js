@@ -63,14 +63,14 @@ router.get('/', async (req, res) => {
     const db = getDb();
     const status = req.query.status;
 
-    let query = "SELECT * FROM blogs ORDER BY created_at DESC";
+    let query = "SELECT * FROM blogs ORDER BY COALESCE(published_at, created_at) DESC";
     let params = [];
 
     if (status && status !== 'all') {
-      query = "SELECT * FROM blogs WHERE status = ? ORDER BY created_at DESC";
+      query = "SELECT * FROM blogs WHERE status = ? ORDER BY COALESCE(published_at, created_at) DESC";
       params = [status];
     } else if (!status) {
-      query = "SELECT * FROM blogs WHERE status = 'published' ORDER BY created_at DESC";
+      query = "SELECT * FROM blogs WHERE status = 'published' ORDER BY COALESCE(published_at, created_at) DESC";
     }
 
     const rows = await allAsync(db, query, params);
@@ -127,13 +127,18 @@ router.post('/', authenticateToken, async (req, res) => {
       .replace(/[\s_-]+/g, '-')
       .replace(/^-+|-+$/g, '');
 
+        const finalStatus = status || 'published';
+    
+    const publishedAt = finalStatus === 'published' ? new Date().toISOString() : null;
+
     const result = await runAsync(
       db,
       `INSERT INTO blogs (
         title, slug, excerpt, content, image_url,
         quick_answer, sources, cta, status,
-        meta_title, meta_description, schema_code
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        meta_title, meta_description, schema_code,
+        published_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         title,
         finalSlug,
@@ -143,10 +148,11 @@ router.post('/', authenticateToken, async (req, res) => {
         quick_answer || '',
         sources || '',
         cta || '',
-        status || 'published',
+        finalStatus,
         meta_title || '',
         meta_description || '',
-        schema_code || ''
+        schema_code || '',
+        publishedAt
       ]
     );
 
@@ -184,12 +190,36 @@ router.put('/:id', authenticateToken, async (req, res) => {
       ? slug.toLowerCase().trim().replace(/[^\w\s-]/g, '').replace(/[\s_-]+/g, '-')
       : (title || '').toLowerCase().trim().replace(/[^\w\s-]/g, '').replace(/[\s_-]+/g, '-');
 
+    const finalStatus = status || 'published';
+
+    // Pehle existing blog nikaalo — purana status aur published_at dekhne ke liye
+    const existing = await getAsync(db, 'SELECT status, published_at FROM blogs WHERE id = ?', [id]);
+    if (!existing) {
+      return res.status(404).json({ error: 'Blog not found' });
+    }
+
+    // published_at logic:
+    // 1. Agar ab published hai AUR pehle draft tha → naya time set karo
+    // 2. Agar ab published hai AUR pehle bhi published tha → purana published_at rehne do (ya naya chahiye to uncomment karo)
+    // 3. Agar draft hai → published_at null mat karo, purana rehne do (taaki history rahe)
+    let publishedAt = existing.published_at;
+
+    if (finalStatus === 'published') {
+      // Draft → Publish YA re-publish dono pe NAYI date
+      // (Tumhari original complaint yahi thi)
+      publishedAt = new Date().toISOString();
+
+      // Agar chahte ho ki sirf pehli baar publish pe date set ho, re-publish pe na badle:
+      // publishedAt = existing.published_at || new Date().toISOString();
+    }
+
     const result = await runAsync(
       db,
       `UPDATE blogs SET
         title = ?, slug = ?, excerpt = ?, content = ?, image_url = ?,
         quick_answer = ?, sources = ?, cta = ?, status = ?,
         meta_title = ?, meta_description = ?, schema_code = ?,
+        published_at = ?,
         updated_at = CURRENT_TIMESTAMP
       WHERE id = ?`,
       [
@@ -201,10 +231,11 @@ router.put('/:id', authenticateToken, async (req, res) => {
         quick_answer || '',
         sources || '',
         cta || '',
-        status || 'published',
+        finalStatus,
         meta_title || '',
         meta_description || '',
         schema_code || '',
+        publishedAt,
         id
       ]
     );
@@ -213,7 +244,6 @@ router.put('/:id', authenticateToken, async (req, res) => {
       return res.status(404).json({ error: 'Blog not found' });
     }
 
-    // DB write complete hone ke BAAD hi backup
     await backupDatabaseToCloudinary();
 
     res.json({ message: 'Blog updated successfully!' });
