@@ -3204,3 +3204,104 @@ h1, h2, h3, h4 {
     .gr-prev-btn { left: 0px; }
     .gr-next-btn { right: 0px; }
 }
+/* ===== Premium Yelp Button ===== */
+.yelp-wrap {
+  text-align: center;
+  margin: 48px 0 20px;
+}
+
+.yelp-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 14px 12px 12px;
+  background: linear-gradient(180deg, #ffffff 0%, #fbf7f4 100%);
+  border: 1px solid rgba(150, 9, 9, 0.12);
+  border-radius: 60px;
+  text-decoration: none;
+  font-family: 'DM Sans', sans-serif;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 12px 30px -10px rgba(150, 9, 9, 0.25);
+  overflow: hidden;
+  transition: transform .35s ease, box-shadow .35s ease, border-color .35s ease;
+}
+
+/* shine effect on hover */
+.yelp-btn::before {
+  content: "";
+  position: absolute;
+  top: 0; left: -120%;
+  width: 60%; height: 100%;
+  background: linear-gradient(120deg, transparent, rgba(255, 255, 255, .8), transparent);
+  transform: skewX(-20deg);
+  transition: left .7s ease;
+}
+
+.yelp-btn:hover {
+  transform: translateY(-4px);
+  border-color: rgba(211, 35, 35, 0.45);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05), 0 20px 40px -12px rgba(211, 35, 35, 0.4);
+}
+.yelp-btn:hover::before { left: 140%; }
+
+.yelp-btn:active { transform: translateY(-1px); }
+
+.yelp-btn:focus-visible {
+  outline: 3px solid rgba(211, 35, 35, 0.4);
+  outline-offset: 3px;
+}
+
+.yelp-badge {
+  flex-shrink: 0;
+  width: 52px; height: 52px;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #ff4b4b, #d32323 60%, #a81414);
+  box-shadow: 0 6px 14px -4px rgba(211, 35, 35, 0.6), inset 0 1px 0 rgba(255, 255, 255, .35);
+}
+
+.yelp-text {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  line-height: 1.25;
+}
+.yelp-text small {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: .4px;
+  color: #8a7f78;
+}
+.yelp-text strong {
+  font-size: 17px;
+  font-weight: 700;
+  color: #2d2e2f;
+}
+.yelp-text em {
+  font-style: normal;
+  color: #d32323;
+}
+
+.yelp-arrow {
+  flex-shrink: 0;
+  width: 38px; height: 38px;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  background: #fdeaea;
+  color: #d32323;
+  transition: background .3s ease, color .3s ease, transform .3s ease;
+}
+.yelp-btn:hover .yelp-arrow {
+  background: #d32323;
+  color: #fff;
+  transform: translateX(4px);
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .yelp-btn { gap: 12px; padding: 10px 12px 10px 10px; }
+  .yelp-badge { width: 44px; height: 44px; }
+  .yelp-text small { font-size: 11px; }
+  .yelp-text strong { font-size: 15px; }
+  .yelp-arrow { width: 34px; height: 34px; }
+}
